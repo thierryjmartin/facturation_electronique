@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class Facture(BaseModel):
 	facture_id: str
 	date: str
