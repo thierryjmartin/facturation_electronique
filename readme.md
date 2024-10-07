@@ -24,8 +24,7 @@ Ce SDK est conçu pour être extensible et compatible avec les différentes plat
    ```bash
    pip install -r requirements.txt
     ```
-
-3. Configuration
+## Configuration
 
 Vous devez fournir vos clés API et les URL des différentes plateformes dans un fichier de configuration ou via des variables d'environnement.
 
@@ -42,8 +41,8 @@ DPGF_API_KEY = 'votre-api-key-dpgf'
 # Autres configurations...
    ```
 
-4. Utilisation
-   1. Envoi d'une facture à Chorus Pro
+## Utilisation
+1. Envoi d'une facture à Chorus Pro
 
 Voici un exemple simple pour envoyer une facture à Chorus Pro.
    ```python
@@ -67,7 +66,7 @@ reponse = chorus_pro.envoyer_facture(facture)
 print(reponse)
    ```
 
-ii. Générer une facture au format Factur-X
+2. Générer une facture au format Factur-X
    
 ```python
 from facturation_electronique.utils.facturx import creer_facturx
@@ -87,3 +86,41 @@ facturx_pdf = creer_facturx(facture_data, pdf_path)
 
 print(f"Facture Factur-X générée: {facturx_pdf}")
    ```
+
+3. Récupérer le statut d'une facture sur DPGF
+
+```python
+from facturation_electronique.api.dpgf import DPGFAPI
+
+api_key = "votre-api-key-dpgf"
+dpgf = DPGFAPI(api_key)
+
+facture_id = "12345"
+statut = dpgf.obtenir_statut_facture(facture_id)
+print(statut)
+   ```
+
+## Gestion des erreurs
+La bibliothèque lève des exceptions personnalisées pour la gestion des erreurs spécifiques aux interactions avec les API de facturation. Voici un exemple :
+```python
+from facturation_electronique.exceptions import FacturationAPIError
+
+try:
+	reponse = chorus_pro.envoyer_facture(facture)
+except FacturationAPIError as e:
+	print(f"Erreur lors de l'envoi de la facture: {e}")
+   ```
+
+## Contribution
+Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes :
+
+    Clonez le dépôt.
+    Créez une branche pour votre fonctionnalité : git checkout -b nouvelle-fonctionnalité.
+    Faites vos modifications et testez-les.
+    Soumettez une pull request.
+
+## Licence
+Ce projet est sous licence MIT.
+
+## Auteur
+Developpé par Thierry Martin
