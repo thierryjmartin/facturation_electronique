@@ -10,5 +10,7 @@ CHORUS_PRO_SANDBOX_FACTURES_BASE_URL = 'https://sandbox-api.piste.gouv.fr/cpro/f
 CHORUS_PRO_LOGIN = "<LOGIN>"
 CHORUS_PRO_PASSWORD = "<PASSWORD>"
 
-DPGF_BASE_URL = 'https://dpgf-partenaire.fr/api'
-# Autres configurations (clés API, etc.)
+SAGE_BASE_URL = ''
+SAGE_SANDBOX_BASE_URL = ''
+SAGE_CLIENT_ID = "<SAGE_CLIENT_ID>"
+SAGE_CLIENT_SECRET = "<SAGE_CLIENT_SECRET>"
