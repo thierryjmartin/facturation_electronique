@@ -1,15 +1,23 @@
 import requests
+import base64
 from ..utils.http_client import HttpClient
-from ..config import CHORUS_PRO_BASE_URL, PISTE_SANDBOX_URL, PISTE_CLIENT_ID, PISTE_CLIENT_SECRET
+from ..config import *
 
 
 class ChorusProAPI:
-	def __init__(self):
+	def __init__(self, sandbox=True):
+		self.sandbox = sandbox
 		self.token = self.get_token()
-		self.client = HttpClient(base_url=CHORUS_PRO_BASE_URL, api_key=self.token)
+		url = CHORUS_PRO_FACTURES_BASE_URL
+		if self.sandbox:
+			url = CHORUS_PRO_SANDBOX_FACTURES_BASE_URL
+		self.client = HttpClient(base_url=url, api_key=self.token)
+		self.client.headers["cpro-account"] = self.cpro_account()
 
 	def get_token(self):
-		url = PISTE_SANDBOX_URL
+		url = PISTE_OAUTH_URL
+		if self.sandbox:
+			url = PISTE_SANDBOX_OAUTH_URL
 		headers = {
 			"content-type": "application/x-www-form-urlencoded"
 		}
@@ -23,6 +31,13 @@ class ChorusProAPI:
 		response.raise_for_status()
 		return response.json()['access_token']
 
+	@staticmethod
+	def cpro_account():
+		"""
+		Identifiant compte CPRO sous la forme 'login:password' encodé en base 64.
+		Exemple : 'bG9naW46cGFzc3dvcmQ='
+		"""
+		return base64.b64encode(bytes(f"{CHORUS_PRO_LOGIN}:{CHORUS_PRO_PASSWORD}", 'utf-8')).decode('utf-8')
 
 	def envoyer_facture(self, facture: dict) -> dict:
 		"""
@@ -30,7 +45,7 @@ class ChorusProAPI:
 		:param facture: dict contenant les informations de la facture
 		:return: dict avec la réponse de l'API
 		"""
-		response = self.client.post('/factures', json=facture)
+		response = self.client.post('/soumettre', json=facture)
 		return response.json()
 
 	def obtenir_statut_facture(self, facture_id: str) -> dict:
@@ -46,3 +61,81 @@ class ChorusProAPI:
 if __name__ == '__main__':
 	c = ChorusProAPI()
 	print(c.token)
+
+	exemple_facture = {
+						  "cadreDeFacturation": {
+							"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
+							"codeServiceValideur": "string",
+							"codeStructureValideur": "string"
+						  },
+						  "commentaire": "string",
+						  "dateFacture": "2024-10-08T11:30:23.463Z",
+						  "destinataire": {
+							"codeDestinataire": "string",
+							"codeServiceExecutant": "string"
+						  },
+						  "fournisseur": {
+							"codeCoordonneesBancairesFournisseur": 0,
+							"idFournisseur": 0,
+							"idServiceFournisseur": 0
+						  },
+						  "idUtilisateurCourant": 0,
+						  "lignePoste": [
+							{
+							  "lignePosteDenomination": "string",
+							  "lignePosteMontantRemiseHT": 0,
+							  "lignePosteMontantUnitaireHT": 0,
+							  "lignePosteNumero": 0,
+							  "lignePosteQuantite": 0,
+							  "lignePosteReference": "string",
+							  "lignePosteTauxTva": "string",
+							  "lignePosteTauxTvaManuel": 0,
+							  "lignePosteUnite": "string"
+							}
+						  ],
+						  "ligneTva": [
+							{
+							  "ligneTvaMontantBaseHtParTaux": 0,
+							  "ligneTvaMontantTvaParTaux": 0,
+							  "ligneTvaTaux": "string",
+							  "ligneTvaTauxManuel": 0
+							}
+						  ],
+						  "modeDepot": "SAISIE_API",
+						  "montantTotal": {
+							"montantAPayer": 0,
+							"montantHtTotal": 0,
+							"montantRemiseGlobaleTTC": 0,
+							"montantTVA": 0,
+							"montantTtcTotal": 0,
+							"motifRemiseGlobaleTTC": "string"
+						  },
+						  "numeroFactureSaisi": "string",
+						  "pieceJointeComplementaire": [
+							{
+							  "pieceJointeComplementaireDesignation": "string",
+							  "pieceJointeComplementaireId": 0,
+							  "pieceJointeComplementaireIdLiaison": 0,
+							  "pieceJointeComplementaireNumeroLigneFacture": 0,
+							  "pieceJointeComplementaireType": "string"
+							}
+						  ],
+						  "pieceJointePrincipale": [
+							{
+							  "pieceJointePrincipaleDesignation": "string",
+							  "pieceJointePrincipaleId": 0
+							}
+						  ],
+						  "references": {
+							"deviseFacture": "string",
+							"modePaiement": "CHEQUE",
+							"motifExonerationTva": "string",
+							"numeroBonCommande": "string",
+							"numeroFactureOrigine": "string",
+							"numeroMarche": "string",
+							"typeFacture": "AVOIR",
+							"typeTva": "TVA_SUR_DEBIT"
+						  }
+						}
+
+	c.envoyer_facture(exemple_facture)
