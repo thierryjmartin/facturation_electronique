@@ -1,11 +1,29 @@
 import requests
 from ..utils.http_client import HttpClient
-from ..config import CHORUS_PRO_BASE_URL
+from ..config import CHORUS_PRO_BASE_URL, PISTE_SANDBOX_URL, PISTE_CLIENT_ID, PISTE_CLIENT_SECRET
 
 
 class ChorusProAPI:
 	def __init__(self, api_key: str):
 		self.client = HttpClient(base_url=CHORUS_PRO_BASE_URL, api_key=api_key)
+		self.token = self.get_token()
+
+	def get_token(self):
+		url = PISTE_SANDBOX_URL
+		headers = {
+			"content-type": "application/x-www-form-urlencoded"
+		}
+		data = {
+			"grant_type": "client_credentials",
+
+			"scope": "openid"
+		}
+		response = requests.post(url, headers=headers, data=data, verify=False)
+
+		# Afficher la réponse
+		print(response.json())
+		return response.json()
+
 
 	def envoyer_facture(self, facture: dict) -> dict:
 		"""
