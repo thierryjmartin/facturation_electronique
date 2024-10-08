@@ -4,9 +4,9 @@ from ..config import CHORUS_PRO_BASE_URL, PISTE_SANDBOX_URL, PISTE_CLIENT_ID, PI
 
 
 class ChorusProAPI:
-	def __init__(self, api_key: str):
-		self.client = HttpClient(base_url=CHORUS_PRO_BASE_URL, api_key=api_key)
+	def __init__(self):
 		self.token = self.get_token()
+		self.client = HttpClient(base_url=CHORUS_PRO_BASE_URL, api_key=self.token)
 
 	def get_token(self):
 		url = PISTE_SANDBOX_URL
@@ -15,14 +15,13 @@ class ChorusProAPI:
 		}
 		data = {
 			"grant_type": "client_credentials",
-
+			"client_id": PISTE_CLIENT_ID,
+			"client_secret": PISTE_CLIENT_SECRET,
 			"scope": "openid"
 		}
 		response = requests.post(url, headers=headers, data=data, verify=False)
-
-		# Afficher la réponse
-		print(response.json())
-		return response.json()
+		response.raise_for_status()
+		return response.json()['access_token']
 
 
 	def envoyer_facture(self, facture: dict) -> dict:
@@ -42,3 +41,8 @@ class ChorusProAPI:
 		"""
 		response = self.client.get(f'/factures/{facture_id}/statut')
 		return response.json()
+
+
+if __name__ == '__main__':
+	c = ChorusProAPI()
+	print(c.token)

@@ -30,6 +30,9 @@ Vous devez fournir vos clés API et les URL des différentes plateformes dans un
 
 Exemple d'un fichier config.py :
    ```python
+from .template_config import *
+
+
 # Configuration API Chorus Pro
 CHORUS_PRO_BASE_URL = 'https://chorus-pro.gouv.fr/api'
 CHORUS_PRO_API_KEY = 'votre-api-key-chorus-pro'
@@ -46,7 +49,7 @@ DPGF_API_KEY = 'votre-api-key-dpgf'
 
 Voici un exemple simple pour envoyer une facture à Chorus Pro.
    ```python
-from facturation_electronique.api.chorus_pro import ChorusProAPI
+from facture_electronique.api.chorus_pro import ChorusProAPI
 
 api_key = "votre-api-key-chorus-pro"
 chorus_pro = ChorusProAPI(api_key)
@@ -69,7 +72,7 @@ print(reponse)
 2. Générer une facture au format Factur-X
    
 ```python
-from facturation_electronique.utils.facturx import creer_facturx
+from facture_electronique.utils.facturx import creer_facturx
 
 facture_data = {
 	"facture_id": "INV-2023-001",
@@ -90,7 +93,7 @@ print(f"Facture Factur-X générée: {facturx_pdf}")
 3. Récupérer le statut d'une facture sur DPGF
 
 ```python
-from facturation_electronique.api.dpgf import DPGFAPI
+from facture_electronique.api.dpgf import DPGFAPI
 
 api_key = "votre-api-key-dpgf"
 dpgf = DPGFAPI(api_key)
@@ -103,7 +106,7 @@ print(statut)
 ## Gestion des erreurs
 La bibliothèque lève des exceptions personnalisées pour la gestion des erreurs spécifiques aux interactions avec les API de facturation. Voici un exemple :
 ```python
-from facturation_electronique.exceptions import FacturationAPIError
+from facture_electronique.exceptions import FacturationAPIError
 
 try:
 	reponse = chorus_pro.envoyer_facture(facture)
