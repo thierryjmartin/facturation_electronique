@@ -5,9 +5,12 @@ from ..config import *
 class SAGEAPI:
 	def __init__(self,
 				 sandbox: bool=True,
-
+				 client_id: str='',
+				 client_secret: str='',
 				 ):
 		self.sandbox = sandbox
+		self.client_id = client_id or SAGE_CLIENT_ID
+		self.client_secret = client_secret or SAGE_CLIENT_SECRET
 		self.base_url = SAGE_BASE_URL
 		if self.sandbox:
 			self.base_url = SAGE_SANDBOX_BASE_URL
