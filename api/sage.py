@@ -3,7 +3,10 @@ from ..config import *
 
 
 class SAGEAPI:
-	def __init__(self, sandbox=True):
+	def __init__(self,
+				 sandbox: bool=True,
+
+				 ):
 		self.sandbox = sandbox
 		self.base_url = SAGE_BASE_URL
 		if self.sandbox:

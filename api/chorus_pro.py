@@ -5,8 +5,19 @@ from ..config import *
 
 
 class ChorusProAPI:
-	def __init__(self, sandbox=True):
+	def __init__(self,
+				 sandbox: bool=True,
+				 piste_client_id: str = '',
+				 piste_client_secret: str = '',
+				 cpro_login: str = '',
+				 cpro_password: str = '',
+				 ):
 		self.sandbox = sandbox
+		self.piste_client_id = piste_client_id or PISTE_CLIENT_ID
+		self.piste_client_secret = piste_client_secret or PISTE_CLIENT_SECRET
+		self.cpro_login = cpro_login or CHORUS_PRO_LOGIN
+		self.cpro_password = cpro_password or CHORUS_PRO_PASSWORD
+
 		self.token = self.get_token()
 		url = CHORUS_PRO_FACTURES_BASE_URL
 		if self.sandbox:
@@ -23,21 +34,20 @@ class ChorusProAPI:
 		}
 		data = {
 			"grant_type": "client_credentials",
-			"client_id": PISTE_CLIENT_ID,
-			"client_secret": PISTE_CLIENT_SECRET,
+			"client_id": self.piste_client_id,
+			"client_secret": self.piste_client_secret,
 			"scope": "openid"
 		}
 		response = requests.post(url, headers=headers, data=data, verify=False)
 		response.raise_for_status()
 		return response.json()['access_token']
 
-	@staticmethod
-	def cpro_account():
+	def cpro_account(self):
 		"""
 		Identifiant compte CPRO sous la forme 'login:password' encodé en base 64.
 		Exemple : 'bG9naW46cGFzc3dvcmQ='
 		"""
-		return base64.b64encode(bytes(f"{CHORUS_PRO_LOGIN}:{CHORUS_PRO_PASSWORD}", 'utf-8')).decode('utf-8')
+		return base64.b64encode(bytes(f"{self.cpro_login}:{self.cpro_password}", 'utf-8')).decode('utf-8')
 
 	def envoyer_facture(self, facture: dict) -> dict:
 		"""
