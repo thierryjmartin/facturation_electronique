@@ -6,7 +6,7 @@ class HttpClient:
 		self.base_url = base_url
 		self.headers = {
 			'Authorization': f'Bearer {api_key}',
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json; charset=UTF-8'
 		}
 
 	def get(self, endpoint: str, params=None):
@@ -23,6 +23,9 @@ class HttpClient:
 		Effectuer une requête POST
 		"""
 		url = f"{self.base_url}{endpoint}"
-		response = requests.post(url, headers=self.headers, json=json)
+		print(self.headers)
+		response = requests.post(url, headers=self.headers, json=json, verify=False)
+		print(response.status_code)
+		print(response.text)
 		response.raise_for_status()
 		return response
