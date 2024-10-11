@@ -55,7 +55,7 @@ class ChorusProAPI:
 		:param facture: dict contenant les informations de la facture
 		:return: dict avec la réponse de l'API
 		"""
-		response = self.client.post('/soumettre', json=facture)
+		response = self.client.post('/factures/v1/soumettre', json=facture)
 		return response.json()
 
 	def obtenir_statut_facture(self, facture_id: str) -> dict:
@@ -67,99 +67,110 @@ class ChorusProAPI:
 		response = self.client.get(f'/factures/{facture_id}/statut')
 		return response.json()
 
+	def consulter_structure(self, id_structure: int) -> dict:
+		reponse = self.client.post('/structures/v1/consulter', json={'codeLangue': 'fr', 'idStructureCPP': id_structure})
+		return reponse.json()
+
+	def rechercher_structure(self, payload) -> dict:
+		reponse = self.client.post('/structures/v1/rechercher', json=payload)
+		return reponse.json()
+
 
 if __name__ == '__main__':
 	c = ChorusProAPI()
 	print(c.token)
 
-	exemple_facture = {
-						  "cadreDeFacturation": {
-							"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
-							"codeServiceValideur": "string",
-							"codeStructureValideur": "string"
-						  },
-						  "commentaire": "string",
-						  "dateFacture": "2024-10-08T11:30:23.463Z",
-						  "destinataire": {
-							"codeDestinataire": "string",
-							"codeServiceExecutant": "string"
-						  },
-						  "fournisseur": {
-							"codeCoordonneesBancairesFournisseur": 0,
-							"idFournisseur": 0,
-							"idServiceFournisseur": 0
-						  },
-						  "idUtilisateurCourant": 0,
-						  "lignePoste": [
-							{
-							  "lignePosteDenomination": "string",
-							  "lignePosteMontantRemiseHT": 0,
-							  "lignePosteMontantUnitaireHT": 0,
-							  "lignePosteNumero": 0,
-							  "lignePosteQuantite": 0,
-							  "lignePosteReference": "string",
-							  "lignePosteTauxTva": "string",
-							  "lignePosteTauxTvaManuel": 0,
-							  "lignePosteUnite": "string"
-							}
-						  ],
-						  "ligneTva": [
-							{
-							  "ligneTvaMontantBaseHtParTaux": 0,
-							  "ligneTvaMontantTvaParTaux": 0,
-							  "ligneTvaTaux": "string",
-							  "ligneTvaTauxManuel": 0
-							}
-						  ],
-						  "modeDepot": "SAISIE_API",
-						  "montantTotal": {
-							"montantAPayer": 0,
-							"montantHtTotal": 0,
-							"montantRemiseGlobaleTTC": 0,
-							"montantTVA": 0,
-							"montantTtcTotal": 0,
-							"motifRemiseGlobaleTTC": "string"
-						  },
-						  "numeroFactureSaisi": "string",
-						  "pieceJointeComplementaire": [
-							{
-							  "pieceJointeComplementaireDesignation": "string",
-							  "pieceJointeComplementaireId": 0,
-							  "pieceJointeComplementaireIdLiaison": 0,
-							  "pieceJointeComplementaireNumeroLigneFacture": 0,
-							  "pieceJointeComplementaireType": "string"
-							}
-						  ],
-						  "pieceJointePrincipale": [
-							{
-							  "pieceJointePrincipaleDesignation": "string",
-							  "pieceJointePrincipaleId": 0
-							}
-						  ],
-						  "references": {
-							"deviseFacture": "string",
-							"modePaiement": "CHEQUE",
-							"motifExonerationTva": "string",
-							"numeroBonCommande": "string",
-							"numeroFactureOrigine": "string",
-							"numeroMarche": "string",
-							"typeFacture": "AVOIR",
-							"typeTva": "TVA_SUR_DEBIT"
-						  }
-						}
+	# exemple_facture = {
+	# 					  "cadreDeFacturation": {
+	# 						"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
+	# 						"codeServiceValideur": "string",
+	# 						"codeStructureValideur": "string"
+	# 					  },
+	# 					  "commentaire": "string",
+	# 					  "dateFacture": "2024-10-08T11:30:23.463Z",
+	# 					  "destinataire": {
+	# 						"codeDestinataire": "string",
+	# 						"codeServiceExecutant": "string"
+	# 					  },
+	# 					  "fournisseur": {
+	# 						"codeCoordonneesBancairesFournisseur": 0,
+	# 						"idFournisseur": "26073617692140",
+	# 						"idServiceFournisseur": "SERVICE_PRIVE_1_26073617692140",
+	# 					  },
+	# 					  "idUtilisateurCourant": 0,
+	# 					  "lignePoste": [
+	# 						{
+	# 						  "lignePosteDenomination": "string",
+	# 						  "lignePosteMontantRemiseHT": 0,
+	# 						  "lignePosteMontantUnitaireHT": 0,
+	# 						  "lignePosteNumero": 0,
+	# 						  "lignePosteQuantite": 0,
+	# 						  "lignePosteReference": "string",
+	# 						  "lignePosteTauxTva": "string",
+	# 						  "lignePosteTauxTvaManuel": 0,
+	# 						  "lignePosteUnite": "string"
+	# 						}
+	# 					  ],
+	# 					  "ligneTva": [
+	# 						{
+	# 						  "ligneTvaMontantBaseHtParTaux": 0,
+	# 						  "ligneTvaMontantTvaParTaux": 0,
+	# 						  "ligneTvaTaux": "string",
+	# 						  "ligneTvaTauxManuel": 0
+	# 						}
+	# 					  ],
+	# 					  "modeDepot": "SAISIE_API",
+	# 					  "montantTotal": {
+	# 						"montantAPayer": 0,
+	# 						"montantHtTotal": 0,
+	# 						"montantRemiseGlobaleTTC": 0,
+	# 						"montantTVA": 0,
+	# 						"montantTtcTotal": 0,
+	# 						"motifRemiseGlobaleTTC": "string"
+	# 					  },
+	# 					  "numeroFactureSaisi": "string",
+	# 					  "pieceJointeComplementaire": [
+	# 						{
+	# 						  "pieceJointeComplementaireDesignation": "string",
+	# 						  "pieceJointeComplementaireId": 0,
+	# 						  "pieceJointeComplementaireIdLiaison": 0,
+	# 						  "pieceJointeComplementaireNumeroLigneFacture": 0,
+	# 						  "pieceJointeComplementaireType": "string"
+	# 						}
+	# 					  ],
+	# 					  "pieceJointePrincipale": [
+	# 						{
+	# 						  "pieceJointePrincipaleDesignation": "string",
+	# 						  "pieceJointePrincipaleId": 0
+	# 						}
+	# 					  ],
+	# 					  "references": {
+	# 						"deviseFacture": "string",
+	# 						"modePaiement": "CHEQUE",
+	# 						"motifExonerationTva": "string",
+	# 						"numeroBonCommande": "string",
+	# 						"numeroFactureOrigine": "string",
+	# 						"numeroMarche": "string",
+	# 						"typeFacture": "AVOIR",
+	# 						"typeTva": "TVA_SUR_DEBIT"
+	# 					  }
+	# 					}
 
 	exemple_facture = {
 		"modeDepot": "SAISIE_API",
 		"numeroFactureSaisi": None,
 
 		"destinataire": {
-			"codeDestinataire": "22460001500511",
-			"codeServiceExecutant": "DIRINFRA"
+			"codeDestinataire": "99986401570264", # SIRET  trouvé via une recherche...
+			#"codeServiceExecutant": "DIRINFRA"
 		},
 		"fournisseur": {
-			"idFournisseur": 160,
-			"idServiceFournisseur": 436,
-			"codeCoordonneesBancairesFournisseur": 132
+			# j'ai retrouvé ce code en faisant une recherche de fournisseur..., j'aurais pu chercher par siret ?
+			# le SIRET de mon fournisseur 26073617692140
+			"idFournisseur": 26300989,
+			#"typeIdentifiantFournisseur": "SIRET",
+		#	"idServiceFournisseur": 26073617692140,
+		#	"codeCoordonneesBancairesFournisseur": 132
 		},
 		"cadreDeFacturation": {
 			"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
@@ -253,3 +264,32 @@ if __name__ == '__main__':
 	}
 
 	c.envoyer_facture(exemple_facture)
+	c.consulter_structure(26300989)
+	#c.consulter_structure(1)
+
+	payload={
+			  "parametres": {
+				"nbResultatsParPage": 10,
+				"pageResultatDemandee": 1,
+				"triColonne": "IdentifiantStructure",
+				"triSens": "Descendant"
+			  },
+			  "restreindreStructuresPrivees": False,
+			  "structure": {
+				#"adresseCodePays": "string",
+				#"adresseCodePostal": "string",
+				#"adresseVille": "string",
+				#"estMOA": true,
+				#"estMOAUniquement": true,
+				"identifiantStructure": "26073617692140",
+				#"libelleStructure": "string",
+				#"nomStructure": "string",
+				#"prenomStructure": "string",
+				#"raisonSocialeStructure": "string",
+				#"statutStructure": "ACTIF",
+				"typeIdentifiantStructure": "SIRET",
+				#"typeStructure": "PUBLIQUE"
+			  }
+			}
+
+	c.rechercher_structure(payload)
