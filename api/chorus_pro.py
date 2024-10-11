@@ -148,4 +148,108 @@ if __name__ == '__main__':
 						  }
 						}
 
+	exemple_facture = {
+		"modeDepot": "SAISIE_API",
+		"numeroFactureSaisi": None,
+
+		"destinataire": {
+			"codeDestinataire": "22460001500511",
+			"codeServiceExecutant": "DIRINFRA"
+		},
+		"fournisseur": {
+			"idFournisseur": 160,
+			"idServiceFournisseur": 436,
+			"codeCoordonneesBancairesFournisseur": 132
+		},
+		"cadreDeFacturation": {
+			"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
+			"codeStructureValideur": None
+		},
+		"references": {
+			"deviseFacture": "EUR",
+			"typeFacture": "FACTURE",
+			"typeTva": "TVA_SUR_DEBIT",
+			"motifExonerationTva": None,
+			"numeroMarche": "VABFM001",
+			"numeroBonCommande": None,
+			"numeroFactureOrigine": None,
+			"modePaiement": "ESPECE"
+		},
+		"lignePoste": [
+			{
+				"lignePosteNumero": 1,
+				"lignePosteReference": "R1",
+				"lignePosteDenomination": "D1",
+				"lignePosteQuantite": 10,
+				"lignePosteUnite": "lot",
+				"lignePosteMontantUnitaireHT": 50.000000,
+				"lignePosteMontantRemiseHT": None,
+				"lignePosteTauxTva": "TVA5",
+				"lignePosteTauxTvaManuel": None
+			}
+			, {
+				"lignePosteNumero": 2,
+				"lignePosteReference": "R2",
+				"lignePosteDenomination": "D2",
+				"lignePosteQuantite": 12,
+				"lignePosteUnite": "Kg",
+				"lignePosteMontantUnitaireHT": 36.000000,
+				"lignePosteMontantRemiseHT": None,
+				"lignePosteTauxTva": None,
+				"lignePosteTauxTvaManuel": 2.1
+			}
+			, {
+				"lignePosteNumero": 3,
+				"lignePosteReference": "R3",
+				"lignePosteDenomination": "D3",
+				"lignePosteQuantite": 16,
+				"lignePosteUnite": "lot",
+				"lignePosteMontantUnitaireHT": 24.000000,
+				"lignePosteMontantRemiseHT": None,
+				"lignePosteTauxTva": None,
+				"lignePosteTauxTvaManuel": 5
+			}
+			, {
+				"lignePosteNumero": 4,
+				"lignePosteReference": "XX",
+				"lignePosteDenomination": "XX",
+				"lignePosteQuantite": 1,
+				"lignePosteUnite": "lot",
+				"lignePosteMontantUnitaireHT": 10.000000,
+				"lignePosteMontantRemiseHT": None,
+				"lignePosteTauxTva": "TVA5",
+				"lignePosteTauxTvaManuel": None
+			}
+		],
+		"ligneTva": [
+			{
+				"ligneTvaTauxManuel": None,
+				"ligneTvaTaux": "TVA5",
+				"ligneTvaMontantBaseHtParTaux": 510.000000,
+				"ligneTvaMontantTvaParTaux": 102.000000
+			}
+			, {
+				"ligneTvaTauxManuel": 2.1,
+				"ligneTvaTaux": None,
+				"ligneTvaMontantBaseHtParTaux": 432.000000,
+				"ligneTvaMontantTvaParTaux": 9.072000
+			}
+			, {
+				"ligneTvaTauxManuel": 5,
+				"ligneTvaTaux": None,
+				"ligneTvaMontantBaseHtParTaux": 384.000000,
+				"ligneTvaMontantTvaParTaux": 19.200000
+			}
+		],
+		"montantTotal": {
+			"montantHtTotal": 1326.000000,
+			"montantTVA": 130.272000,
+			"montantTtcTotal": 1406.272000,
+			"montantRemiseGlobaleTTC": 50.000000,
+			"motifRemiseGlobaleTTC": "Geste commercial",
+			"montantAPayer": 1400.000000
+		},
+		"commentaire": "Création_VABF_SoumettreFacture"
+	}
+
 	c.envoyer_facture(exemple_facture)
