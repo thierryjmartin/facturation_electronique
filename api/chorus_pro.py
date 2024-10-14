@@ -221,119 +221,225 @@ if __name__ == '__main__':
 	# 					  }
 	# 					}
 
-	exemple_facture = {
-		"modeDepot": "SAISIE_API",
-		"numeroFactureSaisi": None,
+	# exemple_facture = {
+	# 	"modeDepot": "SAISIE_API",
+	# 	"numeroFactureSaisi": None,
+	#
+	# 	"destinataire": {
+	# 		"codeDestinataire": "99986401570264", # SIRET  trouvé via une recherche...
+	# 		#"codeServiceExecutant": "DIRINFRA"
+	# 	},
+	# 	"fournisseur": {
+	# 		# j'ai retrouvé ce code en faisant une recherche de fournisseur..., j'aurais pu chercher par siret ?
+	# 		# le SIRET de mon fournisseur 26073617692140
+	# 		"idFournisseur": 26300989,
+	# 		#"typeIdentifiantFournisseur": "SIRET",
+	# 	#	"idServiceFournisseur": 26073617692140,
+	# 	#	"codeCoordonneesBancairesFournisseur": 132
+	# 	},
+	# 	"cadreDeFacturation": {
+	# 		"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
+	# 		"codeStructureValideur": None
+	# 	},
+	# 	"references": {
+	# 		"deviseFacture": "EUR",
+	# 		"typeFacture": "FACTURE",
+	# 		"typeTva": "TVA_SUR_DEBIT",
+	# 		"motifExonerationTva": None,
+	# 		"numeroMarche": "VABFM001",
+	# 		"numeroBonCommande": None,
+	# 		"numeroFactureOrigine": None,
+	# 		"modePaiement": "ESPECE"
+	# 	},
+	# 	"lignePoste": [
+	# 		{
+	# 			"lignePosteNumero": 1,
+	# 			"lignePosteReference": "R1",
+	# 			"lignePosteDenomination": "D1",
+	# 			"lignePosteQuantite": 10,
+	# 			"lignePosteUnite": "lot",
+	# 			"lignePosteMontantUnitaireHT": 50.000000,
+	# 			"lignePosteMontantRemiseHT": None,
+	# 			#"lignePosteTauxTva": "TVA5",
+	# 			"lignePosteTauxTva": None,
+	# 			#"lignePosteTauxTvaManuel": None
+	# 			"lignePosteTauxTvaManuel": 20
+	# 		}
+	# 		, {
+	# 			"lignePosteNumero": 2,
+	# 			"lignePosteReference": "R2",
+	# 			"lignePosteDenomination": "D2",
+	# 			"lignePosteQuantite": 12,
+	# 			"lignePosteUnite": "Kg",
+	# 			"lignePosteMontantUnitaireHT": 36.000000,
+	# 			"lignePosteMontantRemiseHT": None,
+	# 			"lignePosteTauxTva": None,
+	# 			"lignePosteTauxTvaManuel": 2.1
+	# 		}
+	# 		, {
+	# 			"lignePosteNumero": 3,
+	# 			"lignePosteReference": "R3",
+	# 			"lignePosteDenomination": "D3",
+	# 			"lignePosteQuantite": 16,
+	# 			"lignePosteUnite": "lot",
+	# 			"lignePosteMontantUnitaireHT": 24.000000,
+	# 			"lignePosteMontantRemiseHT": None,
+	# 			"lignePosteTauxTva": None,
+	# 			"lignePosteTauxTvaManuel": 5
+	# 		}
+	# 		, {
+	# 			"lignePosteNumero": 4,
+	# 			"lignePosteReference": "XX",
+	# 			"lignePosteDenomination": "XX",
+	# 			"lignePosteQuantite": 1,
+	# 			"lignePosteUnite": "lot",
+	# 			"lignePosteMontantUnitaireHT": 10.000000,
+	# 			"lignePosteMontantRemiseHT": None,
+	# 			#"lignePosteTauxTva": "TVA5",
+	# 			"lignePosteTauxTva": None,
+	# 			#"lignePosteTauxTvaManuel": None
+	# 			"lignePosteTauxTvaManuel": 20
+	# 		}
+	# 	],
+	# 	"ligneTva": [
+	# 		{
+	# 			#"ligneTvaTauxManuel": None,
+	# 			#"ligneTvaTaux": "TVA5",
+	# 			"ligneTvaTauxManuel": 20,
+	# 			"ligneTvaTaux": None,
+	# 			"ligneTvaMontantBaseHtParTaux": 510.000000,
+	# 			"ligneTvaMontantTvaParTaux": 102.000000
+	# 		},
+	# 		{
+	# 			"ligneTvaTauxManuel": 2.1,
+	# 			"ligneTvaTaux": None,
+	# 			"ligneTvaMontantBaseHtParTaux": 432.000000,
+	# 			"ligneTvaMontantTvaParTaux": 9.072000
+	# 		}
+	# 		, {
+	# 			"ligneTvaTauxManuel": 5,
+	# 			"ligneTvaTaux": None,
+	# 			"ligneTvaMontantBaseHtParTaux": 384.000000,
+	# 			"ligneTvaMontantTvaParTaux": 19.200000
+	# 		}
+	# 	],
+	# 	"montantTotal": {
+	# 		"montantHtTotal": 1326.000000,
+	# 		"montantTVA": 130.272000,
+	# 		"montantTtcTotal": 1406.272000,
+	# 		"montantRemiseGlobaleTTC": 50.000000,
+	# 		"motifRemiseGlobaleTTC": "Geste commercial",
+	# 		"montantAPayer": 1400.000000
+	# 	},
+	# 	"commentaire": "Création_VABF_SoumettreFacture"
+	# }
 
-		"destinataire": {
-			"codeDestinataire": "99986401570264", # SIRET  trouvé via une recherche...
-			#"codeServiceExecutant": "DIRINFRA"
-		},
-		"fournisseur": {
-			# j'ai retrouvé ce code en faisant une recherche de fournisseur..., j'aurais pu chercher par siret ?
-			# le SIRET de mon fournisseur 26073617692140
-			"idFournisseur": 26300989,
-			#"typeIdentifiantFournisseur": "SIRET",
-		#	"idServiceFournisseur": 26073617692140,
-		#	"codeCoordonneesBancairesFournisseur": 132
-		},
-		"cadreDeFacturation": {
-			"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
-			"codeStructureValideur": None
-		},
-		"references": {
-			"deviseFacture": "EUR",
-			"typeFacture": "FACTURE",
-			"typeTva": "TVA_SUR_DEBIT",
-			"motifExonerationTva": None,
-			"numeroMarche": "VABFM001",
-			"numeroBonCommande": None,
-			"numeroFactureOrigine": None,
-			"modePaiement": "ESPECE"
-		},
-		"lignePoste": [
-			{
-				"lignePosteNumero": 1,
-				"lignePosteReference": "R1",
-				"lignePosteDenomination": "D1",
-				"lignePosteQuantite": 10,
-				"lignePosteUnite": "lot",
-				"lignePosteMontantUnitaireHT": 50.000000,
-				"lignePosteMontantRemiseHT": None,
-				#"lignePosteTauxTva": "TVA5",
-				"lignePosteTauxTva": None,
-				#"lignePosteTauxTvaManuel": None
-				"lignePosteTauxTvaManuel": 20
-			}
-			, {
-				"lignePosteNumero": 2,
-				"lignePosteReference": "R2",
-				"lignePosteDenomination": "D2",
-				"lignePosteQuantite": 12,
-				"lignePosteUnite": "Kg",
-				"lignePosteMontantUnitaireHT": 36.000000,
-				"lignePosteMontantRemiseHT": None,
-				"lignePosteTauxTva": None,
-				"lignePosteTauxTvaManuel": 2.1
-			}
-			, {
-				"lignePosteNumero": 3,
-				"lignePosteReference": "R3",
-				"lignePosteDenomination": "D3",
-				"lignePosteQuantite": 16,
-				"lignePosteUnite": "lot",
-				"lignePosteMontantUnitaireHT": 24.000000,
-				"lignePosteMontantRemiseHT": None,
-				"lignePosteTauxTva": None,
-				"lignePosteTauxTvaManuel": 5
-			}
-			, {
-				"lignePosteNumero": 4,
-				"lignePosteReference": "XX",
-				"lignePosteDenomination": "XX",
-				"lignePosteQuantite": 1,
-				"lignePosteUnite": "lot",
-				"lignePosteMontantUnitaireHT": 10.000000,
-				"lignePosteMontantRemiseHT": None,
-				#"lignePosteTauxTva": "TVA5",
-				"lignePosteTauxTva": None,
-				#"lignePosteTauxTvaManuel": None
-				"lignePosteTauxTvaManuel": 20
-			}
-		],
-		"ligneTva": [
-			{
-				#"ligneTvaTauxManuel": None,
-				#"ligneTvaTaux": "TVA5",
-				"ligneTvaTauxManuel": 20,
-				"ligneTvaTaux": None,
-				"ligneTvaMontantBaseHtParTaux": 510.000000,
-				"ligneTvaMontantTvaParTaux": 102.000000
-			},
-			{
-				"ligneTvaTauxManuel": 2.1,
-				"ligneTvaTaux": None,
-				"ligneTvaMontantBaseHtParTaux": 432.000000,
-				"ligneTvaMontantTvaParTaux": 9.072000
-			}
-			, {
-				"ligneTvaTauxManuel": 5,
-				"ligneTvaTaux": None,
-				"ligneTvaMontantBaseHtParTaux": 384.000000,
-				"ligneTvaMontantTvaParTaux": 19.200000
-			}
-		],
-		"montantTotal": {
-			"montantHtTotal": 1326.000000,
-			"montantTVA": 130.272000,
-			"montantTtcTotal": 1406.272000,
-			"montantRemiseGlobaleTTC": 50.000000,
-			"motifRemiseGlobaleTTC": "Geste commercial",
-			"montantAPayer": 1400.000000
-		},
-		"commentaire": "Création_VABF_SoumettreFacture"
-	}
+	from datetime import datetime
+	from ..models import *
 
-	# c.envoyer_facture(exemple_facture)
+	exemple_facture = Facture(
+		mode_depot="SAISIE_API",
+		numero_facture_saisi=None,
+		destinataire=Destinataire(
+			code_destinataire="99986401570264"
+			# code_service_executant est absent
+		),
+		fournisseur=Fournisseur(
+			id_fournisseur=26300989
+			# Les autres champs du fournisseur sont absents
+		),
+		cadre_de_facturation=CadreDeFacturation(
+			code_cadre_facturation="A1_FACTURE_FOURNISSEUR",
+			code_structure_valideur=None
+		),
+		references=References(
+			devise_facture="EUR",
+			type_facture="FACTURE",
+			type_tva="TVA_SUR_DEBIT",
+			motif_exoneration_tva=None,
+			numero_marche="VABFM001",
+			numero_bon_commande=None,
+			numero_facture_origine=None,
+			mode_paiement="ESPECE"
+		),
+		ligne_poste=[
+			LignePoste(
+				ligne_poste_numero=1,
+				ligne_poste_reference="R1",
+				ligne_poste_denomination="D1",
+				ligne_poste_quantite=10,
+				ligne_poste_unite="lot",
+				ligne_poste_montant_unitaire_ht=50.00,
+				ligne_poste_montant_remise_ht=0,
+				ligne_poste_taux_tva='',
+				ligne_poste_taux_tva_manuel=20
+			),
+			LignePoste(
+				ligne_poste_numero=2,
+				ligne_poste_reference="R2",
+				ligne_poste_denomination="D2",
+				ligne_poste_quantite=12,
+				ligne_poste_unite="Kg",
+				ligne_poste_montant_unitaire_ht=36.00,
+				ligne_poste_montant_remise_ht=0,
+				ligne_poste_taux_tva='',
+				ligne_poste_taux_tva_manuel=2.1
+			),
+			LignePoste(
+				ligne_poste_numero=3,
+				ligne_poste_reference="R3",
+				ligne_poste_denomination="D3",
+				ligne_poste_quantite=16,
+				ligne_poste_unite="lot",
+				ligne_poste_montant_unitaire_ht=24.00,
+				ligne_poste_montant_remise_ht=0,
+				ligne_poste_taux_tva='',
+				ligne_poste_taux_tva_manuel=5
+			),
+			LignePoste(
+				ligne_poste_numero=4,
+				ligne_poste_reference="XX",
+				ligne_poste_denomination="XX",
+				ligne_poste_quantite=1,
+				ligne_poste_unite="lot",
+				ligne_poste_montant_unitaire_ht=10.00,
+				ligne_poste_montant_remise_ht=0,
+				ligne_poste_taux_tva='',
+				ligne_poste_taux_tva_manuel=20
+			)
+		],
+		ligne_tva=[
+			LigneTva(
+				ligne_tva_taux_manuel=20,
+				ligne_tva_taux=None,
+				ligne_tva_montant_base_ht_par_taux=510.00,
+				ligne_tva_montant_tva_par_taux=102.00
+			),
+			LigneTva(
+				ligne_tva_taux_manuel=2.1,
+				ligne_tva_taux=None,
+				ligne_tva_montant_base_ht_par_taux=432.00,
+				ligne_tva_montant_tva_par_taux=9.072
+			),
+			LigneTva(
+				ligne_tva_taux_manuel=5,
+				ligne_tva_taux=None,
+				ligne_tva_montant_base_ht_par_taux=384.00,
+				ligne_tva_montant_tva_par_taux=19.20
+			)
+		],
+		montant_total=MontantTotal(
+			montant_ht_total=1326.00,
+			montant_tva=130.272,
+			montant_ttc_total=1406.272,
+			montant_remise_globale_ttc=50.00,
+			motif_remise_globale_ttc="Geste commercial",
+			montant_a_payer=1400.00
+		),
+		commentaire="Création_VABF_SoumettreFacture"
+	)
+
+
+	c.envoyer_facture(exemple_facture.to_chorus_pro_payload())
 
 
