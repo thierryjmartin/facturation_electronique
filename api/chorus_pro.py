@@ -79,7 +79,16 @@ class ChorusProAPI:
 		reponse = self.client.post('/structures/v1/rechercher/services', json={"idStructure": id_structure})
 		return reponse.json()
 
-	def obtenir_identifiant_cpro_depuis_siret(self, siret: str) -> dict:
+	def obtenir_identifiant_cpro_depuis_siret(self, siret:str, type_identifiant:str='SIRET') -> dict:
+		# "SIRET", "UE_HORS_FRANCE", "HORS_UE", "RIDET", "TAHITI", "AUTRE", "PARTICULIER"
+		payload = {
+			"restreindreStructuresPrivees": False,
+			"structure": {
+				"identifiantStructure": siret,
+				"typeIdentifiantStructure": type_identifiant,
+			}
+		}
+		recherche_structure = self.rechercher_structure(payload)
 		identifiant_cpro = 0
 		if recherche_structure["parametresRetour"]["total"] == 1:
 			identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
@@ -88,7 +97,7 @@ class ChorusProAPI:
 
 if __name__ == '__main__':
 	c = ChorusProAPI()
-	print(c.token)
+	# print(c.token)
 
 	"""
 	 A titre d'exemple, voici une cinématique nominale pour avoir des informations sur une structure et ses services:
@@ -129,12 +138,14 @@ if __name__ == '__main__':
 			  }
 			}
 
-	recherche_structure = c.rechercher_structure(payload)
+	#recherche_structure = c.rechercher_structure(payload)
 
-	identifiant_cpro = 0
-	if recherche_structure["parametresRetour"]["total"] == 1:
-		identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
-	print(identifiant_cpro)
+	#identifiant_cpro = 0
+	#if recherche_structure["parametresRetour"]["total"] == 1:
+	#	identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
+	#print(identifiant_cpro)
+
+	identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
 
 	# 2 .
 	# c.consulter_structure(26300989)
@@ -142,8 +153,6 @@ if __name__ == '__main__':
 	# c.rechercher_services_structure(26300989)
 
 	# 4.
-
-
 
 	# exemple_facture = {
 	# 					  "cadreDeFacturation": {
@@ -347,7 +356,7 @@ if __name__ == '__main__':
 			# code_service_executant est absent
 		),
 		fournisseur=Fournisseur(
-			id_fournisseur=26300989
+			id_fournisseur=identifiant_cpro
 			# Les autres champs du fournisseur sont absents
 		),
 		cadre_de_facturation=CadreDeFacturation(
@@ -442,6 +451,7 @@ if __name__ == '__main__':
 	)
 
 
-	c.envoyer_facture(exemple_facture.to_chorus_pro_payload())
+	# c.envoyer_facture(exemple_facture.to_chorus_pro_payload())
+	#print(exemple_facture.to_facturx_basic())
 
 

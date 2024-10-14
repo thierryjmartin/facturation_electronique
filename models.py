@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from enum import Enum
 from typing import List, Optional
 from datetime import datetime
 
@@ -52,9 +53,17 @@ class PieceJointePrincipale(BaseModel):
 	piece_jointe_principale_designation: str
 	piece_jointe_principale_id: int
 
+class ModePaiement(str, Enum):
+	cheque = "CHEQUE"
+	prelevement = "PRELEVEMENT"
+	virement = "VIREMENT"
+	espece = "ESPECE"
+	autre = "AUTRE"
+	report = "REPORT"
+
 class References(BaseModel):
 	devise_facture: str
-	mode_paiement: str
+	mode_paiement: ModePaiement
 	motif_exoneration_tva: Optional[str] = None
 	numero_bon_commande: Optional[str] = None
 	numero_facture_origine: Optional[str] = None
