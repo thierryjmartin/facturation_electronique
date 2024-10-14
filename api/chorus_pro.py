@@ -75,10 +75,75 @@ class ChorusProAPI:
 		reponse = self.client.post('/structures/v1/rechercher', json=payload)
 		return reponse.json()
 
+	def rechercher_services_structure(self, id_structure: int) -> dict:
+		reponse = self.client.post('/structures/v1/rechercher/services', json={"idStructure": id_structure})
+		return reponse.json()
+
+	def obtenir_identifiant_cpro_depuis_siret(self, siret: str) -> dict:
+		identifiant_cpro = 0
+		if recherche_structure["parametresRetour"]["total"] == 1:
+			identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
+		return identifiant_cpro
+
 
 if __name__ == '__main__':
 	c = ChorusProAPI()
 	print(c.token)
+
+	"""
+	 A titre d'exemple, voici une cinématique nominale pour avoir des informations sur une structure et ses services:
+
+              1- Faire appel à l'API "RechercherStructure" afin de retrouver des structures avec quelques informations en sortie notamment "idStructureCPP
+
+              2- Faire appel à l'API "ConsulterStructure" avec en entrée l'idStructureCPP pour avoir les paramètres obligatoires de la structure (numéro d'engagement et/ou code service)
+
+              3- Faire appel à l'API "rechercherServicesStructure" avec "idStructure" en entrée de la requête afin de visualiser les services actifs de la structure renseignée
+
+              4- Faire appel à l'API consulterServiceStructure avec idService en entrée de la requête afin de consulter les paramètres obligatoires du service.
+    """
+
+	# 1 .
+
+	payload={
+			  "parametres": {
+				"nbResultatsParPage": 10,
+				"pageResultatDemandee": 1,
+				"triColonne": "IdentifiantStructure",
+				"triSens": "Descendant"
+			  },
+			  "restreindreStructuresPrivees": False,
+			  "structure": {
+				#"adresseCodePays": "string",
+				#"adresseCodePostal": "string",
+				#"adresseVille": "string",
+				#"estMOA": true,
+				#"estMOAUniquement": true,
+				"identifiantStructure": "26073617692140",
+				#"libelleStructure": "string",
+				#"nomStructure": "string",
+				#"prenomStructure": "string",
+				#"raisonSocialeStructure": "string",
+				#"statutStructure": "ACTIF",
+				"typeIdentifiantStructure": "SIRET",
+				#"typeStructure": "PUBLIQUE"
+			  }
+			}
+
+	recherche_structure = c.rechercher_structure(payload)
+
+	identifiant_cpro = 0
+	if recherche_structure["parametresRetour"]["total"] == 1:
+		identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
+	print(identifiant_cpro)
+
+	# 2 .
+	# c.consulter_structure(26300989)
+	# 3 .
+	# c.rechercher_services_structure(26300989)
+
+	# 4.
+
+
 
 	# exemple_facture = {
 	# 					  "cadreDeFacturation": {
@@ -195,8 +260,10 @@ if __name__ == '__main__':
 				"lignePosteUnite": "lot",
 				"lignePosteMontantUnitaireHT": 50.000000,
 				"lignePosteMontantRemiseHT": None,
-				"lignePosteTauxTva": "TVA5",
-				"lignePosteTauxTvaManuel": None
+				#"lignePosteTauxTva": "TVA5",
+				"lignePosteTauxTva": None,
+				#"lignePosteTauxTvaManuel": None
+				"lignePosteTauxTvaManuel": 20
 			}
 			, {
 				"lignePosteNumero": 2,
@@ -228,18 +295,22 @@ if __name__ == '__main__':
 				"lignePosteUnite": "lot",
 				"lignePosteMontantUnitaireHT": 10.000000,
 				"lignePosteMontantRemiseHT": None,
-				"lignePosteTauxTva": "TVA5",
-				"lignePosteTauxTvaManuel": None
+				#"lignePosteTauxTva": "TVA5",
+				"lignePosteTauxTva": None,
+				#"lignePosteTauxTvaManuel": None
+				"lignePosteTauxTvaManuel": 20
 			}
 		],
 		"ligneTva": [
 			{
-				"ligneTvaTauxManuel": None,
-				"ligneTvaTaux": "TVA5",
+				#"ligneTvaTauxManuel": None,
+				#"ligneTvaTaux": "TVA5",
+				"ligneTvaTauxManuel": 20,
+				"ligneTvaTaux": None,
 				"ligneTvaMontantBaseHtParTaux": 510.000000,
 				"ligneTvaMontantTvaParTaux": 102.000000
-			}
-			, {
+			},
+			{
 				"ligneTvaTauxManuel": 2.1,
 				"ligneTvaTaux": None,
 				"ligneTvaMontantBaseHtParTaux": 432.000000,
@@ -263,33 +334,6 @@ if __name__ == '__main__':
 		"commentaire": "Création_VABF_SoumettreFacture"
 	}
 
-	c.envoyer_facture(exemple_facture)
-	c.consulter_structure(26300989)
-	#c.consulter_structure(1)
+	# c.envoyer_facture(exemple_facture)
 
-	payload={
-			  "parametres": {
-				"nbResultatsParPage": 10,
-				"pageResultatDemandee": 1,
-				"triColonne": "IdentifiantStructure",
-				"triSens": "Descendant"
-			  },
-			  "restreindreStructuresPrivees": False,
-			  "structure": {
-				#"adresseCodePays": "string",
-				#"adresseCodePostal": "string",
-				#"adresseVille": "string",
-				#"estMOA": true,
-				#"estMOAUniquement": true,
-				"identifiantStructure": "26073617692140",
-				#"libelleStructure": "string",
-				#"nomStructure": "string",
-				#"prenomStructure": "string",
-				#"raisonSocialeStructure": "string",
-				#"statutStructure": "ACTIF",
-				"typeIdentifiantStructure": "SIRET",
-				#"typeStructure": "PUBLIQUE"
-			  }
-			}
 
-	c.rechercher_structure(payload)
