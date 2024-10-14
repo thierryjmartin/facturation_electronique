@@ -9,12 +9,12 @@ class CadreDeFacturation(BaseModel):
 
 class Destinataire(BaseModel):
 	code_destinataire: str
-	code_service_executant: Optional[str] = ''
+	code_service_executant: Optional[str] = None
 
 class Fournisseur(BaseModel):
 	code_coordonnees_bancaires_fournisseur: Optional[int] = 0
 	id_fournisseur: int
-	id_service_fournisseur: Optional[int] = 0
+	id_service_fournisseur: Optional[int] = None
 
 class LignePoste(BaseModel):
 	ligne_poste_denomination: str
@@ -68,14 +68,14 @@ class Facture(BaseModel):
 	date_facture: datetime
 	destinataire: Destinataire
 	fournisseur: Fournisseur
-	id_utilisateur_courant: int
+	id_utilisateur_courant: Optional[int] = 0
 	ligne_poste: List[LignePoste]
 	ligne_tva: List[LigneTva]
 	mode_depot: str
 	montant_total: MontantTotal
-	numero_facture_saisi: str
-	piece_jointe_complementaire: List[PieceJointeComplementaire]
-	piece_jointe_principale: List[PieceJointePrincipale]
+	numero_facture_saisi: Optional[str] = None
+	piece_jointe_complementaire: Optional[List[PieceJointeComplementaire]] = None
+	piece_jointe_principale: Optional[List[PieceJointePrincipale]] = None
 	references: References
 
 	def to_chorus_pro_payload(self) -> dict:

@@ -340,6 +340,8 @@ if __name__ == '__main__':
 	exemple_facture = Facture(
 		mode_depot="SAISIE_API",
 		numero_facture_saisi=None,
+		date_facture=datetime.now(),
+		id_utilisateur_courant=0,
 		destinataire=Destinataire(
 			code_destinataire="99986401570264"
 			# code_service_executant est absent
