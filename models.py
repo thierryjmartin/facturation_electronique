@@ -81,6 +81,8 @@ class MontantTotal(BaseModel):
 
 class PieceJointeComplementaire(BaseModel):
 	piece_jointe_complementaire_designation: str
+	"""Nombre : identifiant technique de la pièce jointe dans le système
+	RechercherPieceJointeSurStructure OU RechercherPieceJointeSurMonCompte OU AjouterFichierDansSysteme"""
 	piece_jointe_complementaire_id: int
 	piece_jointe_complementaire_id_liaison: int
 	piece_jointe_complementaire_numero_ligne_facture: int
@@ -90,8 +92,7 @@ class PieceJointePrincipale(BaseModel):
 	'''String : champ libre désignant la pièce jointe max 100 cars'''
 	piece_jointe_principale_designation: str
 	'''Nombre : identifiant technique de la pièce jointe dans le système
-	obtenu par deposerPdfFacture ou ajouterFichierDansSysteme
-	'''
+	obtenu par deposerPdfFacture ou ajouterFichierDansSysteme'''
 	piece_jointe_principale_id: int
 
 class ModePaiement(str, Enum):
@@ -161,7 +162,7 @@ class Facture(BaseModel):
 	date_facture: Optional[str] = None
 	id_utilisateur_courant: Optional[int] = 0
 	mode_depot: ModeDepot
-	commentaire: Optional[str]
+	commentaire: Optional[str] # max 200 cars
 
 	def to_chorus_pro_payload(self) -> dict:
 		data = self.dict(by_alias=True, exclude_unset=True)
