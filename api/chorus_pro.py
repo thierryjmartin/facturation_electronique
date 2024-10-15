@@ -344,13 +344,12 @@ if __name__ == '__main__':
 	# 	"commentaire": "Création_VABF_SoumettreFacture"
 	# }
 
-	import datetime
 	from ..models import *
 
-	exemple_facture = Facture(
+	exemple_facture_mode_api = Facture(
 		mode_depot="SAISIE_API",
-		numero_facture_saisi="20240000000000000013",
-		#date_facture="2024-15-08",#format_datetime_to_iso(datetime.datetime(2024,1,1)),
+		# numero_facture_saisi="20240000000000000013", # ce champ n'est pas utilié en mode_depot saisie_api
+		#date_facture="2024-15-08", # seulement en depot PDF
 		id_utilisateur_courant=0,
 		destinataire=Destinataire(
 			code_destinataire="99986401570264"
@@ -452,7 +451,50 @@ if __name__ == '__main__':
 	)
 
 
-	c.envoyer_facture(exemple_facture.to_chorus_pro_payload())
-	#print(exemple_facture.to_facturx_basic())
+	# c.envoyer_facture(exemple_facture_mode_api.to_chorus_pro_payload())
+	# print(exemple_facture.to_facturx_basic())
+
+	exemple_facture_mode_pdf = Facture(
+		mode_depot="DEPOT_PDF_API",
+		numero_facture_saisi="20240000000000000099", # ce champ n'est pas utilié en mode_depot saisie_api
+		date_facture="2024-10-15", # seulement en depot PDF
+		id_utilisateur_courant=0,
+		destinataire=Destinataire(
+			code_destinataire="99986401570264"
+			# code_service_executant est absent
+		),
+		fournisseur=Fournisseur(
+			id_fournisseur=identifiant_cpro
+			# Les autres champs du fournisseur sont absents
+		),
+		cadre_de_facturation=CadreDeFacturation(
+			code_cadre_facturation="A1_FACTURE_FOURNISSEUR",
+			code_structure_valideur=None
+		),
+		references=References(
+			devise_facture="EUR",
+			type_facture="FACTURE",
+			type_tva="TVA_SUR_DEBIT",
+			motif_exoneration_tva=None,
+			numero_marche="VABFM001",
+			numero_bon_commande=None,
+			numero_facture_origine=None,
+			mode_paiement="ESPECE"
+		),
+		montant_total=MontantTotal(
+			montant_ht_total=1326.00,
+			montant_TVA=130.272,
+			montant_ttc_total=1406.272,
+			montant_remise_globale_TTC=50.00,
+			motif_remise_globale_TTC="Geste commercial",
+			montant_a_payer=1400.00
+		),
+		ligne_poste = [],
+		ligne_tva = [],
+		commentaire = '',
+	)
+	c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
+
+
 
 

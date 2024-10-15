@@ -31,9 +31,17 @@ def compare_dicts(dict1, dict2):
 
 	return differences
 
+
+class CodeCadreFacturation(str, Enum):
+	a1 = "A1_FACTURE_FOURNISSEUR"
+	a2 = "A2_FACTURE_FOURNISSEUR_DEJA_PAYEE"
+	a3 = "A9_FACTURE_SOUSTRAITANT"
+	a4 = "A12_FACTURE_COTRAITANT"
+
+
 class CadreDeFacturation(BaseModel):
 	code_cadre_facturation: str
-	code_service_valideur: Optional[str] = None
+	code_service_valideur: Optional[str] = CodeCadreFacturation
 	code_structure_valideur: Optional[str] = None
 
 class Destinataire(BaseModel):
@@ -91,13 +99,20 @@ class ModePaiement(str, Enum):
 
 class References(BaseModel):
 	devise_facture: str
-	mode_paiement: str
+	mode_paiement: ModePaiement
 	motif_exoneration_tva: Optional[str] = None
 	numero_bon_commande: Optional[str] = None
 	numero_facture_origine: Optional[str] = None
 	numero_marche: str
 	type_facture: str
 	type_tva: str
+
+
+class ModeDepot(str, Enum):
+	saisie_api = "SAISIE_API"
+	depot_pdf_api = "DEPOT_PDF_API"
+	depot_pdf_signe_api = "DEPOT_PDF_SIGNE_API"
+
 
 class Facture(BaseModel):
 	cadre_de_facturation: CadreDeFacturation
@@ -110,10 +125,14 @@ class Facture(BaseModel):
 	piece_jointe_principale: Optional[List[PieceJointePrincipale]] = None
 	references: References
 
+	"""Obligatoire si le mode de Dépôt est "DEPOT_PDF_API" ou "DEPOT_PDF_SIGNE_API". Cet identifiant est unique par fournisseur. 
+	En saisie API, le numeroFacture n’est pas pris en compte mais généré automatiquement par Chorus Pro. Valeur alphanumérique"""
 	numero_facture_saisi: Optional[str] = None
+	"""Obligatoire si le mode de Dépôt est "DEPOT_PDF_API" ou "DEPOT_PDF_SIGNE_API". Format date : AAAA-MM-JJ
+	La date d'émission de la facture doit être antérieure ou égale à la date de dépôt de la facture dans le système."""
 	date_facture: Optional[str] = None
 	id_utilisateur_courant: Optional[int] = 0
-	mode_depot: str
+	mode_depot: ModeDepot
 	commentaire: Optional[str]
 
 	def to_chorus_pro_payload(self) -> dict:
