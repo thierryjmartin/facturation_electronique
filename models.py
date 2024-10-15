@@ -1,7 +1,35 @@
 from pydantic import BaseModel
 from enum import Enum
 from typing import List, Optional
-from datetime import datetime
+
+from .utils.strings_and_dicts import to_camel_case, transform_dict_keys
+
+
+def compare_dicts(dict1, dict2):
+	"""
+	Compare two dictionaries recursively and return a list of differences.
+	"""
+	differences = []
+
+	# Check keys in dict1 that are missing or different in dict2
+	for key in dict1:
+		if key not in dict2:
+			differences.append(f"Key '{key}' found in dict1 but missing in dict2")
+		else:
+			if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+				# Recursively compare nested dictionaries
+				differences.extend(
+					[f"In key '{key}': {diff}" for diff in compare_dicts(dict1[key], dict2[key])]
+				)
+			elif dict1[key] != dict2[key]:
+				differences.append(f"Value mismatch at key '{key}': dict1={dict1[key]}, dict2={dict2[key]}")
+
+	# Check keys in dict2 that are missing in dict1
+	for key in dict2:
+		if key not in dict1:
+			differences.append(f"Key '{key}' found in dict2 but missing in dict1")
+
+	return differences
 
 class CadreDeFacturation(BaseModel):
 	code_cadre_facturation: str
@@ -19,8 +47,8 @@ class Fournisseur(BaseModel):
 
 class LignePoste(BaseModel):
 	ligne_poste_denomination: str
-	ligne_poste_montant_remise_ht: float
-	ligne_poste_montant_unitaire_ht: float
+	ligne_poste_montant_remise_HT: float
+	ligne_poste_montant_unitaire_HT: float
 	ligne_poste_numero: int
 	ligne_poste_quantite: float
 	ligne_poste_reference: str
@@ -37,10 +65,10 @@ class LigneTva(BaseModel):
 class MontantTotal(BaseModel):
 	montant_a_payer: float
 	montant_ht_total: float
-	montant_remise_globale_ttc: float
-	montant_tva: float
+	montant_remise_globale_TTC: float
+	montant_TVA: float
 	montant_ttc_total: float
-	motif_remise_globale_ttc: str
+	motif_remise_globale_TTC: str
 
 class PieceJointeComplementaire(BaseModel):
 	piece_jointe_complementaire_designation: str
@@ -63,7 +91,7 @@ class ModePaiement(str, Enum):
 
 class References(BaseModel):
 	devise_facture: str
-	mode_paiement: ModePaiement
+	mode_paiement: str
 	motif_exoneration_tva: Optional[str] = None
 	numero_bon_commande: Optional[str] = None
 	numero_facture_origine: Optional[str] = None
@@ -73,28 +101,31 @@ class References(BaseModel):
 
 class Facture(BaseModel):
 	cadre_de_facturation: CadreDeFacturation
-	commentaire: Optional[str]
-	date_facture: datetime
 	destinataire: Destinataire
 	fournisseur: Fournisseur
-	id_utilisateur_courant: Optional[int] = 0
 	ligne_poste: List[LignePoste]
 	ligne_tva: List[LigneTva]
-	mode_depot: str
 	montant_total: MontantTotal
-	numero_facture_saisi: Optional[str] = None
 	piece_jointe_complementaire: Optional[List[PieceJointeComplementaire]] = None
 	piece_jointe_principale: Optional[List[PieceJointePrincipale]] = None
 	references: References
 
-	def to_chorus_pro_payload(self) -> dict:
-		# Transformer l'instance en dictionnaire en gérant les champs None
-		data = self.dict(by_alias=True, exclude_unset=True)
+	numero_facture_saisi: Optional[str] = None
+	date_facture: Optional[str] = None
+	id_utilisateur_courant: Optional[int] = 0
+	mode_depot: str
+	commentaire: Optional[str]
 
-		# Conversion en format camelCase si nécessaire
-		return {
+	def to_chorus_pro_payload(self) -> dict:
+		data = self.dict(by_alias=True, exclude_unset=True)
+		transformed_data = transform_dict_keys(data, to_camel_case)
+		print(transformed_data)
+
+		ret = {
 			"modeDepot": data.get("mode_depot"),
 			"numeroFactureSaisi": data.get("numero_facture_saisi"),
+			"dateFacture": data.get("date_facture"),
+			"commentaire": self.commentaire,
 			"destinataire": {
 				"codeDestinataire": self.destinataire.code_destinataire,
 				"codeServiceExecutant": getattr(self.destinataire, "code_service_executant", None)
@@ -126,8 +157,8 @@ class Facture(BaseModel):
 					"lignePosteDenomination": lp.ligne_poste_denomination,
 					"lignePosteQuantite": lp.ligne_poste_quantite,
 					"lignePosteUnite": lp.ligne_poste_unite,
-					"lignePosteMontantUnitaireHT": lp.ligne_poste_montant_unitaire_ht,
-					"lignePosteMontantRemiseHT": lp.ligne_poste_montant_remise_ht,
+					"lignePosteMontantUnitaireHT": lp.ligne_poste_montant_unitaire_HT,
+					"lignePosteMontantRemiseHT": lp.ligne_poste_montant_remise_HT,
 					"lignePosteTauxTva": lp.ligne_poste_taux_tva,
 					"lignePosteTauxTvaManuel": lp.ligne_poste_taux_tva_manuel
 				} for lp in self.ligne_poste
@@ -142,14 +173,17 @@ class Facture(BaseModel):
 			],
 			"montantTotal": {
 				"montantHtTotal": self.montant_total.montant_ht_total,
-				"montantTVA": self.montant_total.montant_tva,
+				"montantTVA": self.montant_total.montant_TVA,
 				"montantTtcTotal": self.montant_total.montant_ttc_total,
-				"montantRemiseGlobaleTTC": self.montant_total.montant_remise_globale_ttc,
-				"motifRemiseGlobaleTTC": self.montant_total.motif_remise_globale_ttc,
+				"montantRemiseGlobaleTTC": self.montant_total.montant_remise_globale_TTC,
+				"motifRemiseGlobaleTTC": self.montant_total.motif_remise_globale_TTC,
 				"montantAPayer": self.montant_total.montant_a_payer
 			},
-			"commentaire": self.commentaire,
 		}
+		print(ret)
+
+		print(compare_dicts(transformed_data, ret))
+		return transformed_data
 
 	def to_facturx_basic(self):
 		from xml.etree.ElementTree import Element, SubElement, tostring

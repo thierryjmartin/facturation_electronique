@@ -1,6 +1,7 @@
 import requests
 import base64
 from ..utils.http_client import HttpClient
+from ..utils.datetime_utils import *
 from ..config import *
 
 
@@ -343,13 +344,13 @@ if __name__ == '__main__':
 	# 	"commentaire": "Création_VABF_SoumettreFacture"
 	# }
 
-	from datetime import datetime
+	import datetime
 	from ..models import *
 
 	exemple_facture = Facture(
 		mode_depot="SAISIE_API",
-		numero_facture_saisi=None,
-		date_facture=datetime.now(),
+		numero_facture_saisi="20240000000000000013",
+		#date_facture="2024-15-08",#format_datetime_to_iso(datetime.datetime(2024,1,1)),
 		id_utilisateur_courant=0,
 		destinataire=Destinataire(
 			code_destinataire="99986401570264"
@@ -380,8 +381,8 @@ if __name__ == '__main__':
 				ligne_poste_denomination="D1",
 				ligne_poste_quantite=10,
 				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_ht=50.00,
-				ligne_poste_montant_remise_ht=0,
+				ligne_poste_montant_unitaire_HT=50.00,
+				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=20
 			),
@@ -391,8 +392,8 @@ if __name__ == '__main__':
 				ligne_poste_denomination="D2",
 				ligne_poste_quantite=12,
 				ligne_poste_unite="Kg",
-				ligne_poste_montant_unitaire_ht=36.00,
-				ligne_poste_montant_remise_ht=0,
+				ligne_poste_montant_unitaire_HT=36.00,
+				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=2.1
 			),
@@ -402,8 +403,8 @@ if __name__ == '__main__':
 				ligne_poste_denomination="D3",
 				ligne_poste_quantite=16,
 				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_ht=24.00,
-				ligne_poste_montant_remise_ht=0,
+				ligne_poste_montant_unitaire_HT=24.00,
+				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=5
 			),
@@ -413,8 +414,8 @@ if __name__ == '__main__':
 				ligne_poste_denomination="XX",
 				ligne_poste_quantite=1,
 				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_ht=10.00,
-				ligne_poste_montant_remise_ht=0,
+				ligne_poste_montant_unitaire_HT=10.00,
+				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=20
 			)
@@ -441,17 +442,17 @@ if __name__ == '__main__':
 		],
 		montant_total=MontantTotal(
 			montant_ht_total=1326.00,
-			montant_tva=130.272,
+			montant_TVA=130.272,
 			montant_ttc_total=1406.272,
-			montant_remise_globale_ttc=50.00,
-			motif_remise_globale_ttc="Geste commercial",
+			montant_remise_globale_TTC=50.00,
+			motif_remise_globale_TTC="Geste commercial",
 			montant_a_payer=1400.00
 		),
 		commentaire="Création_VABF_SoumettreFacture"
 	)
 
 
-	# c.envoyer_facture(exemple_facture.to_chorus_pro_payload())
+	c.envoyer_facture(exemple_facture.to_chorus_pro_payload())
 	#print(exemple_facture.to_facturx_basic())
 
 
