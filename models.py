@@ -95,6 +95,7 @@ class PieceJointePrincipale(BaseModel):
 	obtenu par deposerPdfFacture ou ajouterFichierDansSysteme'''
 	piece_jointe_principale_id: int
 
+
 class ModePaiement(str, Enum):
 	cheque = "CHEQUE"
 	prelevement = "PRELEVEMENT"

@@ -1,7 +1,6 @@
 import requests
 import base64
 from ..utils.http_client import HttpClient
-from ..utils.datetime_utils import *
 from ..config import *
 
 
@@ -66,6 +65,25 @@ class ChorusProAPI:
 		:return: dict avec les informations de statut de la facture
 		"""
 		response = self.client.get(f'/factures/{facture_id}/statut')
+		return response.json()
+
+	def ajouter_fichier_dans_systeme(self, fichier: base64 = '', nom: str = '', type_mime: str = '', extension: str = ''):
+		"""La méthode ajouterFichierDansSysteme permet d’ajouter une pièce-jointe au compte utilisateur courant
+		et d’en obtenir l’identifiant technique. La pièce jointe ne doit pas dépasser 10Mo.
+		Si le fichier dépasse cette taille, une erreur 20003 sera remontée.
+		:param fichier: String : fichier contenant la piece jointe encodé en base64
+		:param nom: Nom du fichier taille max 50 cars
+		:param type_mime: format de données de la pièce taille max 255 cars
+		:param extension: Liste des extensions des pièces jointes autorisées par Chorus Pro : BMP;HTM;FAX;PNG;XHTML;BZ2;JPEG;PPS;XLC;CSV;JPG;PPT;PPTX ;XLM;DOC ;ODP;RTF;XLS;GIF;ODS;SVG;XML;GZ;ODT;TGZ;XSD;GZIP;P7S;TIF;XSL;HTML;PDF;TXT;ZIP ;TIFF,XLSX;DOC ;DOCX
+		:return reponse de l'api
+		"""
+		response = self.client.post('/transverses/v1/ajouter/fichier', json = {
+				"pieceJointeFichier" : fichier,
+				"pieceJointeNom" :  nom,
+				"pieceJointeTypeMime" : type_mime,
+				"pieceJointeExtension" : extension
+				})
+		response.raise_for_status()
 		return response.json()
 
 	def consulter_structure(self, id_structure: int) -> dict:
@@ -454,11 +472,28 @@ if __name__ == '__main__':
 	# c.envoyer_facture(exemple_facture_mode_api.to_chorus_pro_payload())
 	# print(exemple_facture.to_facturx_basic())
 
+	from ..utils.files import *
+	file_path = get_absolute_path("facture_electronique/exemples/facture_bidon.pdf")
+	print(file_path)
+
+	reponse_fichier = c.ajouter_fichier_dans_systeme(
+		file_to_base64(file_path),
+		"facture.pdf",
+		guess_mime_type(file_path),
+		get_file_extension(file_path),
+	)
+
+	pj_id = reponse_fichier["pieceJointeId"]
+
 	exemple_facture_mode_pdf = Facture(
 		mode_depot="DEPOT_PDF_API",
 		numero_facture_saisi="20240000000000000099", # ce champ n'est pas utilié en mode_depot saisie_api
 		date_facture="2024-10-15", # seulement en depot PDF
 		id_utilisateur_courant=0,
+		piece_jointe_principale = [PieceJointePrincipale(
+			piece_jointe_principale_designation = 'facture',
+			piece_jointe_principale_id = pj_id
+		)],
 		destinataire=Destinataire(
 			code_destinataire="99986401570264"
 			# code_service_executant est absent
