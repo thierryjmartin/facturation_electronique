@@ -87,7 +87,11 @@ class PieceJointeComplementaire(BaseModel):
 	piece_jointe_complementaire_type: str
 
 class PieceJointePrincipale(BaseModel):
+	'''String : champ libre désignant la pièce jointe max 100 cars'''
 	piece_jointe_principale_designation: str
+	'''Nombre : identifiant technique de la pièce jointe dans le système
+	obtenu par deposerPdfFacture ou ajouterFichierDansSysteme
+	'''
 	piece_jointe_principale_id: int
 
 class ModePaiement(str, Enum):
