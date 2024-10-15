@@ -473,7 +473,7 @@ if __name__ == '__main__':
 	# print(exemple_facture.to_facturx_basic())
 
 	from ..utils.files import *
-	file_path = get_absolute_path("facture_electronique/exemples/facture_bidon.pdf")
+	file_path = get_absolute_path("facture_electronique/exemples/Facture-2024-003.pdf")
 	print(file_path)
 
 	reponse_fichier = c.ajouter_fichier_dans_systeme(
@@ -487,7 +487,7 @@ if __name__ == '__main__':
 
 	exemple_facture_mode_pdf = Facture(
 		mode_depot="DEPOT_PDF_API",
-		numero_facture_saisi="20240000000000000099", # ce champ n'est pas utilié en mode_depot saisie_api
+		numero_facture_saisi="20240000000000000100", # ce champ n'est pas utilié en mode_depot saisie_api
 		date_facture="2024-10-15", # seulement en depot PDF
 		id_utilisateur_courant=0,
 		piece_jointe_principale = [PieceJointePrincipale(
