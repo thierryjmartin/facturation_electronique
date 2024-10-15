@@ -42,6 +42,7 @@ class CodeCadreFacturation(str, Enum):
 class CadreDeFacturation(BaseModel):
 	code_cadre_facturation: str
 	code_service_valideur: Optional[str] = CodeCadreFacturation
+	"""Si le cadre de facturation est un cadre de facturation de cotraitant ou de sous-traitant (A9, A12) alors le valideur doit obligatoirement être renseigné."""
 	code_structure_valideur: Optional[str] = None
 
 class Destinataire(BaseModel):
@@ -97,15 +98,38 @@ class ModePaiement(str, Enum):
 	autre = "AUTRE"
 	report = "REPORT"
 
+class TypeFacture(str, Enum):
+	facture = 'FACTURE'
+	avoir = 'AVOIR'
+
+
+class TypeTVA(str, Enum):
+	"""La valeur à transmettre ici est déduite des données "Régime TVA" et "Exoneration" du format E1,
+	selon la règle de gestion suivante :
+	- Si aucune ligne de récapitulatifs taxes n'est renseignée, le TypeTVA est 'SANS_TVA'
+	- Sinon si la balise RécapitulatifTaxes.Exoneration est renseignée, le TypeTVA est 'EXONERATION'
+	- Sinon, le TypeTVA est celui de la balise RegimeTVA (TVA_SUR_DEBIT ou TVA_SUR_ENCAISSEMENT)"""
+	tva_sur_debit = 'TVA_SUR_DEBIT'
+	tva_sur_encaissment = 'TVA_SUR_ENCAISSEMENT'
+	exoneration = 'EXONERATION'
+	sans_tva = 'SANS_TVA'
+
+
 class References(BaseModel):
 	devise_facture: str
 	mode_paiement: ModePaiement
 	motif_exoneration_tva: Optional[str] = None
+	'''1) Si le destinataire est l’état, alors le système contrôle l’existence du bon de commande (si renseigné). 
+	   2) Si le destinataire indique, au niveau de son paramétrage, que le bon de commande est obligatoire 
+		(StructurePublique.gestionNumeroEj = TRUE ou StructurePublique.gestionNumeroEJOuCodeService et code service non renseigné), 
+		alors le système contrôle que le bon de commande est renseigné. 
+	   3) Dans tous les autres cas, ces paramètres ne sont pas contrôlés.'''
 	numero_bon_commande: Optional[str] = None
+	'''Ce paramètre est saisissable uniquement si le type de la facture est "Avoir". Sinon, le paramètre est ignoré.'''
 	numero_facture_origine: Optional[str] = None
 	numero_marche: str
-	type_facture: str
-	type_tva: str
+	type_facture: TypeFacture
+	type_tva: TypeTVA
 
 
 class ModeDepot(str, Enum):
@@ -118,8 +142,8 @@ class Facture(BaseModel):
 	cadre_de_facturation: CadreDeFacturation
 	destinataire: Destinataire
 	fournisseur: Fournisseur
-	ligne_poste: List[LignePoste]
-	ligne_tva: List[LigneTva]
+	ligne_poste: Optional[List[LignePoste]] = []
+	ligne_tva: Optional[List[LigneTva]] = []
 	montant_total: MontantTotal
 	piece_jointe_complementaire: Optional[List[PieceJointeComplementaire]] = None
 	piece_jointe_principale: Optional[List[PieceJointePrincipale]] = None

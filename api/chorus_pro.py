@@ -489,8 +489,6 @@ if __name__ == '__main__':
 			motif_remise_globale_TTC="Geste commercial",
 			montant_a_payer=1400.00
 		),
-		ligne_poste = [],
-		ligne_tva = [],
 		commentaire = '',
 	)
 	c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
