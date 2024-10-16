@@ -1,16 +1,13 @@
 # Facturation Electronique SDK
 
 ## Description
-`Facturation Electronique SDK` est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, **DPGF**, et d'autres partenaires privés. Elle supporte également le format **Factur-X** pour la création et l'envoi de factures électroniques, ainsi que la gestion des signatures électroniques.
+`Facturation Electronique SDK` est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, et d'autres partenaires privés. Elle supporte également le format **Factur-X** pour la création et l'envoi de factures électroniques.
 
 Ce SDK est conçu pour être extensible et compatible avec les différentes plateformes de facturation électronique en France, facilitant l'envoi et la gestion des factures en toute conformité avec les réglementations.
 
 ## Fonctionnalités
 - **Chorus Pro** : Création, envoi et suivi des factures à destination des entités publiques.
-- **DPGF** : Gestion des factures électroniques entre entreprises privées.
-- **JeDéclare** : Envoi de factures via EDI.
 - **Factur-X** : Génération de factures au format PDF/Factur-X.
-- **Signature électronique** : Gestion des signatures électroniques sur les documents (optionnel).
 
 ## Installation
 
