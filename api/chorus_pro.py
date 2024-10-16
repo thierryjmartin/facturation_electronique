@@ -475,9 +475,12 @@ if __name__ == '__main__':
 	from ..utils.files import *
 	file_path = get_absolute_path("facture_electronique/exemples/Facture-2024-003.pdf")
 	print(file_path)
+	file_path_pdfa = get_absolute_path("facture_electronique/exemples/Facture_pdfa-2024-003.pdf")
+	from ..utils.pdfs import *
+	convert_to_pdfa(file_path, file_path_pdfa)
 
 	reponse_fichier = c.ajouter_fichier_dans_systeme(
-		file_to_base64(file_path),
+		file_to_base64(file_path_pdfa),
 		"facture.pdf",
 		guess_mime_type(file_path),
 		get_file_extension(file_path),
