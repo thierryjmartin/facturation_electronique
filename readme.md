@@ -42,63 +42,8 @@ DPGF_API_KEY = 'votre-api-key-dpgf'
    ```
 
 ## Utilisation
-1. Envoi d'une facture à Chorus Pro
 
-Voici un exemple simple pour envoyer une facture à Chorus Pro.
-   ```python
-from facture_electronique.api.chorus_pro import ChorusProAPI
-
-api_key = "votre-api-key-chorus-pro"
-chorus_pro = ChorusProAPI(api_key)
-
-facture = {
-	"facture_id": "12345",
-	"client": {
-		"nom": "Client Externe",
-		"adresse": "12 Rue Externe, 75000 Paris"
-	},
-	"montant_total": 1000.50,
-	# autres détails...
-}
-
-# Envoi de la facture
-reponse = chorus_pro.envoyer_facture(facture)
-print(reponse)
-   ```
-
-2. Générer une facture au format Factur-X
-   
-```python
-from facture_electronique.utils.facturx import creer_facturx
-
-facture_data = {
-	"facture_id": "INV-2023-001",
-	"client": {
-		"nom": "Entreprise XYZ",
-		"adresse": "15 Rue Principale, 75001 Paris"
-	},
-	"montant_total": 1500.00,
-	# autres informations
-}
-
-pdf_path = "facture_base.pdf"
-facturx_pdf = creer_facturx(facture_data, pdf_path)
-
-print(f"Facture Factur-X générée: {facturx_pdf}")
-   ```
-
-3. Récupérer le statut d'une facture sur DPGF
-
-```python
-from facture_electronique.api.dpgf import DPGFAPI
-
-api_key = "votre-api-key-dpgf"
-dpgf = DPGFAPI(api_key)
-
-facture_id = "12345"
-statut = dpgf.obtenir_statut_facture(facture_id)
-print(statut)
-   ```
+Voir le script api/chorus_pro.py
 
 ## Gestion des erreurs
 La bibliothèque lève des exceptions personnalisées pour la gestion des erreurs spécifiques aux interactions avec les API de facturation. Voici un exemple :
