@@ -45,24 +45,13 @@ DPGF_API_KEY = 'votre-api-key-dpgf'
 
 Voir le script api/chorus_pro.py
 
-## Gestion des erreurs
-La bibliothèque lève des exceptions personnalisées pour la gestion des erreurs spécifiques aux interactions avec les API de facturation. Voici un exemple :
-```python
-from facture_electronique.exceptions import FacturationAPIError
-
-try:
-	reponse = chorus_pro.envoyer_facture(facture)
-except FacturationAPIError as e:
-	print(f"Erreur lors de l'envoi de la facture: {e}")
-   ```
-
 ## Contribution
 Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes :
 
     Clonez le dépôt.
     Créez une branche pour votre fonctionnalité : git checkout -b nouvelle-fonctionnalité.
     Faites vos modifications et testez-les.
-    Soumettez une pull request.
+    Soumettez une merge request.
 
 ## Licence
 Ce projet est sous licence MIT.
