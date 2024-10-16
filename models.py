@@ -46,12 +46,17 @@ class CadreDeFacturation(BaseModel):
 	code_structure_valideur: Optional[str] = None
 
 class Destinataire(BaseModel):
-	code_destinataire: str
+	nom: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
+	code_destinataire: str # SIRET
 	code_service_executant: Optional[str] = None
 
 class Fournisseur(BaseModel):
+	nom: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
+	siret: Optional[str] = ''  # utilisé dans facturx mais pas dans l'API Chorus
+	pays_code_iso: Optional[str] = ''  # utilisé dans facturx mais pas dans l'API Chorus
+	numero_tva_intra: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
 	code_coordonnees_bancaires_fournisseur: Optional[int] = 0
-	id_fournisseur: int
+	id_fournisseur: int # identifiant chorus pro
 	id_service_fournisseur: Optional[int] = None
 
 class LignePoste(BaseModel):
@@ -93,7 +98,7 @@ class PieceJointePrincipale(BaseModel):
 	piece_jointe_principale_designation: str
 	'''Nombre : identifiant technique de la pièce jointe dans le système
 	obtenu par deposerPdfFacture ou ajouterFichierDansSysteme'''
-	piece_jointe_principale_id: int
+	piece_jointe_principale_id: Optional[int] = 0
 
 
 class ModePaiement(str, Enum):
@@ -167,90 +172,24 @@ class Facture(BaseModel):
 
 	def to_chorus_pro_payload(self) -> dict:
 		data = self.dict(by_alias=True, exclude_unset=True)
+		cle_a_detruire = [ # des champs sont pour facturx mais ne fonctionnent pas dans la payload cpro
+			("fournisseur", "pays_code_iso"),
+			("fournisseur", "nom"),
+			("fournisseur", "siret"),
+			("destinataire", "nom"),
+		]
+		for elt in cle_a_detruire:
+			try:
+				del data[elt[0]][elt[1]]
+			except KeyError:
+				# element inexistant, c'est ce qu'on veut
+				continue
 		transformed_data = transform_dict_keys(data, to_camel_case)
 		return transformed_data
 
-	def to_facturx_basic(self):
-		from xml.etree.ElementTree import Element, SubElement, tostring
-
-		# Namespace Factur-X (ceci doit être ajusté selon la norme exacte, ici on se concentre sur la structure)
-		ns = {"rsm": "urn:factur-x:basic"}
-
-		# Création de l'élément racine
-		invoice = Element('rsm:CrossIndustryInvoice', nsmap=ns)
-
-		# Ajouter l'en-tête de l'invoice
-		header_trade = SubElement(invoice, 'rsm:ExchangedDocumentContext')
-		header_id = SubElement(header_trade, 'rsm:ID')
-		header_id.text = '123456789'  # Exemple d'ID
-
-		# Bloc de l'acheteur (Buyer)
-		trade_party_buyer = SubElement(invoice, 'rsm:BuyerTradeParty')
-		buyer_id = SubElement(trade_party_buyer, 'rsm:ID')
-		buyer_id.text = self.destinataire.code_destinataire
-
-		# Bloc du fournisseur (Seller)
-		trade_party_seller = SubElement(invoice, 'rsm:SellerTradeParty')
-		seller_id = SubElement(trade_party_seller, 'rsm:ID')
-		seller_id.text = str(self.fournisseur.id_fournisseur)
-
-		# Références
-		references = SubElement(invoice, 'rsm:ApplicableHeaderTradeAgreement')
-		order_reference = SubElement(references, 'rsm:BuyerOrderReferencedDocument')
-		order_reference_id = SubElement(order_reference, 'rsm:ID')
-		order_reference_id.text = self.references.numero_bon_commande or ''
-
-		# Bloc de la facture (Invoice)
-		trade_settlement = SubElement(invoice, 'rsm:ApplicableHeaderTradeSettlement')
-		invoice_currency = SubElement(trade_settlement, 'rsm:InvoiceCurrencyCode')
-		invoice_currency.text = self.references.devise_facture
-
-		# Montants de la facture
-		total_monetary_summation = SubElement(trade_settlement, 'rsm:SpecifiedTradeSettlementMonetarySummation')
-		line_total_amount = SubElement(total_monetary_summation, 'rsm:LineTotalAmount')
-		line_total_amount.text = str(self.montant_total.montant_ht_total)
-		tax_total_amount = SubElement(total_monetary_summation, 'rsm:TaxTotalAmount')
-		tax_total_amount.text = str(self.montant_total.montant_tva)
-		payable_amount = SubElement(total_monetary_summation, 'rsm:GrandTotalAmount')
-		payable_amount.text = str(self.montant_total.montant_a_payer)
-
-		# Ajouter les lignes de la facture (Invoice Lines)
-		for i, poste in enumerate(self.ligne_poste, start=1):
-			invoice_line = SubElement(invoice, 'rsm:IncludedSupplyChainTradeLineItem')
-			line_id = SubElement(invoice_line, 'rsm:AssociatedDocumentLineDocument')
-			line_id_value = SubElement(line_id, 'rsm:LineID')
-			line_id_value.text = str(poste.ligne_poste_numero)
-
-			line_description = SubElement(invoice_line, 'rsm:SpecifiedTradeProduct')
-			item_name = SubElement(line_description, 'rsm:Name')
-			item_name.text = poste.ligne_poste_denomination
-
-			# Montant unitaire HT
-			trade_price = SubElement(invoice_line, 'rsm:SpecifiedLineTradeAgreement')
-			unit_price = SubElement(trade_price, 'rsm:GrossPriceProductTradePrice')
-			unit_price_amount = SubElement(unit_price, 'rsm:ChargeAmount')
-			unit_price_amount.text = str(poste.ligne_poste_montant_unitaire_ht)
-
-			# Quantité
-			trade_delivery = SubElement(invoice_line, 'rsm:SpecifiedLineTradeDelivery')
-			billed_quantity = SubElement(trade_delivery, 'rsm:BilledQuantity')
-			billed_quantity.text = str(poste.ligne_poste_quantite)
-
-			# Total de la ligne
-			trade_settlement = SubElement(invoice_line, 'rsm:SpecifiedLineTradeSettlement')
-			net_amount = SubElement(trade_settlement, 'rsm:SpecifiedTradeSettlementLineMonetarySummation')
-			net_amount_value = SubElement(net_amount, 'rsm:LineTotalAmount')
-			net_amount_value.text = str(poste.ligne_poste_montant_unitaire_ht * poste.ligne_poste_quantite)
-
-			# TVA applicable
-			tax = SubElement(trade_settlement, 'rsm:ApplicableTradeTax')
-			tax_rate = SubElement(tax, 'rsm:RateApplicablePercent')
-			tax_rate.text = str(poste.ligne_poste_taux_tva_manuel)
-
-		# Convertir l'élément en XML
-		xml_string = tostring(invoice, encoding='utf-8', method='xml').decode('utf-8')
-
-		return xml_string
+	def to_facturx_minimum(self):
+		from .utils.facturx import gen_facturx_minimum
+		return gen_facturx_minimum(self)
 
 
 

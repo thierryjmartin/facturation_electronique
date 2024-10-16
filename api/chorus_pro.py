@@ -374,7 +374,7 @@ if __name__ == '__main__':
 			# code_service_executant est absent
 		),
 		fournisseur=Fournisseur(
-			id_fournisseur=identifiant_cpro
+			id_fournisseur=identifiant_cpro,
 			# Les autres champs du fournisseur sont absents
 		),
 		cadre_de_facturation=CadreDeFacturation(
@@ -474,35 +474,27 @@ if __name__ == '__main__':
 
 	from ..utils.files import *
 	file_path = get_absolute_path("facture_electronique/exemples/Facture-2024-003.pdf")
-	print(file_path)
+
 	file_path_pdfa = get_absolute_path("facture_electronique/exemples/Facture_pdfa-2024-003.pdf")
-	from ..utils.pdfs import *
+	from ..utils.pdfs import convert_to_pdfa
 	convert_to_pdfa(file_path, file_path_pdfa)
-
-	reponse_fichier = c.ajouter_fichier_dans_systeme(
-		file_to_base64(file_path_pdfa),
-		"facture.pdf",
-		guess_mime_type(file_path),
-		get_file_extension(file_path),
-	)
-
-	pj_id = reponse_fichier["pieceJointeId"]
 
 	exemple_facture_mode_pdf = Facture(
 		mode_depot="DEPOT_PDF_API",
-		numero_facture_saisi="20240000000000000100", # ce champ n'est pas utilisé en mode_depot saisie_api
+		numero_facture_saisi="20240000000000000101", # ce champ n'est pas utilisé en mode_depot saisie_api
 		date_facture="2024-10-15", # seulement en depot PDF
 		id_utilisateur_courant=0,
 		piece_jointe_principale = [PieceJointePrincipale(
 			piece_jointe_principale_designation = 'facture',
-			piece_jointe_principale_id = pj_id
+			# piece_jointe_principale_id = pj_id
 		)],
 		destinataire=Destinataire(
 			code_destinataire="99986401570264"
 			# code_service_executant est absent
 		),
 		fournisseur=Fournisseur(
-			id_fournisseur=identifiant_cpro
+			id_fournisseur=identifiant_cpro,
+			pays_code_iso = 'FR',
 			# Les autres champs du fournisseur sont absents
 		),
 		cadre_de_facturation=CadreDeFacturation(
@@ -529,6 +521,32 @@ if __name__ == '__main__':
 		),
 		commentaire = '',
 	)
+
+	import facturx
+	from ..utils.facturx import xml_from_etree
+
+	file_path_facturx = file_path + '.facturx.pdf'
+
+	facturx.generate_from_file(
+		file_path_pdfa,
+		xml_from_etree(exemple_facture_mode_pdf.to_facturx_minimum()),
+		output_pdf_file=file_path_facturx,
+		flavor='factur-x',
+		level='minimum'
+	)
+
+
+	reponse_fichier = c.ajouter_fichier_dans_systeme(
+		file_to_base64(file_path_facturx),
+		"facture.pdf",
+		guess_mime_type(file_path),
+		get_file_extension(file_path),
+	)
+
+	pj_id = reponse_fichier["pieceJointeId"]
+
+	exemple_facture_mode_pdf.piece_jointe_principale[0].piece_jointe_principale_id = pj_id
+
 	c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
 
 
