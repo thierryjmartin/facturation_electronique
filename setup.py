@@ -6,7 +6,7 @@ setup(
 	author='Thierry Martin',
 	author_email='thierry.martin.2008@gadz.org',
 	description="Facturation Electronique SDK est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, et d'autres partenaires privés. Elle supporte également le format Factur-X pour la création et l'envoi de factures électroniques.",
-	long_description=open('README.md').read(),
+	long_description=open('readme.md').read(),
 	long_description_content_type='text/markdown',
 	url='https://gitlab.com/cleverip/fr-efact-python-sdk.git',
 	packages=find_packages(),
