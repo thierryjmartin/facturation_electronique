@@ -481,7 +481,7 @@ if __name__ == '__main__':
 
 	exemple_facture_mode_pdf = Facture(
 		mode_depot="DEPOT_PDF_API",
-		numero_facture_saisi="20240000000000000107", # ce champ n'est pas utilisé en mode_depot saisie_api
+		numero_facture_saisi="20240000000000000108", # ce champ n'est pas utilisé en mode_depot saisie_api
 		date_facture="2024-10-15", # seulement en depot PDF
 		id_utilisateur_courant=0,
 		piece_jointe_principale = [PieceJointePrincipale(
@@ -489,14 +489,25 @@ if __name__ == '__main__':
 			# piece_jointe_principale_id = pj_id
 		)],
 		destinataire=Destinataire(
-			code_destinataire="99986401570264"
+			code_destinataire="99986401570264",
+			postal_trade_adress=PostalAddress(
+				postal_code='122345',
+				line_one='adresse du destinataire',
+				city_name='PARIS',
+				pays_code_iso='FR',
+			)
 			# code_service_executant est absent
 		),
 		fournisseur=Fournisseur(
 			id_fournisseur=identifiant_cpro,
-			pays_code_iso = 'FR',
 			nom='Fournisseur 26073617692140',
 			siret='26073617692140',
+			postal_trade_adress=PostalAddress(
+				postal_code='122345',
+				line_one='2 rue de l andouillette',
+				city_name='PARIS',
+				pays_code_iso='FR',
+			)
 			# Les autres champs du fournisseur sont absents
 		),
 		cadre_de_facturation=CadreDeFacturation(
