@@ -191,6 +191,10 @@ class Facture(BaseModel):
 		from .utils.facturx import gen_facturx_minimum
 		return gen_facturx_minimum(self)
 
+	def to_facturx_basic(self):
+		from .utils.facturx import gen_facturx_basic
+		return gen_facturx_basic(self)
+
 
 
 

@@ -64,7 +64,7 @@ class ChorusProAPI:
 		:param facture_id: l'identifiant unique de la facture
 		:return: dict avec les informations de statut de la facture
 		"""
-		response = self.client.get(f'/factures/{facture_id}/statut')
+		response = self.client.post(f'/factures/v1/consulter/fournisseur', json={'identifiantFactureCPP': facture_id})
 		return response.json()
 
 	def ajouter_fichier_dans_systeme(self, fichier: base64 = '', nom: str = '', type_mime: str = '', extension: str = ''):
@@ -481,7 +481,7 @@ if __name__ == '__main__':
 
 	exemple_facture_mode_pdf = Facture(
 		mode_depot="DEPOT_PDF_API",
-		numero_facture_saisi="20240000000000000101", # ce champ n'est pas utilisé en mode_depot saisie_api
+		numero_facture_saisi="20240000000000000107", # ce champ n'est pas utilisé en mode_depot saisie_api
 		date_facture="2024-10-15", # seulement en depot PDF
 		id_utilisateur_courant=0,
 		piece_jointe_principale = [PieceJointePrincipale(
@@ -495,6 +495,8 @@ if __name__ == '__main__':
 		fournisseur=Fournisseur(
 			id_fournisseur=identifiant_cpro,
 			pays_code_iso = 'FR',
+			nom='Fournisseur 26073617692140',
+			siret='26073617692140',
 			# Les autres champs du fournisseur sont absents
 		),
 		cadre_de_facturation=CadreDeFacturation(
@@ -519,7 +521,7 @@ if __name__ == '__main__':
 			motif_remise_globale_TTC="Geste commercial",
 			montant_a_payer=1400.00
 		),
-		commentaire = '',
+		commentaire = 'voici mon commentaire',
 	)
 
 	import facturx
@@ -529,10 +531,11 @@ if __name__ == '__main__':
 
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_etree(exemple_facture_mode_pdf.to_facturx_minimum()),
+		xml_from_etree(exemple_facture_mode_pdf.to_facturx_basic()),
 		output_pdf_file=file_path_facturx,
 		flavor='factur-x',
-		level='minimum'
+		level='basic',
+		check_xsd=False, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
 	)
 
 
@@ -547,7 +550,11 @@ if __name__ == '__main__':
 
 	exemple_facture_mode_pdf.piece_jointe_principale[0].piece_jointe_principale_id = pj_id
 
-	c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
+	reponse_envoi_facture = c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
+
+	id_facture_cpro = reponse_envoi_facture['identifiantFactureCPP']
+
+	c.obtenir_statut_facture(id_facture_cpro)
 
 
 

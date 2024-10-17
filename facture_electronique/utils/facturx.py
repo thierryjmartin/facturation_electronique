@@ -26,6 +26,10 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	✓ BT-24 : La balise « ram:GuidelineSpecifiedDocumentContextParameter », contient la valeur urn:factur-x.eu:1p0:minimum dans la balise « ram:ID »
 	"""
 	exchanged_document_context = SubElement(cross_industry_invoice, "{%s}ExchangedDocumentContext" % nsmap['rsm'])
+	# BT-23
+	document_context_parameter = SubElement(exchanged_document_context, "{%s}BusinessProcessSpecifiedDocumentContextParameter" % nsmap['ram'])
+	id = SubElement(document_context_parameter, "{%s}ID" % nsmap['ram'])
+	id.text = "A1" if facture.montant_total.montant_a_payer else "A2"
 	# BT-24
 	guide_line_scpecified_document_context_parameter = SubElement(exchanged_document_context,
 																  "{%s}GuidelineSpecifiedDocumentContextParameter" %
@@ -66,14 +70,21 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	else:
 		datetimestring.text = datetime.date.today().strftime("%Y%m%d")
 
-	# BG-1 included_note. pas décrit dans le format "minimum" mais "basic" car le XSD basis minimum est commun
-	# included_note = SubElement(exchanged_document, "{%s}IncludedNote" % nsmap['ram'])
-	# BT-22
-	# included_note_content = SubElement(included_note, "{%s}Content" % nsmap['ram'])
-	# included_note_content.text = " "
-	# BT-21
-	# included_note_subjectcode = SubElement(included_note, "{%s}SubjectCode" % nsmap['ram'])
-	# included_note_subjectcode.text = " "
+	if facture.commentaire:
+		# BG-1 included_note. pas décrit dans le format "minimum" mais "basic" car le XSD basis minimum est commun
+		included_note = SubElement(exchanged_document, "{%s}IncludedNote" % nsmap['ram'])
+		# BT-22
+		included_note_content = SubElement(included_note, "{%s}Content" % nsmap['ram'])
+		included_note_content.text = facture.commentaire
+		# BT-21
+		included_note_subjectcode = SubElement(included_note, "{%s}SubjectCode" % nsmap['ram'])
+		"""AAI : Information générale
+			SUR : Remarques fournisseur
+			REG : Information réglementaire
+			ABL : Information légale
+			TXD : Information fiscale
+			CUS : Information douanière"""
+		included_note_subjectcode.text = "AAI"
 
 	"""
 	Le bloc regroupant les données de la facture sous la balise « rsm:SupplyChainTradeTransaction », composé des blocs suivants :
@@ -189,5 +200,5 @@ def gen_facturx_basic(facture: Facture) -> Element:
 
 def xml_from_etree(etree):
 	# Convertir l'élément en XML
-	xml_string = tostring(etree, encoding='utf-8', method='xml')
+	xml_string = tostring(etree, encoding='utf-8', method='xml', xml_declaration=True, pretty_print=True, )
 	return xml_string
