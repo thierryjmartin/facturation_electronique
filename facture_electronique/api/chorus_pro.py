@@ -547,7 +547,8 @@ if __name__ == '__main__':
 				ligne_poste_montant_unitaire_HT=50.00,
 				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=20
+				ligne_poste_taux_tva_manuel=20,
+				ligne_poste_tva_categorie = 'S'
 			),
 			LignePoste(
 				ligne_poste_numero=2,
@@ -558,7 +559,8 @@ if __name__ == '__main__':
 				ligne_poste_montant_unitaire_HT=36.00,
 				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=2.1
+				ligne_poste_taux_tva_manuel=2.1,
+				ligne_poste_tva_categorie = 'S'
 			),
 			LignePoste(
 				ligne_poste_numero=3,
@@ -569,7 +571,8 @@ if __name__ == '__main__':
 				ligne_poste_montant_unitaire_HT=24.00,
 				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=5
+				ligne_poste_taux_tva_manuel=5,
+				ligne_poste_tva_categorie = 'S'
 			),
 			LignePoste(
 				ligne_poste_numero=4,
@@ -580,7 +583,8 @@ if __name__ == '__main__':
 				ligne_poste_montant_unitaire_HT=10.00,
 				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=20
+				ligne_poste_taux_tva_manuel=20,
+				ligne_poste_tva_categorie = 'S'
 			)
 		],
 		ligne_tva=[

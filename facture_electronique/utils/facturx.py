@@ -1,6 +1,7 @@
 from ..models import Facture, TypeFacture
 from lxml.etree import Element, SubElement, tostring
 from datetime import datetime
+from collections import defaultdict
 
 LEVEL_MINIMUM = 'minimum'
 LEVEL_BASIC = 'basic'
@@ -65,13 +66,25 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		# BT-150 Item price base quantity unit of measure code
 		basis_quantity.set("unitCode", ligne_facture.ligne_poste_unite)
 		# BT-129 LINE TRADE DELIVERY
-
-
-
-
-
-
-
+		specified_line_trade_delivery = SubElement(ligne, "{%s}SpecifiedLineTradeDelivery" % nsmap['ram'])
+		# BT-129 The quantity of items (goods or services) that is charged in the Invoice line.
+		# CHORUS PRO: Invoiced quantity is supported on 10 digits maximum.
+		billed_quantity = SubElement(specified_line_trade_delivery, "{%s}BilledQuantity" % nsmap['ram'])
+		billed_quantity.text = "%.2f" % ligne_facture.ligne_poste_quantite
+		billed_quantity.set("unitCode", ligne_facture.ligne_poste_unite)
+		# BG-30 Line trade settlement
+		line_trade_settlement = SubElement(ligne, "{%s}SpecifiedLineTradeSettlement" % nsmap['ram'])
+		# BG-30 Ligne VAT Information
+		applicable_trade_taxe = SubElement(line_trade_settlement, "{%s}ApplicableTradeTaxe" % nsmap['ram'])
+		# BT-151 Tax Type(Code)Invoiced item VAT category code, Content
+		type_code = SubElement(applicable_trade_taxe, "{%s}TypeCode" % nsmap['ram'])
+		type_code.text = 'VAT'
+		# Invoiced item VAT category code
+		category_code = SubElement(applicable_trade_taxe, "{%s}CategoryCode" % nsmap['ram'])
+		category_code.text = ligne_facture.ligne_poste_tva_categorie
+		# BT-152 Invoiced item VAT rate
+		rate_applicable_percent = SubElement(applicable_trade_taxe, "{%s}RateApplicablePercent" % nsmap['ram'])
+		rate_applicable_percent.text = "%.2f" % ligne_facture.ligne_poste_taux_tva_manuel
 
 
 def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:

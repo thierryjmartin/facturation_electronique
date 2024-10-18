@@ -5,33 +5,6 @@ from typing import List, Optional
 from .utils.strings_and_dicts import to_camel_case, transform_dict_keys
 
 
-def compare_dicts(dict1, dict2):
-	"""
-	Compare two dictionaries recursively and return a list of differences.
-	"""
-	differences = []
-
-	# Check keys in dict1 that are missing or different in dict2
-	for key in dict1:
-		if key not in dict2:
-			differences.append(f"Key '{key}' found in dict1 but missing in dict2")
-		else:
-			if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
-				# Recursively compare nested dictionaries
-				differences.extend(
-					[f"In key '{key}': {diff}" for diff in compare_dicts(dict1[key], dict2[key])]
-				)
-			elif dict1[key] != dict2[key]:
-				differences.append(f"Value mismatch at key '{key}': dict1={dict1[key]}, dict2={dict2[key]}")
-
-	# Check keys in dict2 that are missing in dict1
-	for key in dict2:
-		if key not in dict1:
-			differences.append(f"Key '{key}' found in dict2 but missing in dict1")
-
-	return differences
-
-
 class CodeCadreFacturation(str, Enum):
 	a1 = "A1_FACTURE_FOURNISSEUR"
 	a2 = "A2_FACTURE_FOURNISSEUR_DEJA_PAYEE"
@@ -41,9 +14,10 @@ class CodeCadreFacturation(str, Enum):
 
 class CadreDeFacturation(BaseModel):
 	code_cadre_facturation: str
-	code_service_valideur: Optional[str] = CodeCadreFacturation
+	code_service_valideur: Optional[CodeCadreFacturation] = "A1_FACTURE_FOURNISSEUR"
 	"""Si le cadre de facturation est un cadre de facturation de cotraitant ou de sous-traitant (A9, A12) alors le valideur doit obligatoirement être renseigné."""
 	code_structure_valideur: Optional[str] = None
+
 
 class AdressePostale(BaseModel):
 	code_postal: Optional[str] = None
@@ -70,16 +44,32 @@ class Fournisseur(BaseModel):
 	id_service_fournisseur: Optional[int] = None
 
 
+class TvaCategories(str, Enum):
+	# Défini dans facturx BASIC - Invoiced item VAT category code
+	# The VAT category codes are as follows:
+	tva_cat_S = 'S' # S = Standard VAT rate (standard)
+	tva_cat_zero_rated_good = 'Z' # Z = Zero rated goods (NON APPLICABLE EN FRANCE)
+	tva_cat_exempt = 'E' # E = VAT exempt
+	tva_cat_reverse_charge = 'AE' # AE = Reverse charge
+	tva_cat_intra_community_supply = 'K' # K = Intra-Community supply (specific reverse charge)
+	tva_cat_export_outside_EU = 'G' # G = Exempt VAT for Export outside EU
+	tva_cat_outside_vat_scope = 'O' # O = Outside VAT scope
+	tva_cat_canary = 'L' # L = Canary Islands
+	tva_cat_ceuta = 'M' # M = Ceuta and Mellila
+
+
 class LignePoste(BaseModel):
-	ligne_poste_denomination: str
-	ligne_poste_montant_remise_HT: float
-	ligne_poste_montant_unitaire_HT: PositiveFloat
 	ligne_poste_numero: int
-	ligne_poste_quantite: float
 	ligne_poste_reference: str
+	ligne_poste_denomination: str
+	ligne_poste_quantite: float
+	ligne_poste_unite: str
+	ligne_poste_montant_unitaire_HT: PositiveFloat
+	ligne_poste_montant_remise_HT: float
 	ligne_poste_taux_tva: str
 	ligne_poste_taux_tva_manuel: float
-	ligne_poste_unite: str
+	ligne_poste_tva_categorie: Optional[TvaCategories] = None  # pour facturx Pro basic
+
 
 class LigneTva(BaseModel):
 	ligne_tva_montant_base_ht_par_taux: float
@@ -119,6 +109,7 @@ class ModePaiement(str, Enum):
 	espece = "ESPECE"
 	autre = "AUTRE"
 	report = "REPORT"
+
 
 class TypeFacture(str, Enum):
 	facture = 'FACTURE'
