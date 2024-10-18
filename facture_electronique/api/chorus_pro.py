@@ -481,8 +481,8 @@ if __name__ == '__main__':
 
 	exemple_facture_mode_pdf = Facture(
 		mode_depot="DEPOT_PDF_API",
-		numero_facture_saisi="20240000000000000108", # ce champ n'est pas utilisé en mode_depot saisie_api
-		date_facture="2024-10-15", # seulement en depot PDF
+		numero_facture_saisi="20240000000000000109", # ce champ n'est pas utilisé en mode_depot saisie_api
+		date_facture="2024-10-18", # seulement en depot PDF
 		id_utilisateur_courant=0,
 		piece_jointe_principale = [PieceJointePrincipale(
 			piece_jointe_principale_designation = 'facture',
@@ -544,7 +544,7 @@ if __name__ == '__main__':
 
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_etree(exemple_facture_mode_pdf.to_facturx_basic()),
+		xml_from_etree(exemple_facture_mode_pdf.to_facturx_minimum()),
 		output_pdf_file=file_path_facturx,
 		flavor='factur-x',
 		level='basic',

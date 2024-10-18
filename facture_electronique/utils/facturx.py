@@ -124,7 +124,6 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	# BG-5
 	postal_trade_adress = SubElement(seller_trade_party, "{%s}PostalTradeAddress" % nsmap['ram'])
 	country_id = SubElement(postal_trade_adress, "{%s}CountryID" % nsmap['ram'])
-	print(facture.fournisseur)
 	country_id.text = facture.fournisseur.adresse_postale.pays_code_iso
 	post_code = SubElement(postal_trade_adress, "{%s}PostcodeCode" % nsmap['ram'])
 	post_code.text = facture.fournisseur.adresse_postale.code_postal

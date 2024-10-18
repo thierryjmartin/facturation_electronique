@@ -3,11 +3,11 @@ import ghostscript
 def convert_to_pdfa(input_pdf_path, output_pdfa_path):
 	args = [
 		"gs",                         # Ghostscript command
-		"-dPDFA",                     # Enable PDF/A output
+		"-dPDFA=3",                     # Enable PDF/A output
 		"-dBATCH",                    # Batch mode: no user interaction
 		"-dNOPAUSE",                  # No pause between pages
 		"-dNOOUTERSAVE",              # Disable outer save level
-		"-sProcessColorModel=DeviceRGB", # Use RGB color model
+		"-sColorConversionStrategy=RGB"
 		"-sDEVICE=pdfwrite",          # Set output device to pdfwrite
 		"-dPDFACompatibilityPolicy=1", # PDF/A-1b compliance policy
 		f"-sOutputFile={output_pdfa_path}", # Output file path
