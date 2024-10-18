@@ -57,7 +57,7 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		indicator = SubElement(charge_indicator, "{%s}Indicator" % nsmap['udt'])
 		indicator.text = "false"
 		actual_amount = SubElement(item_price_discount, "{%s}ActualAmount" % nsmap['ram'])
-		actual_amount.text = "%.2f" % ligne_facture.ligne_poste_montant_remise_HT
+		actual_amount.text = "%.2f" % (ligne_facture.ligne_poste_montant_remise_HT / ligne_facture.ligne_poste_quantite)
 		# BT-146 Item net price The price of an item, exclusive of VAT, after subtracting item price discount.
 		item_net_price = SubElement(specified_trade_agreements, "{%s}NetPriceProductTradePrice" % nsmap['ram'])
 		charge_amount = SubElement(item_net_price, "{%s}ChargeAmount" % nsmap['ram'])
@@ -103,6 +103,22 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		date_fin_retenue = ligne_facture.ligne_poste_date_fin or ligne_facture.ligne_poste_date_debut or facture.date_facture
 		date_time_string.text = _parse_date_chorus_vers_facturx(date_fin_retenue)
 		# BG-27 INVOICE LINE ALLOWANCES
+		specified_trade_allowance_charge = SubElement(line_trade_settlement, "{%s}SpecifiedTradeAllowanceCharge" % nsmap['ram'])
+		charge_indicator = SubElement(specified_trade_allowance_charge, "{%s}ChargeIndicator" % nsmap['ram'])
+		indicator = SubElement(charge_indicator, "{%s}Indicator" % nsmap['udt'])
+		indicator.text = "false"
+		# BT-136 Invoice line allowance amount
+		actual_amount = SubElement(specified_trade_allowance_charge, "{%s}ActualAmount" % nsmap['ram'])
+		actual_amount.text = "%.2f" % ligne_facture.ligne_poste_montant_remise_HT
+		if ligne_facture.ligne_poste_code_raison_reduction:
+			reason_code = SubElement(specified_trade_allowance_charge, "{%s}ReasonCode" % nsmap['ram'])
+			reason_code.text = ligne_facture.ligne_poste_code_raison_reduction_code
+		if ligne_facture.ligne_poste_code_raison_reduction:
+			reason = SubElement(specified_trade_allowance_charge, "{%s}Reason" % nsmap['ram'])
+			reason.text = ligne_facture.ligne_poste_code_raison_reduction
+		# BG-28 INVOICE LINE CHARGES
+
+
 
 
 def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:

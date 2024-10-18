@@ -58,6 +58,16 @@ class TvaCategories(str, Enum):
 	tva_cat_ceuta = 'M' # M = Ceuta and Mellila
 
 
+class RaisonReductionCode(str, Enum):
+	raison_reduction_code_advertising = 'AA' # AA = Advertising discount
+	raison_reduction_packing_supplement = 'ABL' # ABL = Packing supplement
+	raison_reduction_code_other_services = 'ADR' # ADR = Other services
+	raison_reduction_code_removal = 'ADT' # ADT = Removal
+	raison_reduction_cdoe_transportation_cost = 'FC' # FC = transportation costs
+	raison_reduction_code_financial_expences = 'FI' # FI = Financial expenses
+	raison_reduction_code_labeling = 'LA' # LA = Labeling
+
+
 class LignePoste(BaseModel):
 	ligne_poste_numero: int
 	ligne_poste_reference: str
@@ -68,9 +78,11 @@ class LignePoste(BaseModel):
 	ligne_poste_montant_remise_HT: float
 	ligne_poste_taux_tva: str
 	ligne_poste_taux_tva_manuel: float
-	ligne_poste_tva_categorie: Optional[TvaCategories] = None  # pour facturx Pro basic
-	ligne_poste_date_debut: Optional[str] = None  # pour facturx Pro basic
-	ligne_poste_date_fin : Optional[str] = None # pour facturx Pro basic
+	ligne_poste_tva_categorie: Optional[TvaCategories] = None  # pour facturx basic
+	ligne_poste_date_debut: Optional[str] = None  # pour facturx basic
+	ligne_poste_date_fin : Optional[str] = None # pour facturx basic
+	ligne_poste_code_raison_reduction_code: Optional[RaisonReductionCode] = None # pour facturx basic
+	ligne_poste_code_raison_reduction: Optional[str] = None
 
 
 class LigneTva(BaseModel):
