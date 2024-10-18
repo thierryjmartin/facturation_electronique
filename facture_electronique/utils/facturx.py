@@ -35,6 +35,43 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		# BT-153 Identifiant d'article basé sur un schéma enregistré.
 		name = SubElement(specified_trade_product, "{%s}Name" % nsmap['ram'])
 		name.text = ligne_facture.ligne_poste_denomination
+		# BG-29  Line trade agreements (price details)
+		specified_trade_agreements = SubElement(ligne, "{%s}SpecifiedLineTradeAgreement" % nsmap['ram'])
+		# BT-148 Price detail - item gross price
+		item_gross_price = SubElement(specified_trade_agreements, "{%s}GrossPriceProductTradePrice" % nsmap['ram'])
+		# BT-148
+		# BR-28: The Item gross price (BT-148) shall NOT be negative.
+		charge_amount = SubElement(item_gross_price, "{%s}ChargeAmount" % nsmap['ram'])
+		charge_amount.text = "%.2f" % ligne_facture.ligne_poste_montant_unitaire_HT
+		# BT-149-1 Item price base quantity
+		basis_quantity = SubElement(item_gross_price, "{%s}BasisQuantity" % nsmap['ram'])
+		basis_quantity.text = "%.2f" % ligne_facture.ligne_poste_quantite
+		basis_quantity.set("unitCode", ligne_facture.ligne_poste_unite)
+		# BT-147 Item price discount
+		item_price_discount = SubElement(item_gross_price, "{%s}AppliedTradeAllowanceCharge" % nsmap['ram'])
+		charge_indicator = SubElement(item_price_discount, "{%s}ChargeIndicator" % nsmap['ram'])
+		indicator = SubElement(charge_indicator, "{%s}Indicator" % nsmap['udt'])
+		indicator.text = "false"
+		actual_amount = SubElement(item_price_discount, "{%s}ActualAmount" % nsmap['ram'])
+		actual_amount.text = "%.2f" % ligne_facture.ligne_poste_montant_remise_HT
+		# BT-146 Item net price The price of an item, exclusive of VAT, after subtracting item price discount.
+		item_net_price = SubElement(item_gross_price, "{%s}NetPriceProductTradePrice" % nsmap['ram'])
+		charge_amount = SubElement(item_net_price, "{%s}ChargeAmount" % nsmap['ram'])
+		charge_amount.text = "%.2f" % ligne_facture.ligne_poste_montant_unitaire_HT - ligne_facture.ligne_poste_montant_remise_HT
+		# BT-149 Item price base quantity
+		# Optional, if filled and if BT-148 is present (EN16931 and EXTENDED profiles), then it should be the same value than BT-149-1
+		basis_quantity = SubElement(item_net_price, "{%s}BasisQuantity" % nsmap['ram'])
+		basis_quantity.text = "%.2f" % ligne_facture.ligne_poste_quantite
+		# BT-150 Item price base quantity unit of measure code
+		basis_quantity.set("unitCode", ligne_facture.ligne_poste_unite)
+		# BT-129 LINE TRADE DELIVERY
+
+
+
+
+
+
+
 
 
 def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:

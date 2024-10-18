@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, PositiveFloat
 from enum import Enum
 from typing import List, Optional
 
@@ -73,7 +73,7 @@ class Fournisseur(BaseModel):
 class LignePoste(BaseModel):
 	ligne_poste_denomination: str
 	ligne_poste_montant_remise_HT: float
-	ligne_poste_montant_unitaire_HT: float
+	ligne_poste_montant_unitaire_HT: PositiveFloat
 	ligne_poste_numero: int
 	ligne_poste_quantite: float
 	ligne_poste_reference: str
