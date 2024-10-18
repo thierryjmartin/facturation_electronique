@@ -48,6 +48,7 @@ class CadreDeFacturation(BaseModel):
 class AdressePostale(BaseModel):
 	code_postal: Optional[str] = None
 	ligne_un: Optional[str] = None
+	ligne_deux: Optional[str] = None
 	nom_ville: Optional[str] = None
 	pays_code_iso: Optional[str] = ''
 
@@ -198,8 +199,8 @@ class Facture(BaseModel):
 		return transformed_data
 
 	def to_facturx_minimum(self):
-		from .utils.facturx import gen_facturx_minimum
-		return gen_facturx_minimum(self)
+		from .utils.facturx import gen_facturx
+		return gen_facturx(self)
 
 	def to_facturx_basic(self):
 		from .utils.facturx import gen_facturx_basic

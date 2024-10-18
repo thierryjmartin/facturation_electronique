@@ -2,7 +2,10 @@ from ..models import Facture, TypeFacture
 from lxml.etree import Element, SubElement, tostring
 from datetime import datetime
 
-def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -> Element:
+LEVEL_MINIMUM = 'minimum'
+LEVEL_BASIC = 'basic'
+
+def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:
 	"""
 	Pour Chorus Pro, permet de générer un xml qui représente une facture CleverIP selon le standard Chorus Pro (MINIMUM)
 	:return: un fichier XML au format facture-x représentant la facture envoyée en argument
@@ -35,7 +38,10 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 																  "{%s}GuidelineSpecifiedDocumentContextParameter" %
 																  nsmap['ram'])
 	id = SubElement(guide_line_scpecified_document_context_parameter, "{%s}ID" % nsmap['ram'])
-	id.text = bt_24
+	if level == LEVEL_MINIMUM:
+		id.text = "urn:factur-x.eu:1p0:minimum"
+	else:
+		id.text = "urn:cen.eu:EN 16931:2017#compliant#urn:factur-x.eu:1p0:basic"
 
 	"""
 	Bloc d’entête du Document contenant les données BT-1, BT-2 et BT-3, à l’intérieur de la balise « rsm:ExchangedDocument » 
@@ -70,7 +76,7 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	else:
 		datetimestring.text = datetime.date.today().strftime("%Y%m%d")
 
-	if facture.commentaire:
+	if level != LEVEL_MINIMUM and facture.commentaire:
 		# BG-1 included_note. pas décrit dans le format "minimum" mais "basic" car le XSD basis minimum est commun
 		included_note = SubElement(exchanged_document, "{%s}IncludedNote" % nsmap['ram'])
 		# BT-22
@@ -125,12 +131,15 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	postal_trade_adress = SubElement(seller_trade_party, "{%s}PostalTradeAddress" % nsmap['ram'])
 	country_id = SubElement(postal_trade_adress, "{%s}CountryID" % nsmap['ram'])
 	country_id.text = facture.fournisseur.adresse_postale.pays_code_iso
-	post_code = SubElement(postal_trade_adress, "{%s}PostcodeCode" % nsmap['ram'])
-	post_code.text = facture.fournisseur.adresse_postale.code_postal
-	line_one = SubElement(postal_trade_adress, "{%s}LineOne" % nsmap['ram'])
-	line_one.text = facture.fournisseur.adresse_postale.ligne_un
-	city_name = SubElement(postal_trade_adress, "{%s}CityName" % nsmap['ram'])
-	city_name.text = facture.fournisseur.adresse_postale.nom_ville
+	if level != LEVEL_MINIMUM:
+		post_code = SubElement(postal_trade_adress, "{%s}PostcodeCode" % nsmap['ram'])
+		post_code.text = facture.fournisseur.adresse_postale.code_postal
+		line_one = SubElement(postal_trade_adress, "{%s}LineOne" % nsmap['ram'])
+		line_one.text = facture.fournisseur.adresse_postale.ligne_un
+		line_two = SubElement(postal_trade_adress, "{%s}LineTwo" % nsmap['ram'])
+		line_two.text = facture.fournisseur.adresse_postale.ligne_deux
+		city_name = SubElement(postal_trade_adress, "{%s}CityName" % nsmap['ram'])
+		city_name.text = facture.fournisseur.adresse_postale.nom_ville
 	# BT-31
 	specified_tax_reigstration = SubElement(seller_trade_party, "{%s}SpecifiedTaxRegistration" % nsmap['ram'])
 	id = SubElement(specified_tax_reigstration, "{%s}ID" % nsmap['ram'])
@@ -150,12 +159,15 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	postal_trade_adress = SubElement(buyer_trade_party, "{%s}PostalTradeAddress" % nsmap['ram'])
 	country_id = SubElement(postal_trade_adress, "{%s}CountryID" % nsmap['ram'])
 	country_id.text = facture.destinataire.adresse_postale.pays_code_iso
-	post_code = SubElement(postal_trade_adress, "{%s}PostcodeCode" % nsmap['ram'])
-	post_code.text = facture.destinataire.adresse_postale.code_postal
-	line_one = SubElement(postal_trade_adress, "{%s}LineOne" % nsmap['ram'])
-	line_one.text = facture.destinataire.adresse_postale.ligne_un
-	city_name = SubElement(postal_trade_adress, "{%s}CityName" % nsmap['ram'])
-	city_name.text = facture.destinataire.adresse_postale.nom_ville
+	if level != LEVEL_MINIMUM:
+		post_code = SubElement(postal_trade_adress, "{%s}PostcodeCode" % nsmap['ram'])
+		post_code.text = facture.destinataire.adresse_postale.code_postal
+		line_one = SubElement(postal_trade_adress, "{%s}LineOne" % nsmap['ram'])
+		line_one.text = facture.destinataire.adresse_postale.ligne_un
+		line_two = SubElement(postal_trade_adress, "{%s}LineTwo" % nsmap['ram'])
+		line_two.text = facture.destinataire.adresse_postale.ligne_deux
+		city_name = SubElement(postal_trade_adress, "{%s}CityName" % nsmap['ram'])
+		city_name.text = facture.destinataire.adresse_postale.nom_ville
 
 	# BT-13
 	buyer_order_referenced_document = SubElement(applicable_header_trade_agreement,
@@ -163,11 +175,12 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	issuer_assigned_id = SubElement(buyer_order_referenced_document, "{%s}IssuerAssignedID" % nsmap['ram'])
 	# a priori optionel
 	issuer_assigned_id.text = facture.references.numero_bon_commande
-	# BT-12 Identifiant de contrat, référence de document (pour valider XML)
-	contract_referenced_document = SubElement(applicable_header_trade_agreement, "{%s}ContractReferencedDocument" % nsmap['ram'])
-	issuer_assigned_id = SubElement(contract_referenced_document, "{%s}IssuerAssignedID" % nsmap['ram'])
-	# a priori optionel
-	issuer_assigned_id.text = facture.references.numero_marche  # numéro de contrat obligatoire pour valider le xml...
+	if level != LEVEL_MINIMUM:
+		# BT-12 Identifiant de contrat, référence de document
+		contract_referenced_document = SubElement(applicable_header_trade_agreement, "{%s}ContractReferencedDocument" % nsmap['ram'])
+		issuer_assigned_id = SubElement(contract_referenced_document, "{%s}IssuerAssignedID" % nsmap['ram'])
+		# a priori optionel
+		issuer_assigned_id.text = facture.references.numero_marche  # numéro de contrat obligatoire pour valider le xml...
 
 	"""
 	Un bloc vide (car nécessaire à la conformité du message) correspondant aux informations de livraison.
@@ -193,9 +206,10 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	specified_trade_settlement_header_monetary_summation = SubElement(applicable_header_trade_settlement,
 																	  "{%s}SpecifiedTradeSettlementHeaderMonetarySummation" %
 																	  nsmap['ram'])
-	# BT-107
-	allowance_total_amount = SubElement(specified_trade_settlement_header_monetary_summation, "{%s}AllowanceTotalAmount" % nsmap['ram'])
-	allowance_total_amount.text = "%.2f" % facture.montant_total.montant_remise_globale_TTC
+	if level != LEVEL_MINIMUM:
+		# BT-107
+		allowance_total_amount = SubElement(specified_trade_settlement_header_monetary_summation, "{%s}AllowanceTotalAmount" % nsmap['ram'])
+		allowance_total_amount.text = "%.2f" % facture.montant_total.montant_remise_globale_TTC
 	# BT-109
 	taxbasistotalamount = SubElement(specified_trade_settlement_header_monetary_summation, "{%s}TaxBasisTotalAmount" % nsmap['ram'])
 	taxbasistotalamount.text = "%.2f" % facture.montant_total.montant_ht_total
@@ -213,8 +227,7 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	return cross_industry_invoice
 
 def gen_facturx_basic(facture: Facture) -> Element:
-	cross_industry_invoice = gen_facturx_minimum(facture, bt_24="urn:cen.eu:EN 16931:2017#compliant#urn:factur-x.eu:1p0:basic")
-
+	cross_industry_invoice = gen_facturx(facture, level=LEVEL_BASIC)
 	return cross_industry_invoice
 
 

@@ -489,6 +489,7 @@ if __name__ == '__main__':
 			# piece_jointe_principale_id = pj_id
 		)],
 		destinataire=Destinataire(
+			nom="acheteur 99986401570264",
 			code_destinataire="99986401570264",
 			adresse_postale=AdressePostale(
 				code_postal='122345',
@@ -502,6 +503,7 @@ if __name__ == '__main__':
 			id_fournisseur=identifiant_cpro,
 			nom='Fournisseur 26073617692140',
 			siret='26073617692140',
+			numero_tva_intra='FR61529571234',
 			adresse_postale=AdressePostale(
 				code_postal='122345',
 				ligne_un='2 rue de l andouillette',
@@ -520,7 +522,7 @@ if __name__ == '__main__':
 			type_tva="TVA_SUR_DEBIT",
 			motif_exoneration_tva=None,
 			numero_marche="VABFM001",
-			numero_bon_commande=None,
+			numero_bon_commande="coucou",
 			numero_facture_origine=None,
 			mode_paiement="ESPECE"
 		),
@@ -537,8 +539,6 @@ if __name__ == '__main__':
 
 	import facturx
 	from ..utils.facturx import xml_from_etree
-
-	print(exemple_facture_mode_pdf.fournisseur)
 
 	file_path_facturx = file_path + '.facturx.pdf'
 
