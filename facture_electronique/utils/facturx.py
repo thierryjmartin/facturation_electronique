@@ -124,13 +124,14 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 	# BG-5
 	postal_trade_adress = SubElement(seller_trade_party, "{%s}PostalTradeAddress" % nsmap['ram'])
 	country_id = SubElement(postal_trade_adress, "{%s}CountryID" % nsmap['ram'])
-	country_id.text = facture.fournisseur.postal_trade_address.pays_code_iso
+	print(facture.fournisseur)
+	country_id.text = facture.fournisseur.adresse_postale.pays_code_iso
 	post_code = SubElement(postal_trade_adress, "{%s}PostcodeCode" % nsmap['ram'])
-	post_code.text = facture.fournisseur.postal_trade_address.postcode
+	post_code.text = facture.fournisseur.adresse_postale.code_postal
 	line_one = SubElement(postal_trade_adress, "{%s}LineOne" % nsmap['ram'])
-	line_one.text = facture.fournisseur.postal_trade_address.line_one
+	line_one.text = facture.fournisseur.adresse_postale.ligne_un
 	city_name = SubElement(postal_trade_adress, "{%s}CityName" % nsmap['ram'])
-	city_name.text = facture.fournisseur.postal_trade_address.city_name
+	city_name.text = facture.fournisseur.adresse_postale.nom_ville
 	# BT-31
 	specified_tax_reigstration = SubElement(seller_trade_party, "{%s}SpecifiedTaxRegistration" % nsmap['ram'])
 	id = SubElement(specified_tax_reigstration, "{%s}ID" % nsmap['ram'])
@@ -149,13 +150,13 @@ def gen_facturx_minimum(facture: Facture, bt_24="urn:factur-x.eu:1p0:minimum") -
 
 	postal_trade_adress = SubElement(buyer_trade_party, "{%s}PostalTradeAddress" % nsmap['ram'])
 	country_id = SubElement(postal_trade_adress, "{%s}CountryID" % nsmap['ram'])
-	country_id.text = facture.destinataire.postal_trade_address.pays_code_iso
+	country_id.text = facture.destinataire.adresse_postale.pays_code_iso
 	post_code = SubElement(postal_trade_adress, "{%s}PostcodeCode" % nsmap['ram'])
-	post_code.text = facture.destinataire.postal_trade_address.postcode
+	post_code.text = facture.destinataire.adresse_postale.code_postal
 	line_one = SubElement(postal_trade_adress, "{%s}LineOne" % nsmap['ram'])
-	line_one.text = facture.destinataire.postal_trade_address.line_one
+	line_one.text = facture.destinataire.adresse_postale.ligne_un
 	city_name = SubElement(postal_trade_adress, "{%s}CityName" % nsmap['ram'])
-	city_name.text = facture.destinataire.postal_trade_address.city_name
+	city_name.text = facture.destinataire.adresse_postale.nom_ville
 
 	# BT-13
 	buyer_order_referenced_document = SubElement(applicable_header_trade_agreement,

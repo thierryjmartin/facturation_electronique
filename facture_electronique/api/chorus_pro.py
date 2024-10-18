@@ -490,10 +490,10 @@ if __name__ == '__main__':
 		)],
 		destinataire=Destinataire(
 			code_destinataire="99986401570264",
-			postal_trade_adress=PostalAddress(
-				postal_code='122345',
-				line_one='adresse du destinataire',
-				city_name='PARIS',
+			adresse_postale=AdressePostale(
+				code_postal='122345',
+				ligne_un='adresse du destinataire',
+				nom_ville='PARIS',
 				pays_code_iso='FR',
 			)
 			# code_service_executant est absent
@@ -502,10 +502,10 @@ if __name__ == '__main__':
 			id_fournisseur=identifiant_cpro,
 			nom='Fournisseur 26073617692140',
 			siret='26073617692140',
-			postal_trade_adress=PostalAddress(
-				postal_code='122345',
-				line_one='2 rue de l andouillette',
-				city_name='PARIS',
+			adresse_postale=AdressePostale(
+				code_postal='122345',
+				ligne_un='2 rue de l andouillette',
+				nom_ville='PARIS',
 				pays_code_iso='FR',
 			)
 			# Les autres champs du fournisseur sont absents
@@ -538,6 +538,8 @@ if __name__ == '__main__':
 	import facturx
 	from ..utils.facturx import xml_from_etree
 
+	print(exemple_facture_mode_pdf.fournisseur)
+
 	file_path_facturx = file_path + '.facturx.pdf'
 
 	facturx.generate_from_file(
@@ -550,22 +552,22 @@ if __name__ == '__main__':
 	)
 
 
-	reponse_fichier = c.ajouter_fichier_dans_systeme(
-		file_to_base64(file_path_facturx),
-		"facture.pdf",
-		guess_mime_type(file_path),
-		get_file_extension(file_path),
-	)
+	#reponse_fichier = c.ajouter_fichier_dans_systeme(
+	#	file_to_base64(file_path_facturx),
+	#	"facture.pdf",
+	#	guess_mime_type(file_path),
+	#	get_file_extension(file_path),
+	#)
 
-	pj_id = reponse_fichier["pieceJointeId"]
+	#pj_id = reponse_fichier["pieceJointeId"]
 
-	exemple_facture_mode_pdf.piece_jointe_principale[0].piece_jointe_principale_id = pj_id
+	#exemple_facture_mode_pdf.piece_jointe_principale[0].piece_jointe_principale_id = pj_id
 
-	reponse_envoi_facture = c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
+	#reponse_envoi_facture = c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
 
-	id_facture_cpro = reponse_envoi_facture['identifiantFactureCPP']
+	#id_facture_cpro = reponse_envoi_facture['identifiantFactureCPP']
 
-	c.obtenir_statut_facture(id_facture_cpro)
+	#c.obtenir_statut_facture(id_facture_cpro)
 
 
 

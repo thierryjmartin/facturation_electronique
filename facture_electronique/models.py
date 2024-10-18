@@ -45,15 +45,16 @@ class CadreDeFacturation(BaseModel):
 	"""Si le cadre de facturation est un cadre de facturation de cotraitant ou de sous-traitant (A9, A12) alors le valideur doit obligatoirement être renseigné."""
 	code_structure_valideur: Optional[str] = None
 
-class PostalAddress(BaseModel):
-	postcode: Optional[str] = None
-	line_one: Optional[str] = None
-	city_name: Optional[str] = None
-	pays_code_iso: Optional[str] = ''  # utilisé dans facturx mais pas dans l'API Chorus
+class AdressePostale(BaseModel):
+	code_postal: Optional[str] = None
+	ligne_un: Optional[str] = None
+	nom_ville: Optional[str] = None
+	pays_code_iso: Optional[str] = ''
+
 
 class Destinataire(BaseModel):
 	nom: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
-	postal_trade_address: Optional[PostalAddress] = None  # utilisé dans facturx mais pas dans l'API Chorus
+	adresse_postale: Optional[AdressePostale] = None  # utilisé dans facturx mais pas dans l'API Chorus
 	code_destinataire: str # SIRET
 	code_service_executant: Optional[str] = None
 
@@ -62,10 +63,11 @@ class Fournisseur(BaseModel):
 	nom: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
 	siret: Optional[str] = ''  # utilisé dans facturx mais pas dans l'API Chorus
 	numero_tva_intra: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
-	postal_trade_address: Optional[PostalAddress] = None  # utilisé dans facturx mais pas dans l'API Chorus
+	adresse_postale: Optional[AdressePostale] = None  # utilisé dans facturx mais pas dans l'API Chorus
 	code_coordonnees_bancaires_fournisseur: Optional[int] = 0
 	id_fournisseur: int # identifiant chorus pro
 	id_service_fournisseur: Optional[int] = None
+
 
 class LignePoste(BaseModel):
 	ligne_poste_denomination: str
