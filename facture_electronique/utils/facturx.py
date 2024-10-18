@@ -21,6 +21,20 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		identifiant_ligne = SubElement(ligne, "{%s}AssociatedDocumentLineDocument" % nsmap['ram'])
 		id_identifiant_ligne = SubElement(identifiant_ligne, "{%s}LineID" % nsmap['ram'])
 		id_identifiant_ligne.text = str(ligne_facture.ligne_poste_numero)
+		# BT-127 Commentaire fournissant des informations non structurées concernant la ligne de Facture.
+		#included_note = SubElement(ligne, "{%s}IncludedNote" % nsmap['ram'])
+		#included_note_content = SubElement(included_note, "{%s}Content" % nsmap['ram'])
+		#included_note_content.text = ligne_facture.ligne_poste_denomination
+		# BG-31 Informations sur l'article
+		specified_trade_product = SubElement(ligne, "{%s}SpecifiedTradeProduct" % nsmap['ram'])
+		# BT-157 Identifiant d'article basé sur un schéma enregistré.
+		global_id = SubElement(specified_trade_product, "{%s}GlobalID" % nsmap['ram'])
+		global_id.text = ligne_facture.ligne_poste_reference
+		# BT-157-1 Scheme identifier
+		global_id.set("schemeID", "")
+		# BT-153 Identifiant d'article basé sur un schéma enregistré.
+		name = SubElement(specified_trade_product, "{%s}Name" % nsmap['ram'])
+		name.text = ligne_facture.ligne_poste_denomination
 
 
 def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:
