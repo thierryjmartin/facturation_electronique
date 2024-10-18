@@ -14,6 +14,9 @@ nsmap = {
 	'rsm': 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
 }
 
+def _parse_date_chorus_vers_facturx(date_str: str) -> str:
+	return datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y%m%d")
+
 def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 	for ligne_facture in facture.ligne_poste:
 		# BG-25 1..n LIGNE DE FACTURE Groupe de termes métiers fournissant des informations sur des lignes de Facture individuelles.
@@ -85,7 +88,21 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		# BT-152 Invoiced item VAT rate
 		rate_applicable_percent = SubElement(applicable_trade_taxe, "{%s}RateApplicablePercent" % nsmap['ram'])
 		rate_applicable_percent.text = "%.2f" % ligne_facture.ligne_poste_taux_tva_manuel
-		# BG-126 INVOICE LINE PERIOD Facultatif, on laisse pour le moment
+		# BG-26 INVOICE LINE PERIOD
+		billing_specified_period = SubElement(line_trade_settlement, "{%s}BillingSpecifiedPeriod" % nsmap['ram'])
+		# BT-134 Invoice line period start date
+		start_date_time = SubElement(billing_specified_period, "{%s}StartDateTime" % nsmap['ram'])
+		date_time_string = SubElement(start_date_time, "{%s}DateTimeString" % nsmap['udt'])
+		date_time_string.set("format", "102")
+		date_debut_retenue = ligne_facture.ligne_poste_date_debut or facture.date_facture
+		date_time_string.text = _parse_date_chorus_vers_facturx(date_debut_retenue)
+		# BT-135 Invoice line period end date
+		end_date_time = SubElement(billing_specified_period, "{%s}EndDateTime" % nsmap['ram'])
+		date_time_string = SubElement(end_date_time, "{%s}DateTimeString" % nsmap['udt'])
+		date_time_string.set("format", "102")
+		date_fin_retenue = ligne_facture.ligne_poste_date_fin or ligne_facture.ligne_poste_date_debut or facture.date_facture
+		date_time_string.text = _parse_date_chorus_vers_facturx(date_fin_retenue)
+		# BG-27 INVOICE LINE ALLOWANCES
 
 
 def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:
@@ -148,7 +165,7 @@ def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:
 	datetimestring = SubElement(issue_date_time, "{%s}DateTimeString" % nsmap['udt'])
 	datetimestring.set("format", "102")
 	if facture.date_facture:
-		datetimestring.text = datetime.strptime(facture.date_facture, "%Y-%m-%d").strftime("%Y%m%d")
+		datetimestring.text = _parse_date_chorus_vers_facturx(facture.date_facture)
 	else:
 		datetimestring.text = datetime.date.today().strftime("%Y%m%d")
 

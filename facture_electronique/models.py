@@ -69,6 +69,8 @@ class LignePoste(BaseModel):
 	ligne_poste_taux_tva: str
 	ligne_poste_taux_tva_manuel: float
 	ligne_poste_tva_categorie: Optional[TvaCategories] = None  # pour facturx Pro basic
+	ligne_poste_date_debut: Optional[str] = None  # pour facturx Pro basic
+	ligne_poste_date_fin : Optional[str] = None # pour facturx Pro basic
 
 
 class LigneTva(BaseModel):
