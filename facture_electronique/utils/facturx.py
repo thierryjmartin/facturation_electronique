@@ -56,9 +56,9 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		actual_amount = SubElement(item_price_discount, "{%s}ActualAmount" % nsmap['ram'])
 		actual_amount.text = "%.2f" % ligne_facture.ligne_poste_montant_remise_HT
 		# BT-146 Item net price The price of an item, exclusive of VAT, after subtracting item price discount.
-		item_net_price = SubElement(item_gross_price, "{%s}NetPriceProductTradePrice" % nsmap['ram'])
+		item_net_price = SubElement(specified_trade_agreements, "{%s}NetPriceProductTradePrice" % nsmap['ram'])
 		charge_amount = SubElement(item_net_price, "{%s}ChargeAmount" % nsmap['ram'])
-		charge_amount.text = "%.2f" % ligne_facture.ligne_poste_montant_unitaire_HT - ligne_facture.ligne_poste_montant_remise_HT
+		charge_amount.text = "%.2f" % (ligne_facture.ligne_poste_montant_unitaire_HT - ligne_facture.ligne_poste_montant_remise_HT)
 		# BT-149 Item price base quantity
 		# Optional, if filled and if BT-148 is present (EN16931 and EXTENDED profiles), then it should be the same value than BT-149-1
 		basis_quantity = SubElement(item_net_price, "{%s}BasisQuantity" % nsmap['ram'])
@@ -75,7 +75,7 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		# BG-30 Line trade settlement
 		line_trade_settlement = SubElement(ligne, "{%s}SpecifiedLineTradeSettlement" % nsmap['ram'])
 		# BG-30 Ligne VAT Information
-		applicable_trade_taxe = SubElement(line_trade_settlement, "{%s}ApplicableTradeTaxe" % nsmap['ram'])
+		applicable_trade_taxe = SubElement(line_trade_settlement, "{%s}ApplicableTradeTax" % nsmap['ram'])
 		# BT-151 Tax Type(Code)Invoiced item VAT category code, Content
 		type_code = SubElement(applicable_trade_taxe, "{%s}TypeCode" % nsmap['ram'])
 		type_code.text = 'VAT'
@@ -85,6 +85,7 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		# BT-152 Invoiced item VAT rate
 		rate_applicable_percent = SubElement(applicable_trade_taxe, "{%s}RateApplicablePercent" % nsmap['ram'])
 		rate_applicable_percent.text = "%.2f" % ligne_facture.ligne_poste_taux_tva_manuel
+		# BG-126 INVOICE LINE PERIOD Facultatif, on laisse pour le moment
 
 
 def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:

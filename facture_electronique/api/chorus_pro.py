@@ -620,6 +620,16 @@ if __name__ == '__main__':
 		output_pdf_file=file_path_facturx,
 		flavor='factur-x',
 		level='basic',
+		check_xsd=False, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
+	)
+
+
+	facturx.generate_from_file(
+		file_path_pdfa,
+		xml_from_etree(exemple_facture_mode_pdf.to_facturx_basic()),
+		output_pdf_file=file_path_facturx,
+		flavor='factur-x',
+		level='basic',
 		check_xsd=True, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
 	)
 
