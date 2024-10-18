@@ -115,7 +115,7 @@ class ChorusProAPI:
 
 
 if __name__ == '__main__':
-	c = ChorusProAPI()
+	# c = ChorusProAPI()
 	# print(c.token)
 
 	"""
@@ -164,7 +164,9 @@ if __name__ == '__main__':
 	#	identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
 	#print(identifiant_cpro)
 
-	identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
+	identifiant_cpro = "12345"
+
+	# identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
 
 	# 2 .
 	# c.consulter_structure(26300989)
@@ -535,6 +537,72 @@ if __name__ == '__main__':
 			montant_a_payer=1400.00
 		),
 		commentaire = 'voici mon commentaire',
+		ligne_poste=[
+			LignePoste(
+				ligne_poste_numero=1,
+				ligne_poste_reference="R1",
+				ligne_poste_denomination="D1",
+				ligne_poste_quantite=10,
+				ligne_poste_unite="lot",
+				ligne_poste_montant_unitaire_HT=50.00,
+				ligne_poste_montant_remise_HT=0,
+				ligne_poste_taux_tva='',
+				ligne_poste_taux_tva_manuel=20
+			),
+			LignePoste(
+				ligne_poste_numero=2,
+				ligne_poste_reference="R2",
+				ligne_poste_denomination="D2",
+				ligne_poste_quantite=12,
+				ligne_poste_unite="Kg",
+				ligne_poste_montant_unitaire_HT=36.00,
+				ligne_poste_montant_remise_HT=0,
+				ligne_poste_taux_tva='',
+				ligne_poste_taux_tva_manuel=2.1
+			),
+			LignePoste(
+				ligne_poste_numero=3,
+				ligne_poste_reference="R3",
+				ligne_poste_denomination="D3",
+				ligne_poste_quantite=16,
+				ligne_poste_unite="lot",
+				ligne_poste_montant_unitaire_HT=24.00,
+				ligne_poste_montant_remise_HT=0,
+				ligne_poste_taux_tva='',
+				ligne_poste_taux_tva_manuel=5
+			),
+			LignePoste(
+				ligne_poste_numero=4,
+				ligne_poste_reference="XX",
+				ligne_poste_denomination="XX",
+				ligne_poste_quantite=1,
+				ligne_poste_unite="lot",
+				ligne_poste_montant_unitaire_HT=10.00,
+				ligne_poste_montant_remise_HT=0,
+				ligne_poste_taux_tva='',
+				ligne_poste_taux_tva_manuel=20
+			)
+		],
+		ligne_tva=[
+			LigneTva(
+				ligne_tva_taux_manuel=20,
+				ligne_tva_taux=None,
+				ligne_tva_montant_base_ht_par_taux=510.00,
+				ligne_tva_montant_tva_par_taux=102.00
+			),
+			LigneTva(
+				ligne_tva_taux_manuel=2.1,
+				ligne_tva_taux=None,
+				ligne_tva_montant_base_ht_par_taux=432.00,
+				ligne_tva_montant_tva_par_taux=9.072
+			),
+			LigneTva(
+				ligne_tva_taux_manuel=5,
+				ligne_tva_taux=None,
+				ligne_tva_montant_base_ht_par_taux=384.00,
+				ligne_tva_montant_tva_par_taux=19.20
+			)
+		],
 	)
 
 	import facturx
@@ -544,11 +612,11 @@ if __name__ == '__main__':
 
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_etree(exemple_facture_mode_pdf.to_facturx_minimum()),
+		xml_from_etree(exemple_facture_mode_pdf.to_facturx_basic()),
 		output_pdf_file=file_path_facturx,
 		flavor='factur-x',
 		level='basic',
-		check_xsd=False, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
+		check_xsd=True, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
 	)
 
 

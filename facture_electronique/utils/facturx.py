@@ -5,19 +5,30 @@ from datetime import datetime
 LEVEL_MINIMUM = 'minimum'
 LEVEL_BASIC = 'basic'
 
+nsmap = {
+	'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+	'udt': 'urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100',
+	'qdt': 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
+	'ram': 'urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100',
+	'rsm': 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
+}
+
+def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
+	for ligne_facture in facture.ligne_poste:
+		# BG-25 1..n LIGNE DE FACTURE Groupe de termes métiers fournissant des informations sur des lignes de Facture individuelles.
+		ligne = SubElement(element, "{%s}IncludedSupplyChainTradeLineItem" % nsmap['ram'])
+		# BT-126 Identifiant de ligne de facture
+		identifiant_ligne = SubElement(ligne, "{%s}AssociatedDocumentLineDocument" % nsmap['ram'])
+		id_identifiant_ligne = SubElement(identifiant_ligne, "{%s}LineID" % nsmap['ram'])
+		id_identifiant_ligne.text = str(ligne_facture.ligne_poste_numero)
+
+
 def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:
 	"""
 	Pour Chorus Pro, permet de générer un xml qui représente une facture CleverIP selon le standard Chorus Pro (MINIMUM)
 	:return: un fichier XML au format facture-x représentant la facture envoyée en argument
 	"""
 
-	nsmap = {
-		'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-		'udt': 'urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100',
-		'qdt': 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
-		'ram': 'urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100',
-		'rsm': 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
-	}
 	cross_industry_invoice = Element('{%s}CrossIndustryInvoice' % nsmap['rsm'], nsmap=nsmap)
 
 	"""
@@ -112,6 +123,10 @@ def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:
 	"""
 	supply_chain_trade_transaction = SubElement(cross_industry_invoice,
 												"{%s}SupplyChainTradeTransaction" % nsmap['rsm'])
+
+	if level != LEVEL_MINIMUM:
+		ajouter_data_lignes_facturx(facture, supply_chain_trade_transaction)
+
 	applicable_header_trade_agreement = SubElement(supply_chain_trade_transaction,
 												   "{%s}ApplicableHeaderTradeAgreement" % nsmap['ram'])
 	# BT-10
