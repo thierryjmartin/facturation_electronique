@@ -113,7 +113,7 @@ def ajouter_data_lignes_facturx(facture: Facture, element: Element) -> Element:
 		# BT-136 Invoice line allowance amount
 		actual_amount = SubElement(specified_trade_allowance_charge, "{%s}ActualAmount" % nsmap['ram'])
 		actual_amount.text = "%.2f" % ligne_facture.ligne_poste_montant_remise_HT
-		if ligne_facture.ligne_poste_code_raison_reduction:
+		if ligne_facture.ligne_poste_code_raison_reduction_code:
 			reason_code = SubElement(specified_trade_allowance_charge, "{%s}ReasonCode" % nsmap['ram'])
 			reason_code.text = ligne_facture.ligne_poste_code_raison_reduction_code
 		if ligne_facture.ligne_poste_code_raison_reduction:
@@ -400,7 +400,19 @@ def gen_facturx_minimum(facture: Facture) -> factur_x_minimum.CrossIndustryInvoi
 	return f
 
 
-def _ligne_facturx_basic(ligne: LignePoste):
+def _ligne_facturx_basic(ligne: LignePoste, facture: Facture):
+	date_debut_retenue = ligne.ligne_poste_date_debut or facture.date_facture
+	date_fin_retenue = ligne.ligne_poste_date_fin or ligne.ligne_poste_date_debut or facture.date_facture
+
+	trade_allowance_charge_type = factur_x_basic.TradeAllowanceChargeType(
+				charge_indicator=factur_x_basic.IndicatorType(indicator=False),
+				actual_amount=factur_x_basic.AmountType(value=format_decimal % ligne.ligne_poste_montant_remise_HT),
+	)
+	if ligne.ligne_poste_code_raison_reduction_code:
+		trade_allowance_charge_type.reason_code=factur_x_basic.AllowanceChargeReasonCodeType(value=ligne.ligne_poste_code_raison_reduction_code)
+	if ligne.ligne_poste_code_raison_reduction:
+		trade_allowance_charge_type.reason = factur_x_basic.TextType(value=ligne.ligne_poste_code_raison_reduction)
+
 	factur_x_basic.SupplyChainTradeLineItemType(
 		associated_document_line_document=factur_x_basic.DocumentLineDocumentType(
 			line_id= factur_x_basic.Idtype(value=ligne.ligne_poste_numero) #, scheme_id=),
@@ -430,8 +442,27 @@ def _ligne_facturx_basic(ligne: LignePoste):
 				# applied_trade_allowance_charge=factur_x_basic.TradeAllowanceChargeType()
 			),
 		),
-		specified_line_trade_delivery=factur_x_basic.LineTradeDeliveryType(),
-		specified_line_trade_settlement=factur_x_basic.LineTradeSettlementType(),
+		specified_line_trade_delivery=factur_x_basic.LineTradeDeliveryType(
+			billed_quantity=factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne.ligne_poste_unite)
+		),
+		specified_line_trade_settlement=factur_x_basic.LineTradeSettlementType(
+			applicable_trade_tax=factur_x_basic.TradeTaxType(
+				#calculated_amount=factur_x_basic.AmountType(),
+				type_code=factur_x_basic.TaxTypeCodeType(value='VAT'),
+				#exemption_reason=factur_x_basic.TextType(),
+				#basis_amount=factur_x_basic.AmountType(),
+				category_code=factur_x_basic.TaxCategoryCodeType(value=ligne.ligne_poste_tva_categorie),
+				#exemption_reason_code=factur_x_basic.CodeType(),
+				#due_date_type_code=factur_x_basic.TimeReferenceCodeType(),
+				rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % ligne.ligne_poste_taux_tva_manuel),
+			),
+			billing_specified_period=factur_x_basic.SpecifiedPeriodType(
+				start_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(date_debut_retenue), format="102")),
+				end_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(date_fin_retenue), format="102")),
+			),
+			specified_trade_allowance_charge=[trade_allowance_charge_type, ],
+			specified_trade_settlement_line_monetary_summation=factur_x_basic.TradeSettlementLineMonetarySummationType(),
+		),
 	),
 
 def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
@@ -444,7 +475,7 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 		issue_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(facture.date_facture), format="102")),
 	)
 	supply_chain_trade_transaction = factur_x_basic.SupplyChainTradeTransactionType(
-		included_supply_chain_trade_line_item=[_ligne_facturx_basic(ligne) for ligne in facture.ligne_poste],
+		included_supply_chain_trade_line_item=[_ligne_facturx_basic(ligne, facture) for ligne in facture.ligne_poste],
 		applicable_header_trade_agreement=factur_x_basic.HeaderTradeAgreementType(
 			buyer_reference=factur_x_basic.TextType(value=facture.destinataire.code_service_executant),
 			seller_trade_party=factur_x_basic.TradePartyType(
