@@ -1,8 +1,7 @@
 from ..models import Facture, TypeFacture
 from lxml.etree import Element, SubElement, tostring
 from datetime import datetime
-from ..generated import *
-from decimal import Decimal
+from ..generated import factur_x_minimum
 
 
 LEVEL_MINIMUM = 'minimum'
@@ -348,46 +347,52 @@ def gen_facturx_basic(facture: Facture) -> Element:
 	return cross_industry_invoice
 
 
-def gen_facturx_minimum(facture: Facture) -> CrossIndustryInvoice:
-	exchanged_document_context = ExchangedDocumentContextType(
-		guideline_specified_document_context_parameter=DocumentContextParameterType(id=Idtype(value="urn:factur-x.eu:1p0:minimum"))
+def get_facturx_type_code(facture: Facture) -> str:
+	if facture.references.type_facture == TypeFacture.avoir:
+		return "381"
+	else:
+		return "380"
+
+def gen_facturx_minimum(facture: Facture) -> factur_x_minimum.CrossIndustryInvoice:
+	exchanged_document_context = factur_x_minimum.ExchangedDocumentContextType(
+		guideline_specified_document_context_parameter=factur_x_minimum.DocumentContextParameterType(id=factur_x_minimum.Idtype(value="urn:factur-x.eu:1p0:minimum"))
 	)
-	exchanged_document = ExchangedDocumentType(
-		id=Idtype(value=facture.numero_facture_saisi),
-		type_code=DocumentCodeType(value='380'),
-		issue_date_time=DateTimeType(date_time_string=DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(facture.date_facture), format="102")),
+	exchanged_document = factur_x_minimum.ExchangedDocumentType(
+		id=factur_x_minimum.Idtype(value=facture.numero_facture_saisi),
+		type_code=factur_x_minimum.DocumentCodeType(value=get_facturx_type_code(facture)),
+		issue_date_time=factur_x_minimum.DateTimeType(date_time_string=factur_x_minimum.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(facture.date_facture), format="102")),
 	)
-	supply_chain_trade_transaction = SupplyChainTradeTransactionType(
-		applicable_header_trade_agreement=HeaderTradeAgreementType(
-			buyer_reference=TextType(value='coucou'),
-			seller_trade_party=TradePartyType(
-				name=TextType(value=facture.fournisseur.nom),
-				specified_legal_organization=LegalOrganizationType(id=Idtype(scheme_id="0002", value=facture.fournisseur.siret)),
-				postal_trade_address=TradeAddressType(country_id=CountryIdtype(value=facture.fournisseur.adresse_postale.pays_code_iso)),
-				specified_tax_registration=[TaxRegistrationType(id=Idtype(scheme_id="VA", value=facture.fournisseur.numero_tva_intra,)),]
+	supply_chain_trade_transaction = factur_x_minimum.SupplyChainTradeTransactionType(
+		applicable_header_trade_agreement=factur_x_minimum.HeaderTradeAgreementType(
+			buyer_reference=factur_x_minimum.TextType(value='coucou'),
+			seller_trade_party=factur_x_minimum.TradePartyType(
+				name=factur_x_minimum.TextType(value=facture.fournisseur.nom),
+				specified_legal_organization=factur_x_minimum.LegalOrganizationType(id=factur_x_minimum.Idtype(scheme_id="0002", value=facture.fournisseur.siret)),
+				postal_trade_address=factur_x_minimum.TradeAddressType(country_id=factur_x_minimum.CountryIdtype(value=facture.fournisseur.adresse_postale.pays_code_iso)),
+				specified_tax_registration=[factur_x_minimum.TaxRegistrationType(id=factur_x_minimum.Idtype(scheme_id="VA", value=facture.fournisseur.numero_tva_intra,)),]
 			),
-			buyer_trade_party=TradePartyType(
-				name=TextType(value=facture.destinataire.nom),
-				specified_legal_organization=LegalOrganizationType(id=Idtype(scheme_id="0002", value=facture.destinataire.code_destinataire)),
-				postal_trade_address=TradeAddressType(country_id=CountryIdtype(value=facture.destinataire.adresse_postale.pays_code_iso)),
+			buyer_trade_party=factur_x_minimum.TradePartyType(
+				name=factur_x_minimum.TextType(value=facture.destinataire.nom),
+				specified_legal_organization=factur_x_minimum.LegalOrganizationType(id=factur_x_minimum.Idtype(scheme_id="0002", value=facture.destinataire.code_destinataire)),
+				postal_trade_address=factur_x_minimum.TradeAddressType(country_id=factur_x_minimum.CountryIdtype(value=facture.destinataire.adresse_postale.pays_code_iso)),
 				#specified_tax_registration=[TaxRegistrationType(), ]
 			),
-			buyer_order_referenced_document=ReferencedDocumentType(
-				issuer_assigned_id=Idtype(value=facture.references.numero_bon_commande)
+			buyer_order_referenced_document=factur_x_minimum.ReferencedDocumentType(
+				issuer_assigned_id=factur_x_minimum.Idtype(value=facture.references.numero_bon_commande)
 			),
 		),
-		applicable_header_trade_delivery=HeaderTradeDeliveryType(),
-		applicable_header_trade_settlement=HeaderTradeSettlementType(
-			invoice_currency_code=CurrencyCodeType(value=facture.references.devise_facture),
-			specified_trade_settlement_header_monetary_summation=TradeSettlementHeaderMonetarySummationType(
-				tax_basis_total_amount=AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
-				tax_total_amount=[AmountType(value=format_decimal % facture.montant_total.montant_TVA, currency_id=facture.references.devise_facture), ],
-				grand_total_amount=AmountType(value=format_decimal % facture.montant_total.montant_ttc_total),
-				due_payable_amount=AmountType(value=format_decimal % facture.montant_total.montant_ht_total)
+		applicable_header_trade_delivery=factur_x_minimum.HeaderTradeDeliveryType(),
+		applicable_header_trade_settlement=factur_x_minimum.HeaderTradeSettlementType(
+			invoice_currency_code=factur_x_minimum.CurrencyCodeType(value=facture.references.devise_facture),
+			specified_trade_settlement_header_monetary_summation=factur_x_minimum.TradeSettlementHeaderMonetarySummationType(
+				tax_basis_total_amount=factur_x_minimum.AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
+				tax_total_amount=[factur_x_minimum.AmountType(value=format_decimal % facture.montant_total.montant_TVA, currency_id=facture.references.devise_facture), ],
+				grand_total_amount=factur_x_minimum.AmountType(value=format_decimal % facture.montant_total.montant_ttc_total),
+				due_payable_amount=factur_x_minimum.AmountType(value=format_decimal % facture.montant_total.montant_ht_total)
 			)
 		),
 	)
-	f=CrossIndustryInvoice(
+	f=factur_x_minimum.CrossIndustryInvoice(
 		exchanged_document_context=exchanged_document_context,
 		exchanged_document=exchanged_document,
 		supply_chain_trade_transaction=supply_chain_trade_transaction,

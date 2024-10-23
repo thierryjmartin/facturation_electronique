@@ -1,7 +1,7 @@
-from pydantic import BaseModel, ConfigDict
-from xsdata_pydantic.fields import field
+from dataclasses import dataclass, field
+from typing import Optional
 
-from ..generated.factur_x_1_0_07_basic_urn_un_unece_uncefact_data_standard_reusable_aggregate_business_information_entity_100 import (
+from ..factur_x_basic.factur_x_1_0_07_basic_urn_un_unece_uncefact_data_standard_reusable_aggregate_business_information_entity_100 import (
     ExchangedDocumentContextType,
     ExchangedDocumentType,
     SupplyChainTradeTransactionType,
@@ -10,38 +10,42 @@ from ..generated.factur_x_1_0_07_basic_urn_un_unece_uncefact_data_standard_reusa
 __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"
 
 
-class CrossIndustryInvoiceType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    exchanged_document_context: ExchangedDocumentContextType = field(
+@dataclass
+class CrossIndustryInvoiceType:
+    exchanged_document_context: Optional[ExchangedDocumentContextType] = field(
+        default=None,
         metadata={
             "name": "ExchangedDocumentContext",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100",
             "required": True,
-        }
+        },
     )
-    exchanged_document: ExchangedDocumentType = field(
+    exchanged_document: Optional[ExchangedDocumentType] = field(
+        default=None,
         metadata={
             "name": "ExchangedDocument",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100",
             "required": True,
-        }
+        },
     )
-    supply_chain_trade_transaction: SupplyChainTradeTransactionType = field(
+    supply_chain_trade_transaction: Optional[
+        SupplyChainTradeTransactionType
+    ] = field(
+        default=None,
         metadata={
             "name": "SupplyChainTradeTransaction",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100",
             "required": True,
-        }
+        },
     )
 
 
+@dataclass
 class CrossIndustryInvoice(CrossIndustryInvoiceType):
     class Meta:
         namespace = (
             "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"
         )
-
-    model_config = ConfigDict(defer_build=True)

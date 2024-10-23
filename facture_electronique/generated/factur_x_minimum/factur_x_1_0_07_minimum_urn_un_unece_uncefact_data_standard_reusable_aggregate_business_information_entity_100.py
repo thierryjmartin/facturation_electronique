@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from ..generated.factur_x_1_0_07_minimum_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
+from ..factur_x_minimum.factur_x_1_0_07_minimum_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
     CountryIdtype,
     CurrencyCodeType,
     DocumentCodeType,
 )
-from ..generated.factur_x_1_0_07_minimum_urn_un_unece_uncefact_data_standard_unqualified_data_type_100 import (
+from ..factur_x_minimum.factur_x_1_0_07_minimum_urn_un_unece_uncefact_data_standard_unqualified_data_type_100 import (
     AmountType,
     DateTimeType,
     Idtype,

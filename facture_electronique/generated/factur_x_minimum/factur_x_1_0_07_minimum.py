@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from ..generated.factur_x_1_0_07_minimum_urn_un_unece_uncefact_data_standard_reusable_aggregate_business_information_entity_100 import (
+from ..factur_x_minimum.factur_x_1_0_07_minimum_urn_un_unece_uncefact_data_standard_reusable_aggregate_business_information_entity_100 import (
     ExchangedDocumentContextType,
     ExchangedDocumentType,
     SupplyChainTradeTransactionType,
