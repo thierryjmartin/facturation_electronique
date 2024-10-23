@@ -16,6 +16,8 @@ nsmap = {
 	'rsm': 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
 }
 
+format_decimal = "%.2f"
+
 def _parse_date_chorus_vers_facturx(date_str: str) -> str:
 	return datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y%m%d")
 
@@ -378,10 +380,10 @@ def gen_facturx_minimum(facture: Facture) -> CrossIndustryInvoice:
 		applicable_header_trade_settlement=HeaderTradeSettlementType(
 			invoice_currency_code=CurrencyCodeType(value=facture.references.devise_facture),
 			specified_trade_settlement_header_monetary_summation=TradeSettlementHeaderMonetarySummationType(
-				tax_basis_total_amount=AmountType(value=Decimal(facture.montant_total.montant_ht_total)),
-				tax_total_amount=[AmountType(value=Decimal(facture.montant_total.montant_TVA), currency_id=facture.references.devise_facture), ],
-				grand_total_amount=AmountType(value=Decimal(facture.montant_total.montant_ttc_total)),
-				due_payable_amount=AmountType(value=Decimal(facture.montant_total.montant_ht_total))
+				tax_basis_total_amount=AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
+				tax_total_amount=[AmountType(value=format_decimal % facture.montant_total.montant_TVA, currency_id=facture.references.devise_facture), ],
+				grand_total_amount=AmountType(value=format_decimal % facture.montant_total.montant_ttc_total),
+				due_payable_amount=AmountType(value=format_decimal % facture.montant_total.montant_ht_total)
 			)
 		),
 	)
@@ -400,7 +402,6 @@ def xml_from_facture_xsdata(facture) -> str:
 	config = SerializerConfig(indent="  ")
 	serializer = XmlSerializer(context=XmlContext(), config=config)
 	xml_data = serializer.render(facture, ns_map=nsmap)
-	print(xml_data)
 	return xml_data
 
 

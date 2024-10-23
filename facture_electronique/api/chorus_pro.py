@@ -619,7 +619,7 @@ if __name__ == '__main__':
 		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
 		output_pdf_file=file_path_facturx,
 		flavor='factur-x',
-		level='basic',
+		level='minimum',
 		check_xsd=False, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
 	)
 
@@ -629,7 +629,7 @@ if __name__ == '__main__':
 		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
 		output_pdf_file=file_path_facturx,
 		flavor='factur-x',
-		level='basic',
+		level='minimum',
 		check_xsd=True, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
 	)
 

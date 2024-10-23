@@ -7,7 +7,7 @@ __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"
 
 @dataclass
 class AmountType:
-    value: Optional[Decimal] = field(
+    value: Optional[str] = field(
         default=None,
         metadata={
             "required": True,
