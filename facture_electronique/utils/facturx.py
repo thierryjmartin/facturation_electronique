@@ -499,7 +499,18 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 		),
 		applicable_header_trade_delivery=factur_x_basic.HeaderTradeDeliveryType(),
 		applicable_header_trade_settlement=factur_x_basic.HeaderTradeSettlementType(
+			creditor_reference_id=factur_x_basic.Idtype(),
+			payment_reference=factur_x_basic.TextType(),
+			tax_currency_code=factur_x_basic.CurrencyCodeType(value=facture.references.devise_facture),
+			# payee_trade_party=factur_x_basic.TradePartyType(), utile si le bénéficiare est différent du fournisseur
+			specified_trade_settlement_payment_means = [factur_x_basic.TradeSettlementPaymentMeansType(),],
+			applicable_trade_tax=[factur_x_basic.TradeTaxType(), ],
+			billing_specified_period=factur_x_basic.SpecifiedPeriodType(),
+			specified_trade_allowance_charge=[factur_x_basic.TradeAllowanceChargeType(),],
+			specified_trade_payment_terms=factur_x_basic.TradePaymentTermsType(),
 			invoice_currency_code=factur_x_basic.CurrencyCodeType(value=facture.references.devise_facture),
+			invoice_referenced_document=[factur_x_basic.ReferencedDocumentType(),],
+			receivable_specified_trade_accounting_account=factur_x_basic.TradeAccountingAccountType(),
 			specified_trade_settlement_header_monetary_summation=factur_x_basic.TradeSettlementHeaderMonetarySummationType(
 				tax_basis_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
 				tax_total_amount=[factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_TVA, currency_id=facture.references.devise_facture), ],
