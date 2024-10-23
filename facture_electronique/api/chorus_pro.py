@@ -612,25 +612,44 @@ if __name__ == '__main__':
 	import facturx
 	from ..utils.facturx import xml_from_facture_xsdata
 
-	file_path_facturx = file_path + '.facturx.pdf'
+	file_path_facturx_mini = file_path + '.facturx.minmum.pdf'
+	file_path_facturx_basic = file_path + '.facturx.basic.pdf'
 
 	facturx.generate_from_file(
 		file_path_pdfa,
 		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
-		output_pdf_file=file_path_facturx,
+		output_pdf_file=file_path_facturx_mini,
 		flavor='factur-x',
 		level='minimum',
-		check_xsd=False, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
+		check_xsd=False,
 	)
 
 
 	facturx.generate_from_file(
 		file_path_pdfa,
 		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
-		output_pdf_file=file_path_facturx,
+		output_pdf_file=file_path_facturx_mini,
 		flavor='factur-x',
 		level='minimum',
-		check_xsd=True, # IncludedNote de facturx/ChorusPro ne respecte pas le xsd...
+		check_xsd=True,
+	)
+
+	facturx.generate_from_file(
+		file_path_pdfa,
+		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_basic()),
+		output_pdf_file=file_path_facturx_basic,
+		flavor='factur-x',
+		level='basic',
+		check_xsd=False,
+	)
+
+	facturx.generate_from_file(
+		file_path_pdfa,
+		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_basic()),
+		output_pdf_file=file_path_facturx_basic,
+		flavor='factur-x',
+		level='basic',
+		check_xsd=True,
 	)
 
 

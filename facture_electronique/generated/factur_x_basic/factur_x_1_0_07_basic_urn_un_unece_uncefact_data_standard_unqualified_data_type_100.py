@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from decimal import Decimal
 from typing import Optional
 
 __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"
@@ -7,7 +6,7 @@ __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"
 
 @dataclass
 class AmountType:
-    value: Optional[Decimal] = field(
+    value: Optional[str] = field(
         default=None,
         metadata={
             "required": True,
@@ -96,7 +95,7 @@ class IndicatorType:
 
 @dataclass
 class PercentType:
-    value: Optional[Decimal] = field(
+    value: Optional[str] = field(
         default=None,
         metadata={
             "required": True,
@@ -106,7 +105,7 @@ class PercentType:
 
 @dataclass
 class QuantityType:
-    value: Optional[Decimal] = field(
+    value: Optional[str] = field(
         default=None,
         metadata={
             "required": True,
