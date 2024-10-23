@@ -615,6 +615,7 @@ if __name__ == '__main__':
 	file_path_facturx_mini = file_path + '.facturx.minmum.pdf'
 	file_path_facturx_basic = file_path + '.facturx.basic.pdf'
 
+	"""
 	facturx.generate_from_file(
 		file_path_pdfa,
 		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
@@ -633,6 +634,7 @@ if __name__ == '__main__':
 		level='minimum',
 		check_xsd=True,
 	)
+	"""
 
 	facturx.generate_from_file(
 		file_path_pdfa,
@@ -643,6 +645,7 @@ if __name__ == '__main__':
 		check_xsd=False,
 	)
 
+
 	facturx.generate_from_file(
 		file_path_pdfa,
 		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_basic()),
@@ -651,6 +654,7 @@ if __name__ == '__main__':
 		level='basic',
 		check_xsd=True,
 	)
+
 
 
 	#reponse_fichier = c.ajouter_fichier_dans_systeme(

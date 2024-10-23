@@ -1,4 +1,4 @@
-from ..models import Facture, TypeFacture
+from ..models import Facture, TypeFacture, LignePoste
 from lxml.etree import Element, SubElement, tostring
 from datetime import datetime
 from ..generated import factur_x_minimum, factur_x_basic
@@ -364,7 +364,7 @@ def gen_facturx_minimum(facture: Facture) -> factur_x_minimum.CrossIndustryInvoi
 	)
 	supply_chain_trade_transaction = factur_x_minimum.SupplyChainTradeTransactionType(
 		applicable_header_trade_agreement=factur_x_minimum.HeaderTradeAgreementType(
-			buyer_reference=factur_x_minimum.TextType(value='coucou'),
+			buyer_reference=factur_x_minimum.TextType(value=facture.destinataire.code_service_executant),
 			seller_trade_party=factur_x_minimum.TradePartyType(
 				name=factur_x_minimum.TextType(value=facture.fournisseur.nom),
 				specified_legal_organization=factur_x_minimum.LegalOrganizationType(id=factur_x_minimum.Idtype(scheme_id="0002", value=facture.fournisseur.siret)),
@@ -399,6 +399,41 @@ def gen_facturx_minimum(facture: Facture) -> factur_x_minimum.CrossIndustryInvoi
 	)
 	return f
 
+
+def _ligne_facturx_basic(ligne: LignePoste):
+	factur_x_basic.SupplyChainTradeLineItemType(
+		associated_document_line_document=factur_x_basic.DocumentLineDocumentType(
+			line_id= factur_x_basic.Idtype(value=ligne.ligne_poste_numero) #, scheme_id=),
+			# included_note = factur_x_basic.NoteType(content=, subject_code=),
+		),
+		specified_trade_product=factur_x_basic.TradeProductType(
+			global_id=factur_x_basic.Idtype(value=ligne.ligne_poste_reference, scheme_id=''),
+			name=factur_x_basic.TextType(value=ligne.ligne_poste_denomination)
+		),
+		specified_line_trade_agreement=factur_x_basic.LineTradeAgreementType(
+			gross_price_product_trade_price = factur_x_basic.TradePriceType(
+				charge_amount = factur_x_basic.AmountType(value=format_decimal % ligne.ligne_poste_montant_unitaire_HT),
+				basis_quantity = factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne.ligne_poste_unite),
+				applied_trade_allowance_charge = factur_x_basic.TradeAllowanceChargeType(
+					charge_indicator=factur_x_basic.IndicatorType(indicator=False),
+					# calculation_percent=factur_x_basic.PercentType(),
+					# basis_amount=factur_x_basic.AmountType(),
+					actual_amount=factur_x_basic.AmountType(value=format_decimal % (ligne.ligne_poste_montant_remise_HT / ligne.ligne_poste_quantite)),
+					# reason_code=factur_x_basic.AllowanceChargeReasonCodeType(),
+					# reason=factur_x_basic.TextType(),
+					# category_trade_tax=factur_x_basic.TradeTaxType(),
+				),
+			),
+			net_price_product_trade_price = factur_x_basic.TradePriceType(
+				charge_amount=factur_x_basic.AmountType(value="%.2f" % (ligne.ligne_poste_montant_unitaire_HT - ligne.ligne_poste_montant_remise_HT)),
+				basis_quantity=factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne.ligne_poste_unite),
+				# applied_trade_allowance_charge=factur_x_basic.TradeAllowanceChargeType()
+			),
+		),
+		specified_line_trade_delivery=factur_x_basic.LineTradeDeliveryType(),
+		specified_line_trade_settlement=factur_x_basic.LineTradeSettlementType(),
+	),
+
 def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 	exchanged_document_context = factur_x_basic.ExchangedDocumentContextType(
 		guideline_specified_document_context_parameter=factur_x_basic.DocumentContextParameterType(id=factur_x_basic.Idtype(value="urn:cen.eu:EN 16931:2017#compliant#urn:factur-x.eu:1p0:basic"))
@@ -409,8 +444,9 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 		issue_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(facture.date_facture), format="102")),
 	)
 	supply_chain_trade_transaction = factur_x_basic.SupplyChainTradeTransactionType(
+		included_supply_chain_trade_line_item=[_ligne_facturx_basic(ligne) for ligne in facture.ligne_poste],
 		applicable_header_trade_agreement=factur_x_basic.HeaderTradeAgreementType(
-			buyer_reference=factur_x_basic.TextType(value='coucou'),
+			buyer_reference=factur_x_basic.TextType(value=facture.destinataire.code_service_executant),
 			seller_trade_party=factur_x_basic.TradePartyType(
 				name=factur_x_basic.TextType(value=facture.fournisseur.nom),
 				specified_legal_organization=factur_x_basic.LegalOrganizationType(id=factur_x_basic.Idtype(scheme_id="0002", value=facture.fournisseur.siret)),
