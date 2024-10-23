@@ -413,7 +413,7 @@ def _ligne_facturx_basic(ligne: LignePoste, facture: Facture):
 	if ligne.ligne_poste_code_raison_reduction:
 		trade_allowance_charge_type.reason = factur_x_basic.TextType(value=ligne.ligne_poste_code_raison_reduction)
 
-	factur_x_basic.SupplyChainTradeLineItemType(
+	suply_chain_trade_line = factur_x_basic.SupplyChainTradeLineItemType(
 		associated_document_line_document=factur_x_basic.DocumentLineDocumentType(
 			line_id= factur_x_basic.Idtype(value=ligne.ligne_poste_numero) #, scheme_id=),
 			# included_note = factur_x_basic.NoteType(content=, subject_code=),
@@ -461,9 +461,12 @@ def _ligne_facturx_basic(ligne: LignePoste, facture: Facture):
 				end_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(date_fin_retenue), format="102")),
 			),
 			specified_trade_allowance_charge=[trade_allowance_charge_type, ],
-			specified_trade_settlement_line_monetary_summation=factur_x_basic.TradeSettlementLineMonetarySummationType(),
+			specified_trade_settlement_line_monetary_summation=factur_x_basic.TradeSettlementLineMonetarySummationType(
+				line_total_amount=factur_x_basic.AmountType(value=format_decimal % (ligne.ligne_poste_montant_unitaire_HT * ligne.ligne_poste_quantite)),
+			),
 		),
-	),
+	)
+	return suply_chain_trade_line
 
 def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 	exchanged_document_context = factur_x_basic.ExchangedDocumentContextType(
