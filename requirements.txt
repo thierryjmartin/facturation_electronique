@@ -19,3 +19,6 @@ xmltodict==0.13.0
 
 # générer les pdf/a
 ghostscript==0.7
+
+# pour generer les factur-x
+xsdata==24.9

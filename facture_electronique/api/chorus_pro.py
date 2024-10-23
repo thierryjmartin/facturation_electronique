@@ -610,13 +610,13 @@ if __name__ == '__main__':
 	)
 
 	import facturx
-	from ..utils.facturx import xml_from_etree
+	from ..utils.facturx import xml_from_facture_xsdata
 
 	file_path_facturx = file_path + '.facturx.pdf'
 
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_etree(exemple_facture_mode_pdf.to_facturx_basic()),
+		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
 		output_pdf_file=file_path_facturx,
 		flavor='factur-x',
 		level='basic',
@@ -626,7 +626,7 @@ if __name__ == '__main__':
 
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_etree(exemple_facture_mode_pdf.to_facturx_basic()),
+		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
 		output_pdf_file=file_path_facturx,
 		flavor='factur-x',
 		level='basic',

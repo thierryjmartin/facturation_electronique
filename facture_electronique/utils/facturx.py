@@ -1,7 +1,9 @@
 from ..models import Facture, TypeFacture
 from lxml.etree import Element, SubElement, tostring
 from datetime import datetime
-from collections import defaultdict
+from ..generated import *
+from decimal import Decimal
+
 
 LEVEL_MINIMUM = 'minimum'
 LEVEL_BASIC = 'basic'
@@ -342,6 +344,64 @@ def gen_facturx(facture: Facture, level=LEVEL_MINIMUM, ) -> Element:
 def gen_facturx_basic(facture: Facture) -> Element:
 	cross_industry_invoice = gen_facturx(facture, level=LEVEL_BASIC)
 	return cross_industry_invoice
+
+
+def gen_facturx_minimum(facture: Facture) -> CrossIndustryInvoice:
+	exchanged_document_context = ExchangedDocumentContextType(
+		guideline_specified_document_context_parameter=DocumentContextParameterType(id=Idtype(value="urn:factur-x.eu:1p0:minimum"))
+	)
+	exchanged_document = ExchangedDocumentType(
+		id=Idtype(value=facture.numero_facture_saisi),
+		type_code=DocumentCodeType(value='380'),
+		issue_date_time=DateTimeType(date_time_string=DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(facture.date_facture), format="102")),
+	)
+	supply_chain_trade_transaction = SupplyChainTradeTransactionType(
+		applicable_header_trade_agreement=HeaderTradeAgreementType(
+			buyer_reference=TextType(value='coucou'),
+			seller_trade_party=TradePartyType(
+				name=TextType(value=facture.fournisseur.nom),
+				specified_legal_organization=LegalOrganizationType(id=Idtype(scheme_id="0002", value=facture.fournisseur.siret)),
+				postal_trade_address=TradeAddressType(country_id=CountryIdtype(value=facture.fournisseur.adresse_postale.pays_code_iso)),
+				specified_tax_registration=[TaxRegistrationType(id=Idtype(scheme_id="VA", value=facture.fournisseur.numero_tva_intra,)),]
+			),
+			buyer_trade_party=TradePartyType(
+				name=TextType(value=facture.destinataire.nom),
+				specified_legal_organization=LegalOrganizationType(id=Idtype(scheme_id="0002", value=facture.destinataire.code_destinataire)),
+				postal_trade_address=TradeAddressType(country_id=CountryIdtype(value=facture.destinataire.adresse_postale.pays_code_iso)),
+				#specified_tax_registration=[TaxRegistrationType(), ]
+			),
+			buyer_order_referenced_document=ReferencedDocumentType(
+				issuer_assigned_id=Idtype(value=facture.references.numero_bon_commande)
+			),
+		),
+		applicable_header_trade_delivery=HeaderTradeDeliveryType(),
+		applicable_header_trade_settlement=HeaderTradeSettlementType(
+			invoice_currency_code=CurrencyCodeType(value=facture.references.devise_facture),
+			specified_trade_settlement_header_monetary_summation=TradeSettlementHeaderMonetarySummationType(
+				tax_basis_total_amount=AmountType(value=Decimal(facture.montant_total.montant_ht_total)),
+				tax_total_amount=[AmountType(value=Decimal(facture.montant_total.montant_TVA), currency_id=facture.references.devise_facture), ],
+				grand_total_amount=AmountType(value=Decimal(facture.montant_total.montant_ttc_total)),
+				due_payable_amount=AmountType(value=Decimal(facture.montant_total.montant_ht_total))
+			)
+		),
+	)
+	f=CrossIndustryInvoice(
+		exchanged_document_context=exchanged_document_context,
+		exchanged_document=exchanged_document,
+		supply_chain_trade_transaction=supply_chain_trade_transaction,
+	)
+
+	return f
+
+def xml_from_facture_xsdata(facture) -> str:
+	from xsdata.formats.dataclass.serializers import XmlSerializer
+	from xsdata.formats.dataclass.context import XmlContext
+	from xsdata.formats.dataclass.serializers.config import SerializerConfig
+	config = SerializerConfig(indent="  ")
+	serializer = XmlSerializer(context=XmlContext(), config=config)
+	xml_data = serializer.render(facture, ns_map=nsmap)
+	print(xml_data)
+	return xml_data
 
 
 def xml_from_etree(etree):
