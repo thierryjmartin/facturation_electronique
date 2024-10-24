@@ -109,19 +109,21 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 	date_fin_retenue = ligne.ligne_poste_date_fin or ligne.ligne_poste_date_debut or facture.date_facture
 
 	trade_allowance_charge = None
+	trade_allowance_charge_trade_agreement = None
 	if ligne.ligne_poste_montant_remise_HT:
 		trade_allowance_charge = factur_x_basic.TradeAllowanceChargeType(
 					charge_indicator=factur_x_basic.IndicatorType(indicator=False),
 					actual_amount=factur_x_basic.AmountType(value=format_decimal % (ligne.ligne_poste_montant_remise_HT * ligne.ligne_poste_quantite)),
 		)
-		if ligne.ligne_poste_code_raison_reduction_code:
-			trade_allowance_charge.reason_code=factur_x_basic.AllowanceChargeReasonCodeType(value=ligne.ligne_poste_code_raison_reduction_code)
-		if ligne.ligne_poste_code_raison_reduction:
-			trade_allowance_charge.reason = factur_x_basic.TextType(value=ligne.ligne_poste_code_raison_reduction)
-	trade_allowance_charge_trade_agreement = None
-	if trade_allowance_charge:
+
 		trade_allowance_charge_trade_agreement = copy.deepcopy(trade_allowance_charge)
 		trade_allowance_charge_trade_agreement.actual_amount.value=format_decimal % ligne.ligne_poste_montant_remise_HT
+
+		if ligne.ligne_poste_code_raison_reduction_code:
+			trade_allowance_charge.reason_code = factur_x_basic.AllowanceChargeReasonCodeType(
+				value=ligne.ligne_poste_code_raison_reduction_code)
+		if ligne.ligne_poste_code_raison_reduction:
+			trade_allowance_charge.reason = factur_x_basic.TextType(value=ligne.ligne_poste_code_raison_reduction)
 
 	ligne_unit_code = get_facturx_quantity_units(ligne.ligne_poste_unite)
 
