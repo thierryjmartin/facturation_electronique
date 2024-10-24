@@ -38,6 +38,23 @@ def get_facturx_mode_paiement(facture: Facture) -> str:
 	}
 	return equiv[facture.references.mode_paiement]
 
+def get_facturx_quantity_units(unite: Facture) -> str:
+	"""sont les suivantes:
+		LTR = Litre (1 dm3)
+		MTQ = Mètre cube
+		KGM = Kilogramme
+		MTR = Mètre
+		C62 = Unité
+		TNE = Tonne"""
+	equiv = {
+		"lot": "C62",
+		"Kg": "KGM",
+	}
+	try:
+		return equiv[unite]
+	except KeyError:
+		return "C62"
+
 def _gen_applicable_header_trade_agreement(facturx_minimum_ou_basic, facture):
 	return facturx_minimum_ou_basic.HeaderTradeAgreementType(
 			buyer_reference=facturx_minimum_ou_basic.TextType(value=facture.destinataire.code_service_executant),
@@ -95,7 +112,7 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 	if ligne.ligne_poste_montant_remise_HT:
 		trade_allowance_charge = factur_x_basic.TradeAllowanceChargeType(
 					charge_indicator=factur_x_basic.IndicatorType(indicator=False),
-					actual_amount=factur_x_basic.AmountType(value=format_decimal % ligne.ligne_poste_montant_remise_HT),
+					actual_amount=factur_x_basic.AmountType(value=format_decimal % (ligne.ligne_poste_montant_remise_HT * ligne.ligne_poste_quantite)),
 		)
 		if ligne.ligne_poste_code_raison_reduction_code:
 			trade_allowance_charge.reason_code=factur_x_basic.AllowanceChargeReasonCodeType(value=ligne.ligne_poste_code_raison_reduction_code)
@@ -104,7 +121,9 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 	trade_allowance_charge_trade_agreement = None
 	if trade_allowance_charge:
 		trade_allowance_charge_trade_agreement = copy.deepcopy(trade_allowance_charge)
-		trade_allowance_charge_trade_agreement.actual_amount(value=format_decimal % (ligne.ligne_poste_montant_remise_HT / ligne.ligne_poste_quantite))
+		trade_allowance_charge_trade_agreement.actual_amount.value=format_decimal % ligne.ligne_poste_montant_remise_HT
+
+	ligne_unit_code = get_facturx_quantity_units(ligne.ligne_poste_unite)
 
 	suply_chain_trade_line = factur_x_basic.SupplyChainTradeLineItemType(
 		associated_document_line_document=factur_x_basic.DocumentLineDocumentType(
@@ -118,17 +137,17 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 		specified_line_trade_agreement=factur_x_basic.LineTradeAgreementType(
 			gross_price_product_trade_price = factur_x_basic.TradePriceType(
 				charge_amount = factur_x_basic.AmountType(value=format_decimal % ligne.ligne_poste_montant_unitaire_HT),
-				basis_quantity = factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne.ligne_poste_unite),
+				basis_quantity = factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne_unit_code),
 				applied_trade_allowance_charge = trade_allowance_charge_trade_agreement if trade_allowance_charge_trade_agreement else None,
 			),
 			net_price_product_trade_price = factur_x_basic.TradePriceType(
 				charge_amount=factur_x_basic.AmountType(value="%.2f" % (ligne.ligne_poste_montant_unitaire_HT - ligne.ligne_poste_montant_remise_HT)),
-				basis_quantity=factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne.ligne_poste_unite),
+				basis_quantity=factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne_unit_code),
 				# applied_trade_allowance_charge=factur_x_basic.TradeAllowanceChargeType()
 			),
 		),
 		specified_line_trade_delivery=factur_x_basic.LineTradeDeliveryType(
-			billed_quantity=factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne.ligne_poste_unite)
+			billed_quantity=factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne_unit_code)
 		),
 		specified_line_trade_settlement=factur_x_basic.LineTradeSettlementType(
 			applicable_trade_tax=factur_x_basic.TradeTaxType(

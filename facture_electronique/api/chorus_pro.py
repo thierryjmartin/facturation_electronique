@@ -546,10 +546,11 @@ if __name__ == '__main__':
 				ligne_poste_quantite=10,
 				ligne_poste_unite="lot",
 				ligne_poste_montant_unitaire_HT=50.00,
-				ligne_poste_montant_remise_HT=0,
+				ligne_poste_montant_remise_HT=5,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=20,
-				ligne_poste_tva_categorie = 'S'
+				ligne_poste_tva_categorie = 'S',
+				ligne_poste_code_raison_reduction='parce que je suis sympa'
 			),
 			LignePoste(
 				ligne_poste_numero=2,
