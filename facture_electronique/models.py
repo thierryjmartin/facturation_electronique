@@ -94,6 +94,7 @@ class LigneTva(BaseModel):
 
 
 class MontantTotal(BaseModel):
+	montant_deja_paye: Optional[float] = 0 # facturx basic.
 	montant_a_payer: float
 	montant_ht_total: float
 	montant_remise_globale_TTC: float
@@ -199,6 +200,7 @@ class Facture(BaseModel):
 			("fournisseur", "nom"),
 			("fournisseur", "siret"),
 			("destinataire", "nom"),
+			("montant_total", "montant_deja_paye")
 		]
 		for elt in cle_a_detruire:
 			try:

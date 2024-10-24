@@ -1,6 +1,6 @@
 import copy
 
-from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
+from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva, TvaCategories
 from datetime import datetime
 from ..generated import factur_x_minimum, factur_x_basic
 
@@ -159,6 +159,7 @@ def _ligne_tva_facturx_basic(ligne_tva: LigneTva) -> factur_x_basic.TradeTaxType
 		type_code=factur_x_basic.TaxTypeCodeType(value='VAT'),
 		basis_amount=factur_x_basic.AmountType(value=format_decimal % ligne_tva.ligne_tva_montant_base_ht_par_taux),
 		category_code=factur_x_basic.TaxCategoryCodeType(value=ligne_tva.ligne_tva_categorie),
+		rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % ligne_tva.ligne_tva_taux_manuel),
 	)
 
 def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
@@ -177,7 +178,7 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 		applicable_header_trade_settlement=factur_x_basic.HeaderTradeSettlementType(
 			creditor_reference_id=factur_x_basic.Idtype(),
 			payment_reference=factur_x_basic.TextType(),
-			tax_currency_code=factur_x_basic.CurrencyCodeType(value=facture.references.devise_facture),
+			# tax_currency_code=factur_x_basic.CurrencyCodeType(value=facture.references.devise_facture),
 			# payee_trade_party=factur_x_basic.TradePartyType(), utile si le bénéficiare est différent du fournisseur
 			specified_trade_settlement_payment_means = [factur_x_basic.TradeSettlementPaymentMeansType(
 				type_code=factur_x_basic.PaymentMeansCodeType(value=get_facturx_mode_paiement(facture)),
@@ -185,12 +186,19 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 				# payee_party_creditor_financial_account=factur_x_basic.CreditorFinancialAccountType(ibanid=,proprietary_id=,)
 			),],
 			applicable_trade_tax=[_ligne_tva_facturx_basic(ligne_tva) for ligne_tva in facture.ligne_tva ],
-			billing_specified_period=factur_x_basic.SpecifiedPeriodType(),
-			specified_trade_allowance_charge=[factur_x_basic.TradeAllowanceChargeType(
-				charge_indicator=factur_x_basic.IndicatorType(indicator=False),
-				actual_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_remise_globale_TTC),
-				reason=factur_x_basic.TextType(value=facture.montant_total.motif_remise_globale_TTC)
-			),],
+			# billing_specified_period=factur_x_basic.SpecifiedPeriodType(),
+			#specified_trade_allowance_charge=[factur_x_basic.TradeAllowanceChargeType(
+			#	charge_indicator=factur_x_basic.IndicatorType(indicator=False),
+			#	actual_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_remise_globale_TTC),
+			#	reason=factur_x_basic.TextType(value=facture.montant_total.motif_remise_globale_TTC),
+			#	category_trade_tax=factur_x_basic.TradeTaxType(
+			#		calculated_amount=factur_x_basic.AmountType(format_decimal % 0),
+			#		type_code=factur_x_basic.TaxTypeCodeType("VAT"),
+			#		basis_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_remise_globale_TTC),
+			#		category_code=factur_x_basic.TaxCategoryCodeType(value=TvaCategories.tva_cat_S),
+			#		rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % 0)
+			#	)
+			#),],
 			specified_trade_payment_terms=factur_x_basic.TradePaymentTermsType(
 				due_date_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(format="102", value=_parse_date_chorus_vers_facturx(facture.date_echeance_paiement))),
 			),
@@ -199,9 +207,11 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 			#receivable_specified_trade_accounting_account=factur_x_basic.TradeAccountingAccountType(),
 			specified_trade_settlement_header_monetary_summation=factur_x_basic.TradeSettlementHeaderMonetarySummationType(
 				line_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
+				allowance_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_remise_globale_TTC),
 				tax_basis_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
 				tax_total_amount=[factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_TVA, currency_id=facture.references.devise_facture), ],
 				grand_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ttc_total),
+				total_prepaid_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_deja_paye),
 				due_payable_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_a_payer)
 			)
 		),
