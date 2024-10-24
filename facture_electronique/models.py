@@ -90,6 +90,8 @@ class LigneTva(BaseModel):
 	ligne_tva_montant_tva_par_taux: float
 	ligne_tva_taux: Optional[str] = None
 	ligne_tva_taux_manuel: Optional[float] = None
+	ligne_tva_categorie: Optional[TvaCategories] = None  # pour facturx basic
+
 
 class MontantTotal(BaseModel):
 	montant_a_payer: float
@@ -99,6 +101,7 @@ class MontantTotal(BaseModel):
 	montant_ttc_total: float
 	motif_remise_globale_TTC: str
 
+
 class PieceJointeComplementaire(BaseModel):
 	piece_jointe_complementaire_designation: str
 	"""Nombre : identifiant technique de la pièce jointe dans le système
@@ -107,6 +110,7 @@ class PieceJointeComplementaire(BaseModel):
 	piece_jointe_complementaire_id_liaison: int
 	piece_jointe_complementaire_numero_ligne_facture: int
 	piece_jointe_complementaire_type: str
+
 
 class PieceJointePrincipale(BaseModel):
 	'''String : champ libre désignant la pièce jointe max 100 cars'''

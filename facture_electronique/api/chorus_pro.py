@@ -592,19 +592,22 @@ if __name__ == '__main__':
 				ligne_tva_taux_manuel=20,
 				ligne_tva_taux=None,
 				ligne_tva_montant_base_ht_par_taux=510.00,
-				ligne_tva_montant_tva_par_taux=102.00
+				ligne_tva_montant_tva_par_taux=102.00,
+				ligne_tva_categorie='S'
 			),
 			LigneTva(
 				ligne_tva_taux_manuel=2.1,
 				ligne_tva_taux=None,
 				ligne_tva_montant_base_ht_par_taux=432.00,
-				ligne_tva_montant_tva_par_taux=9.072
+				ligne_tva_montant_tva_par_taux=9.072,
+				ligne_tva_categorie='S'
 			),
 			LigneTva(
 				ligne_tva_taux_manuel=5,
 				ligne_tva_taux=None,
 				ligne_tva_montant_base_ht_par_taux=384.00,
-				ligne_tva_montant_tva_par_taux=19.20
+				ligne_tva_montant_tva_par_taux=19.20,
+				ligne_tva_categorie='S'
 			)
 		],
 	)

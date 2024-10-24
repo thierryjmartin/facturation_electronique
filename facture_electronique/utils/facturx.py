@@ -1,4 +1,4 @@
-from ..models import Facture, TypeFacture, LignePoste
+from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
 from lxml.etree import Element, SubElement, tostring
 from datetime import datetime
 from ..generated import factur_x_minimum, factur_x_basic
@@ -353,6 +353,18 @@ def get_facturx_type_code(facture: Facture) -> str:
 	else:
 		return "380"
 
+def get_facturx_mode_paiement(facture: Facture) -> str:
+	equiv = {
+		ModePaiement.cheque: "20",
+		ModePaiement.prelevement: "49",
+		ModePaiement.virement: "30",
+		ModePaiement.espece: "10",
+		ModePaiement.autre: "57",
+		ModePaiement.report: "97"
+	}
+	return equiv[facture.references.mode_paiement]
+
+
 def gen_facturx_minimum(facture: Facture) -> factur_x_minimum.CrossIndustryInvoice:
 	exchanged_document_context = factur_x_minimum.ExchangedDocumentContextType(
 		guideline_specified_document_context_parameter=factur_x_minimum.DocumentContextParameterType(id=factur_x_minimum.Idtype(value="urn:factur-x.eu:1p0:minimum"))
@@ -415,7 +427,7 @@ def _ligne_facturx_basic(ligne: LignePoste, facture: Facture):
 
 	suply_chain_trade_line = factur_x_basic.SupplyChainTradeLineItemType(
 		associated_document_line_document=factur_x_basic.DocumentLineDocumentType(
-			line_id= factur_x_basic.Idtype(value=ligne.ligne_poste_numero) #, scheme_id=),
+			line_id= factur_x_basic.Idtype(value=str(ligne.ligne_poste_numero)) #, scheme_id=),
 			# included_note = factur_x_basic.NoteType(content=, subject_code=),
 		),
 		specified_trade_product=factur_x_basic.TradeProductType(
@@ -468,6 +480,14 @@ def _ligne_facturx_basic(ligne: LignePoste, facture: Facture):
 	)
 	return suply_chain_trade_line
 
+def _ligne_tva_facturx_basic(ligne_tva: LigneTva, facture: Facture) -> factur_x_basic.TradeTaxType:
+	return factur_x_basic.TradeTaxType(
+		calculated_amount=factur_x_basic.AmountType(value=format_decimal % ligne_tva.ligne_tva_montant_tva_par_taux),
+		type_code=factur_x_basic.TaxTypeCodeType(value='VAT'),
+		basis_amount=factur_x_basic.AmountType(value=format_decimal % ligne_tva.ligne_tva_montant_base_ht_par_taux),
+		category_code=factur_x_basic.TaxCategoryCodeType(value=ligne_tva.ligne_tva_categorie),
+	)
+
 def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 	exchanged_document_context = factur_x_basic.ExchangedDocumentContextType(
 		guideline_specified_document_context_parameter=factur_x_basic.DocumentContextParameterType(id=factur_x_basic.Idtype(value="urn:cen.eu:EN 16931:2017#compliant#urn:factur-x.eu:1p0:basic"))
@@ -503,8 +523,12 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 			payment_reference=factur_x_basic.TextType(),
 			tax_currency_code=factur_x_basic.CurrencyCodeType(value=facture.references.devise_facture),
 			# payee_trade_party=factur_x_basic.TradePartyType(), utile si le bénéficiare est différent du fournisseur
-			specified_trade_settlement_payment_means = [factur_x_basic.TradeSettlementPaymentMeansType(),],
-			applicable_trade_tax=[factur_x_basic.TradeTaxType(), ],
+			specified_trade_settlement_payment_means = [factur_x_basic.TradeSettlementPaymentMeansType(
+				type_code=factur_x_basic.PaymentMeansCodeType(value=get_facturx_mode_paiement(facture)),
+				# payer_party_debtor_financial_account=factur_x_basic.DebtorFinancialAccountType(ibanid=),
+				# payee_party_creditor_financial_account=factur_x_basic.CreditorFinancialAccountType(ibanid=,proprietary_id=,)
+			),],
+			applicable_trade_tax=[_ligne_tva_facturx_basic(ligne_tva, facture) for ligne_tva in facture.ligne_tva ],
 			billing_specified_period=factur_x_basic.SpecifiedPeriodType(),
 			specified_trade_allowance_charge=[factur_x_basic.TradeAllowanceChargeType(),],
 			specified_trade_payment_terms=factur_x_basic.TradePaymentTermsType(),
