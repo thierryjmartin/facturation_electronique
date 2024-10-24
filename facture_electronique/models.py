@@ -186,6 +186,7 @@ class Facture(BaseModel):
 	"""Obligatoire si le mode de Dépôt est "DEPOT_PDF_API" ou "DEPOT_PDF_SIGNE_API". Format date : AAAA-MM-JJ
 	La date d'émission de la facture doit être antérieure ou égale à la date de dépôt de la facture dans le système."""
 	date_facture: Optional[str] = None
+	date_echeance_paiement: Optional[str] = None # obligatoire pour facturx basic
 	id_utilisateur_courant: Optional[int] = 0
 	mode_depot: ModeDepot
 	commentaire: Optional[str] # max 200 cars
@@ -193,6 +194,7 @@ class Facture(BaseModel):
 	def to_chorus_pro_payload(self) -> dict:
 		data = self.dict(by_alias=True, exclude_unset=True)
 		cle_a_detruire = [ # des champs sont pour facturx mais ne fonctionnent pas dans la payload cpro
+			("date_echeance_paiement", ),
 			("fournisseur", "pays_code_iso"),
 			("fournisseur", "nom"),
 			("fournisseur", "siret"),
@@ -200,7 +202,10 @@ class Facture(BaseModel):
 		]
 		for elt in cle_a_detruire:
 			try:
-				del data[elt[0]][elt[1]]
+				if len(elt) == 1:
+					del data[elt[0]]
+				else:
+					del data[elt[0]][elt[1]]
 			except KeyError:
 				# element inexistant, c'est ce qu'on veut
 				continue

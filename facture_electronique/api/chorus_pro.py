@@ -485,6 +485,7 @@ if __name__ == '__main__':
 		mode_depot="DEPOT_PDF_API",
 		numero_facture_saisi="20240000000000000109", # ce champ n'est pas utilisé en mode_depot saisie_api
 		date_facture="2024-10-18", # seulement en depot PDF
+		date_echeance_paiement="2014-12-18",
 		id_utilisateur_courant=0,
 		piece_jointe_principale = [PieceJointePrincipale(
 			piece_jointe_principale_designation = 'facture',
@@ -531,7 +532,7 @@ if __name__ == '__main__':
 		montant_total=MontantTotal(
 			montant_ht_total=1326.00,
 			montant_TVA=130.272,
-			montant_ttc_total=1406.272,
+			montant_ttc_total=1456.272,
 			montant_remise_globale_TTC=50.00,
 			motif_remise_globale_TTC="Geste commercial",
 			montant_a_payer=1400.00

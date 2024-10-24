@@ -1,3 +1,5 @@
+import copy
+
 from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
 from datetime import datetime
 from ..generated import factur_x_minimum, factur_x_basic
@@ -89,14 +91,20 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 	date_debut_retenue = ligne.ligne_poste_date_debut or facture.date_facture
 	date_fin_retenue = ligne.ligne_poste_date_fin or ligne.ligne_poste_date_debut or facture.date_facture
 
-	trade_allowance_charge = factur_x_basic.TradeAllowanceChargeType(
-				charge_indicator=factur_x_basic.IndicatorType(indicator=False),
-				actual_amount=factur_x_basic.AmountType(value=format_decimal % ligne.ligne_poste_montant_remise_HT),
-	)
-	if ligne.ligne_poste_code_raison_reduction_code:
-		trade_allowance_charge.reason_code=factur_x_basic.AllowanceChargeReasonCodeType(value=ligne.ligne_poste_code_raison_reduction_code)
-	if ligne.ligne_poste_code_raison_reduction:
-		trade_allowance_charge.reason = factur_x_basic.TextType(value=ligne.ligne_poste_code_raison_reduction)
+	trade_allowance_charge = None
+	if ligne.ligne_poste_montant_remise_HT:
+		trade_allowance_charge = factur_x_basic.TradeAllowanceChargeType(
+					charge_indicator=factur_x_basic.IndicatorType(indicator=False),
+					actual_amount=factur_x_basic.AmountType(value=format_decimal % ligne.ligne_poste_montant_remise_HT),
+		)
+		if ligne.ligne_poste_code_raison_reduction_code:
+			trade_allowance_charge.reason_code=factur_x_basic.AllowanceChargeReasonCodeType(value=ligne.ligne_poste_code_raison_reduction_code)
+		if ligne.ligne_poste_code_raison_reduction:
+			trade_allowance_charge.reason = factur_x_basic.TextType(value=ligne.ligne_poste_code_raison_reduction)
+	trade_allowance_charge_trade_agreement = None
+	if trade_allowance_charge:
+		trade_allowance_charge_trade_agreement = copy.deepcopy(trade_allowance_charge)
+		trade_allowance_charge_trade_agreement.actual_amount(value=format_decimal % (ligne.ligne_poste_montant_remise_HT / ligne.ligne_poste_quantite))
 
 	suply_chain_trade_line = factur_x_basic.SupplyChainTradeLineItemType(
 		associated_document_line_document=factur_x_basic.DocumentLineDocumentType(
@@ -104,22 +112,14 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 			# included_note = factur_x_basic.NoteType(content=, subject_code=),
 		),
 		specified_trade_product=factur_x_basic.TradeProductType(
-			global_id=factur_x_basic.Idtype(value=ligne.ligne_poste_reference, scheme_id=''),
-			name=factur_x_basic.TextType(value=ligne.ligne_poste_denomination)
+			#global_id=factur_x_basic.Idtype(value=ligne.ligne_poste_reference, scheme_id=''),
+			name=factur_x_basic.TextType(value=ligne.ligne_poste_reference + " " + ligne.ligne_poste_denomination)
 		),
 		specified_line_trade_agreement=factur_x_basic.LineTradeAgreementType(
 			gross_price_product_trade_price = factur_x_basic.TradePriceType(
 				charge_amount = factur_x_basic.AmountType(value=format_decimal % ligne.ligne_poste_montant_unitaire_HT),
 				basis_quantity = factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne.ligne_poste_unite),
-				applied_trade_allowance_charge = factur_x_basic.TradeAllowanceChargeType(
-					charge_indicator=factur_x_basic.IndicatorType(indicator=False),
-					# calculation_percent=factur_x_basic.PercentType(),
-					# basis_amount=factur_x_basic.AmountType(),
-					actual_amount=factur_x_basic.AmountType(value=format_decimal % (ligne.ligne_poste_montant_remise_HT / ligne.ligne_poste_quantite)),
-					# reason_code=factur_x_basic.AllowanceChargeReasonCodeType(),
-					# reason=factur_x_basic.TextType(),
-					# category_trade_tax=factur_x_basic.TradeTaxType(),
-				),
+				applied_trade_allowance_charge = trade_allowance_charge_trade_agreement if trade_allowance_charge_trade_agreement else None,
 			),
 			net_price_product_trade_price = factur_x_basic.TradePriceType(
 				charge_amount=factur_x_basic.AmountType(value="%.2f" % (ligne.ligne_poste_montant_unitaire_HT - ligne.ligne_poste_montant_remise_HT)),
@@ -145,7 +145,7 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 				start_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(date_debut_retenue), format="102")),
 				end_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(date_fin_retenue), format="102")),
 			),
-			specified_trade_allowance_charge=[trade_allowance_charge, ],
+			specified_trade_allowance_charge=[trade_allowance_charge, ] if trade_allowance_charge else None,
 			specified_trade_settlement_line_monetary_summation=factur_x_basic.TradeSettlementLineMonetarySummationType(
 				line_total_amount=factur_x_basic.AmountType(value=format_decimal % (ligne.ligne_poste_montant_unitaire_HT * ligne.ligne_poste_quantite)),
 			),
@@ -191,7 +191,9 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 				actual_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_remise_globale_TTC),
 				reason=factur_x_basic.TextType(value=facture.montant_total.motif_remise_globale_TTC)
 			),],
-			specified_trade_payment_terms=factur_x_basic.TradePaymentTermsType(),
+			specified_trade_payment_terms=factur_x_basic.TradePaymentTermsType(
+				due_date_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(format="102", value=_parse_date_chorus_vers_facturx(facture.date_echeance_paiement))),
+			),
 			invoice_currency_code=factur_x_basic.CurrencyCodeType(value=facture.references.devise_facture),
 			#invoice_referenced_document=[factur_x_basic.ReferencedDocumentType(),], # Numéro de facture antérieure ?
 			#receivable_specified_trade_accounting_account=factur_x_basic.TradeAccountingAccountType(),
