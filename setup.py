@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name='facture_electronique',
-	version='0.1.4',
+	version='0.1.5',
 	author='Thierry Martin',
 	author_email='thierry.martin.2008@gadz.org',
 	description="Facturation Electronique SDK est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, et d'autres partenaires privés. Elle supporte également le format Factur-X pour la création et l'envoi de factures électroniques.",
