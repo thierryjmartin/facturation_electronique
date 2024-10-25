@@ -475,9 +475,9 @@ if __name__ == '__main__':
 	# print(exemple_facture.to_facturx_basic())
 
 	from ..utils.files import *
-	file_path = get_absolute_path("facture_electronique/exemples/Facture-2024-003.pdf")
+	file_path = get_absolute_path("facture_electronique/exemples/dummy.pdf")
 
-	file_path_pdfa = get_absolute_path("facture_electronique/exemples/Facture_pdfa-2024-003.pdf")
+	file_path_pdfa = get_absolute_path("facture_electronique/exemples/dummy.pdfa.pdf")
 	from ..utils.pdfs import convert_to_pdfa
 	convert_to_pdfa(file_path, file_path_pdfa)
 
