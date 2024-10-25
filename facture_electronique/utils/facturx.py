@@ -1,5 +1,7 @@
+import os
 import copy
 from datetime import datetime
+from lxml import etree
 
 from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
 from ..generated import factur_x_minimum, factur_x_basic
@@ -183,7 +185,7 @@ def _ligne_tva_facturx_basic(ligne_tva: LigneTva) -> factur_x_basic.TradeTaxType
 		rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % ligne_tva.ligne_tva_taux_manuel),
 	)
 
-def est_valide_pour_facturx_basic(facture: Facture):
+def est_valide_pour_facturx_basic(facture: Facture) -> None:
 	if facture.montant_total.montant_remise_globale_TTC:
 		raise InvalidDataFacturxError("On ne peut pas mettre une remise TTC dans Facturx basic, il faut dispatch la remise sur les différentes lignes.")
 
@@ -255,3 +257,24 @@ def xml_from_facture_xsdata(facture) -> str:
 	serializer = XmlSerializer(context=XmlContext(), config=config)
 	xml_data = serializer.render(facture, ns_map=nsmap)
 	return xml_data
+
+current_file_dir = os.path.dirname(os.path.dirname(__file__))
+chemin_xldt_minimum = os.path.join(current_file_dir, "xsd", "facturx-minimum", "_XSLT_MINIMUM", "FACTUR-X_MINIMUM.xslt")
+chemin_schematron_minimum = os.path.join(current_file_dir, "xsd", "facturx-minimum", "Factur-X_1.0.07_MINIMUM.sch")
+chemin_xldt_basic = os.path.join(current_file_dir, "xsd", "facturx-basic", "_XSLT_BASIC", "FACTUR-X_BASIC.xslt")
+chemin_schematron_basic = os.path.join(current_file_dir, "xsd", "facturx-basic", "Factur-X_1.0.07_BASIC.sch")
+def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
+	xslt_doc = etree.parse(chemin_xldt)
+	transform = etree.XSLT(xslt_doc)
+
+	xml_doc = etree.fromstring(xml_data.encode("utf-8"))
+
+	result = transform(xml_doc)
+
+	if "failed-assert" in str(result):
+		print("Le document XML n'est pas valide selon le Schematron.")
+		for elem in result.xpath("//svrl:failed-assert", namespaces={"svrl": "http://purl.oclc.org/dsdl/svrl"}):
+			print(f"Erreur : {elem.xpath('string(svrl:text)', namespaces={'svrl': 'http://purl.oclc.org/dsdl/svrl'})}")
+	else:
+		print("Le document XML est valide selon le Schematron.")
+	return True

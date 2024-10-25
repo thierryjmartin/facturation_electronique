@@ -616,15 +616,24 @@ if __name__ == '__main__':
 	)
 
 	import facturx
-	from ..utils.facturx import xml_from_facture_xsdata
+	from ..utils.facturx import (
+		xml_from_facture_xsdata,
+		valider_xml_xldt,
+		chemin_schematron_minimum,
+		chemin_schematron_basic,
+		chemin_xldt_basic,
+		chemin_xldt_minimum
+	)
 
 	file_path_facturx_mini = file_path + '.facturx.minmum.pdf'
 	file_path_facturx_basic = file_path + '.facturx.basic.pdf'
 
 
+	xml = xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum())
+	valider_xml_xldt(xml, chemin_xldt_minimum)
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
+		xml,
 		output_pdf_file=file_path_facturx_mini,
 		flavor='factur-x',
 		level='minimum',
@@ -633,16 +642,18 @@ if __name__ == '__main__':
 
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum()),
+		xml,
 		output_pdf_file=file_path_facturx_mini,
 		flavor='factur-x',
 		level='minimum',
 		check_xsd=True,
 	)
 
+	xml = xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_basic())
+	valider_xml_xldt(xml, chemin_xldt_basic)
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_basic()),
+		xml,
 		output_pdf_file=file_path_facturx_basic,
 		flavor='factur-x',
 		level='basic',
@@ -652,7 +663,7 @@ if __name__ == '__main__':
 
 	facturx.generate_from_file(
 		file_path_pdfa,
-		xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_basic()),
+		xml,
 		output_pdf_file=file_path_facturx_basic,
 		flavor='factur-x',
 		level='basic',
