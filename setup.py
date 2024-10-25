@@ -13,7 +13,6 @@ setup(
 	install_requires=[
 		'requests>=2.32.3',
 		'pydantic>=2.9.2',
-		'factur-x>=3.1'
 	],
 	classifiers=[
 		'Programming Language :: Python :: 3',

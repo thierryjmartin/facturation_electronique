@@ -4,14 +4,14 @@ requests==2.32.3
 # Outils de validation et de manipulation des données
 pydantic==2.9.2
 
-# Gestion du format Factur-X
+# Gestion du format Factur-X (optionnel)
 factur-x==3.1
 
-# générer les pdf/a
+# générer les pdf/a pour Factur-X (optionnel)
 ghostscript==0.7
 
-# pour generer les factur-x
+# pour generer les Factur-X depuis les objets Pydantic Facture (optionnel)
 xsdata==24.9
 
-# pour valider les factur-x avec xldt
+# pour valider les Factur-X avec xldt (optionnel)
 saxonche==12.5.0
