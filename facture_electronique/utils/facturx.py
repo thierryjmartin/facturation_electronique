@@ -5,7 +5,7 @@ from lxml import etree
 
 from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
 from ..generated import factur_x_minimum, factur_x_basic
-from ..exceptions import InvalidDataFacturxError
+from ..exceptions import InvalidDataFacturxError, XSLTValidationError
 
 LEVEL_MINIMUM = 'minimum'
 LEVEL_BASIC = 'basic'
@@ -79,7 +79,7 @@ def _gen_applicable_header_trade_agreement(facturx_minimum_ou_basic, facture):
 
 def gen_facturx_minimum(facture: Facture) -> factur_x_minimum.CrossIndustryInvoice:
 	exchanged_document_context = factur_x_minimum.ExchangedDocumentContextType(
-		guideline_specified_document_context_parameter=factur_x_minimum.DocumentContextParameterType(id=factur_x_minimum.Idtype(value="urn:factur-x.eu:1p0:minimum"))
+		guideline_specified_document_context_parameter=factur_x_minimum.DocumentContextParameterType(id=factur_x_minimum.Idtype(value="urn:factur-x.eu:1p0:minimum")) # urn:factur-x.eu:1p0:minimum
 	)
 	exchanged_document = factur_x_minimum.ExchangedDocumentType(
 		id=factur_x_minimum.Idtype(value=facture.numero_facture_saisi),
@@ -192,7 +192,7 @@ def est_valide_pour_facturx_basic(facture: Facture) -> None:
 def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 	est_valide_pour_facturx_basic(facture)
 	exchanged_document_context = factur_x_basic.ExchangedDocumentContextType(
-		guideline_specified_document_context_parameter=factur_x_basic.DocumentContextParameterType(id=factur_x_basic.Idtype(value="urn:cen.eu:EN 16931:2017#compliant#urn:factur-x.eu:1p0:basic"))
+		guideline_specified_document_context_parameter=factur_x_basic.DocumentContextParameterType(id=factur_x_basic.Idtype(value="urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic"))
 	)
 	exchanged_document = factur_x_basic.ExchangedDocumentType(
 		id=factur_x_basic.Idtype(value=facture.numero_facture_saisi),
@@ -278,3 +278,22 @@ def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
 	else:
 		print("Le document XML est valide selon le Schematron.")
 	return True
+
+def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
+	from saxonche import PySaxonProcessor
+	import re
+
+	with PySaxonProcessor(license=False) as proc:
+		xsltproc = proc.new_xslt30_processor()
+		document = proc.parse_xml(xml_text=xml_data)
+		executable = xsltproc.compile_stylesheet(stylesheet_file=chemin_xldt)
+		output = executable.transform_to_string(xdm_node=document)
+		pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^"]+)<\/svrl:text>')
+		matches = pattern.findall(output)
+		if not matches:
+			return
+		res = ""
+		for match in matches:
+			test_expr, location, message = match
+			res += f"Test: {test_expr}\nLocation: {location}\nMessage: {message.strip() if message else 'Pas de message'}\n\n"
+		raise XSLTValidationError(res)

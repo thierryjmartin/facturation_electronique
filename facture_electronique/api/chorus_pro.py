@@ -619,8 +619,6 @@ if __name__ == '__main__':
 	from ..utils.facturx import (
 		xml_from_facture_xsdata,
 		valider_xml_xldt,
-		chemin_schematron_minimum,
-		chemin_schematron_basic,
 		chemin_xldt_basic,
 		chemin_xldt_minimum
 	)

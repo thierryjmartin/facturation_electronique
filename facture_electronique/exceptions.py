@@ -9,3 +9,7 @@ class FactureNonTrouveeError(FacturationAPIError):
 class InvalidDataFacturxError(Exception):
 	"""Exception lorsqu'on l'objet Facture comprend des données qui sont incompatibles avec Facturx """
 	pass
+
+class XSLTValidationError(Exception):
+	"""Erreur lorsque qu'on essaie de valider un facturx selon xslt et que ça ne passe pas"""
+	pass

@@ -22,3 +22,6 @@ ghostscript==0.7
 
 # pour generer les factur-x
 xsdata==24.9
+
+# pour valider les factur-x avec xldt
+saxonche==12.5.0
