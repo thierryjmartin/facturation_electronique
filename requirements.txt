@@ -4,18 +4,8 @@ requests==2.32.3
 # Outils de validation et de manipulation des données
 pydantic==2.9.2
 
-# Gestion du format Factur-X (exemple, factur-x est une librairie courante)
+# Gestion du format Factur-X
 factur-x==3.1
-
-# Outils pour les signatures électroniques et validation (optionnel)
-cryptography==43.0.1
-
-# Gestion des fichiers PDF pour Factur-X
-PyPDF2==3.0.1
-
-# Optionnel : outils pour des formats XML/JSON complexes
-lxml==5.3.0
-xmltodict==0.13.0
 
 # générer les pdf/a
 ghostscript==0.7

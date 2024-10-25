@@ -1,7 +1,6 @@
 import os
 import copy
 from datetime import datetime
-from lxml import etree
 
 from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
 from ..generated import factur_x_minimum, factur_x_basic
