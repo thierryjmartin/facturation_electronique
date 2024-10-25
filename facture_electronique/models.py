@@ -94,10 +94,10 @@ class LigneTva(BaseModel):
 
 
 class MontantTotal(BaseModel):
-	montant_deja_paye: Optional[float] = 0 # facturx basic.
+	acompte: Optional[float] = 0 # facturx basic.
 	montant_a_payer: float
 	montant_ht_total: float
-	montant_remise_globale_TTC: float
+	montant_remise_globale_TTC: float # les remises globales TTC ne vont pas avec Chorus pro, il faudrait plutot des lignes de remises HT ou charges HT avec chacune leur taux de tva
 	montant_TVA: float
 	montant_ttc_total: float
 	motif_remise_globale_TTC: str
@@ -200,7 +200,7 @@ class Facture(BaseModel):
 			("fournisseur", "nom"),
 			("fournisseur", "siret"),
 			("destinataire", "nom"),
-			("montant_total", "montant_deja_paye")
+			("montant_total", "acompte")
 		]
 		for elt in cle_a_detruire:
 			try:

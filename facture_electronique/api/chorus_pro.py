@@ -533,8 +533,9 @@ if __name__ == '__main__':
 			montant_ht_total=1326.00,
 			montant_TVA=130.272,
 			montant_ttc_total=1456.272,
-			montant_remise_globale_TTC=50.00,
-			motif_remise_globale_TTC="Geste commercial",
+			montant_remise_globale_TTC=0.00,
+			motif_remise_globale_TTC="",
+			acompte=56.272,
 			montant_a_payer=1400.00
 		),
 		commentaire = 'voici mon commentaire',

@@ -1,9 +1,9 @@
 import copy
-
-from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva, TvaCategories
 from datetime import datetime
-from ..generated import factur_x_minimum, factur_x_basic
 
+from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
+from ..generated import factur_x_minimum, factur_x_basic
+from ..exceptions import InvalidDataFacturxError
 
 LEVEL_MINIMUM = 'minimum'
 LEVEL_BASIC = 'basic'
@@ -183,7 +183,12 @@ def _ligne_tva_facturx_basic(ligne_tva: LigneTva) -> factur_x_basic.TradeTaxType
 		rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % ligne_tva.ligne_tva_taux_manuel),
 	)
 
+def est_valide_pour_facturx_basic(facture: Facture):
+	if facture.montant_total.montant_remise_globale_TTC:
+		raise InvalidDataFacturxError("On ne peut pas mettre une remise TTC dans Facturx basic, il faut dispatch la remise sur les différentes lignes.")
+
 def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
+	est_valide_pour_facturx_basic(facture)
 	exchanged_document_context = factur_x_basic.ExchangedDocumentContextType(
 		guideline_specified_document_context_parameter=factur_x_basic.DocumentContextParameterType(id=factur_x_basic.Idtype(value="urn:cen.eu:EN 16931:2017#compliant#urn:factur-x.eu:1p0:basic"))
 	)
@@ -213,11 +218,9 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 			#	actual_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_remise_globale_TTC),
 			#	reason=factur_x_basic.TextType(value=facture.montant_total.motif_remise_globale_TTC),
 			#	category_trade_tax=factur_x_basic.TradeTaxType(
-			#		calculated_amount=factur_x_basic.AmountType(format_decimal % 0),
 			#		type_code=factur_x_basic.TaxTypeCodeType("VAT"),
-			#		basis_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_remise_globale_TTC),
 			#		category_code=factur_x_basic.TaxCategoryCodeType(value=TvaCategories.tva_cat_S),
-			#		rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % 0)
+			#		rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % facture.ligne_tva[0].ligne_tva_taux_manuel)
 			#	)
 			#),],
 			specified_trade_payment_terms=factur_x_basic.TradePaymentTermsType(
@@ -232,7 +235,7 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 				tax_basis_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
 				tax_total_amount=[factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_TVA, currency_id=facture.references.devise_facture), ],
 				grand_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ttc_total),
-				total_prepaid_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_deja_paye),
+				total_prepaid_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.acompte),
 				due_payable_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_a_payer)
 			)
 		),
