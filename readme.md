@@ -14,7 +14,7 @@ Le concept repose sur l'instanciation d’une classe **Facture** (actuellement l
 1. Clonez ce dépôt ou téléchargez-le :
 
    ```bash
-   git clone https://gitlab.com/cleverip/fr-efact-python-sdk.git
+   git clone https://github.com/thierryjmartin/facturation_electronique.git
     ```
    
 2. Installez les dépendances à l'aide du fichier requirements.txt :
