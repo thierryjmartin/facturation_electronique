@@ -1,13 +1,13 @@
 # Facturation Electronique SDK
 
 ## Description
-`Facturation Electronique SDK` est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, et d'autres partenaires privés. Elle supporte également le format **Factur-X** pour la création et l'envoi de factures électroniques.
+`Facturation Electronique` est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, et d'autres partenaires privés. Elle supporte également le format **Factur-X** pour la création et l'envoi de factures électroniques.
 
-Ce SDK est conçu pour être extensible et compatible avec les différentes plateformes de facturation électronique en France, facilitant l'envoi et la gestion des factures en toute conformité avec les réglementations.
+Le concept repose sur l'instanciation d’une classe **Facture** (actuellement largement inspirée de l’API Chorus Pro), qui fournit ensuite les outils nécessaires pour interagir avec diverses API publiques, principalement Chorus Pro, ainsi qu’avec des plateformes de dématérialisation partenaires telles que Qonto, Sage, et Pennylane. La vérification de cohérence et de logique des factures s'appuie sur le format Factur-X, pris en charge par Chorus Pro, et particulièrement adapté pour les contrôles de cohérence avancés.
 
 ## Fonctionnalités
-- **Chorus Pro** : Création, envoi et suivi des factures à destination des entités publiques.
-- **Factur-X** : Génération de factures au format PDF/Factur-X.
+- **Chorus Pro** : Ce module permet la création, l'envoi et le suivi des factures destinées aux entités publiques. Il intègre également des fonctionnalités de recherche d’entités via le SIRET, permettant par exemple de retrouver l’identifiant Chorus Pro d’une entité.
+- **Factur-X** : Ce module prend en charge la génération de factures au format PDF/Factur-X, en particulier les profils minimum et basic. Il valide le fichier factur-x.xml en conformité avec les schémas XSD via le module facturx. De plus, il offre la possibilité d'une validation plus poussée du fichier XML en appliquant les règles avancées définies dans les fichiers XSLT, ce que le module facturx ne propose pas nativement, via la fonction valider_xml_xslt.
 
 ## Installation
 
