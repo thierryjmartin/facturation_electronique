@@ -1,7 +1,10 @@
 import requests
 import base64
 from ..utils.http_client import HttpClient
-from ..config import *
+try:
+	from ..config import *
+except ImportError:
+	from ..template_config import *
 
 
 class ChorusProAPI:
