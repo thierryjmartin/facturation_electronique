@@ -1,11 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Optional
+from pydantic import BaseModel, ConfigDict
+from xsdata_pydantic.fields import field
 
 __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:QualifiedDataType:100"
 
 
-@dataclass
-class AllowanceChargeReasonCodeType:
+class AllowanceChargeReasonCodeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -14,11 +14,11 @@ class AllowanceChargeReasonCodeType:
     )
 
 
-@dataclass
-class CountryIdtype:
+class CountryIdtype(BaseModel):
     class Meta:
         name = "CountryIDType"
 
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -27,8 +27,8 @@ class CountryIdtype:
     )
 
 
-@dataclass
-class CurrencyCodeType:
+class CurrencyCodeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -37,8 +37,8 @@ class CurrencyCodeType:
     )
 
 
-@dataclass
-class DocumentCodeType:
+class DocumentCodeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -47,37 +47,35 @@ class DocumentCodeType:
     )
 
 
-@dataclass
-class FormattedDateTimeType:
-    date_time_string: Optional["FormattedDateTimeType.DateTimeString"] = field(
-        default=None,
+class FormattedDateTimeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    date_time_string: "FormattedDateTimeType.DateTimeString" = field(
         metadata={
             "name": "DateTimeString",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:QualifiedDataType:100",
             "required": True,
-        },
+        }
     )
 
-    @dataclass
-    class DateTimeString:
+    class DateTimeString(BaseModel):
+        model_config = ConfigDict(defer_build=True)
         value: str = field(
             default="",
             metadata={
                 "required": True,
             },
         )
-        format: Optional[str] = field(
-            default=None,
+        format: str = field(
             metadata={
                 "type": "Attribute",
                 "required": True,
-            },
+            }
         )
 
 
-@dataclass
-class PaymentMeansCodeType:
+class PaymentMeansCodeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -86,8 +84,8 @@ class PaymentMeansCodeType:
     )
 
 
-@dataclass
-class TaxCategoryCodeType:
+class ReferenceCodeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -96,8 +94,8 @@ class TaxCategoryCodeType:
     )
 
 
-@dataclass
-class TaxTypeCodeType:
+class TaxCategoryCodeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -106,8 +104,18 @@ class TaxTypeCodeType:
     )
 
 
-@dataclass
-class TimeReferenceCodeType:
+class TaxTypeCodeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    value: str = field(
+        default="",
+        metadata={
+            "required": True,
+        },
+    )
+
+
+class TimeReferenceCodeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={

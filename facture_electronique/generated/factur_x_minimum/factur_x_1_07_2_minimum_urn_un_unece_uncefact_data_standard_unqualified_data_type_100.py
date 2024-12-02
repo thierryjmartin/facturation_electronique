@@ -1,17 +1,18 @@
-from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
+from xsdata_pydantic.fields import field
 
 __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"
 
 
-@dataclass
-class AmountType:
-    value: Optional[str] = field(
-        default=None,
+class AmountType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    value: Decimal = field(
         metadata={
             "required": True,
-        },
+        }
     )
     currency_id: Optional[str] = field(
         default=None,
@@ -22,40 +23,38 @@ class AmountType:
     )
 
 
-@dataclass
-class DateTimeType:
-    date_time_string: Optional["DateTimeType.DateTimeString"] = field(
-        default=None,
+class DateTimeType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    date_time_string: "DateTimeType.DateTimeString" = field(
         metadata={
             "name": "DateTimeString",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
             "required": True,
-        },
+        }
     )
 
-    @dataclass
-    class DateTimeString:
+    class DateTimeString(BaseModel):
+        model_config = ConfigDict(defer_build=True)
         value: str = field(
             default="",
             metadata={
                 "required": True,
             },
         )
-        format: Optional[str] = field(
-            default=None,
+        format: str = field(
             metadata={
                 "type": "Attribute",
                 "required": True,
-            },
+            }
         )
 
 
-@dataclass
-class Idtype:
+class Idtype(BaseModel):
     class Meta:
         name = "IDType"
 
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -71,8 +70,8 @@ class Idtype:
     )
 
 
-@dataclass
-class TextType:
+class TextType(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
