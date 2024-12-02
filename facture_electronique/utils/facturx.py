@@ -258,8 +258,8 @@ def xml_from_facture_xsdata(facture) -> str:
 	return xml_data
 
 current_file_dir = os.path.dirname(os.path.dirname(__file__))
-chemin_xldt_minimum = os.path.join(current_file_dir, "xsd", "facturx-minimum", "_XSLT_MINIMUM", "FACTUR-X_MINIMUM.xslt")
-chemin_xldt_basic = os.path.join(current_file_dir, "xsd", "facturx-basic", "_XSLT_BASIC", "FACTUR-X_BASIC.xslt")
+chemin_xldt_minimum = os.path.join(current_file_dir, "xsd", "facturx-minimum", "_XSLT_MINIMUM", "Factur-X_1.07.2_MINIMUM.xslt")
+chemin_xldt_basic = os.path.join(current_file_dir, "xsd", "facturx-basic", "_XSLT_BASIC", "Factur-X_1.07.2_BASIC.xslt")
 
 def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
 	from saxonche import PySaxonProcessor
