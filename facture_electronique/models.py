@@ -203,14 +203,24 @@ class Facture(BaseModel):
 			("fournisseur", "siret"),
 			("destinataire", "nom"),
 			("destinataire", "adresse_postale"),
-			("montant_total", "acompte")
+			("montant_total", "acompte"),
+			("ligne_tva", "ligne_tva_categorie"),
+			("ligne_poste", "ligne_poste_code_raison_reduction"),
+			("ligne_poste", "ligne_poste_tva_categorie"),
 		]
 		for elt in cle_a_detruire:
 			try:
 				if len(elt) == 1:
 					del data[elt[0]]
 				else:
-					del data[elt[0]][elt[1]]
+					if isinstance(data[elt[0]], list):
+						res = list()
+						for val in data[elt[0]]:
+							del val[elt[1]]
+							res.append(elt)
+						data[elt[0]] = res
+					else:
+						del data[elt[0]][elt[1]]
 			except KeyError:
 				# element inexistant, c'est ce qu'on veut
 				continue
