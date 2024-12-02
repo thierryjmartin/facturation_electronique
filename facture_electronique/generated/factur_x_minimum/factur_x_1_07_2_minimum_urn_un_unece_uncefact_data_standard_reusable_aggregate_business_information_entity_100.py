@@ -1,7 +1,5 @@
+from dataclasses import dataclass, field
 from typing import List, Optional
-
-from pydantic import BaseModel, ConfigDict
-from xsdata_pydantic.fields import field
 
 from facture_electronique.generated.factur_x_minimum.factur_x_1_07_2_minimum_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
     CountryIdtype,
@@ -18,53 +16,57 @@ from facture_electronique.generated.factur_x_minimum.factur_x_1_07_2_minimum_urn
 __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
 
 
-class HeaderTradeDeliveryType(BaseModel):
+@dataclass
+class HeaderTradeDeliveryType:
     pass
-    model_config = ConfigDict(defer_build=True)
 
 
-class DocumentContextParameterType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class DocumentContextParameterType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class ExchangedDocumentType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class ExchangedDocumentType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    type_code: DocumentCodeType = field(
+    type_code: Optional[DocumentCodeType] = field(
+        default=None,
         metadata={
             "name": "TypeCode",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    issue_date_time: DateTimeType = field(
+    issue_date_time: Optional[DateTimeType] = field(
+        default=None,
         metadata={
             "name": "IssueDateTime",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class LegalOrganizationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class LegalOrganizationType:
     id: Optional[Idtype] = field(
         default=None,
         metadata={
@@ -75,51 +77,55 @@ class LegalOrganizationType(BaseModel):
     )
 
 
-class ReferencedDocumentType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    issuer_assigned_id: Idtype = field(
+@dataclass
+class ReferencedDocumentType:
+    issuer_assigned_id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "IssuerAssignedID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TaxRegistrationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class TaxRegistrationType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TradeAddressType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    country_id: CountryIdtype = field(
+@dataclass
+class TradeAddressType:
+    country_id: Optional[CountryIdtype] = field(
+        default=None,
         metadata={
             "name": "CountryID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TradeSettlementHeaderMonetarySummationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    tax_basis_total_amount: AmountType = field(
+@dataclass
+class TradeSettlementHeaderMonetarySummationType:
+    tax_basis_total_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "TaxBasisTotalAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     tax_total_amount: List[AmountType] = field(
         default_factory=list,
@@ -130,26 +136,28 @@ class TradeSettlementHeaderMonetarySummationType(BaseModel):
             "max_occurs": 2,
         },
     )
-    grand_total_amount: AmountType = field(
+    grand_total_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "GrandTotalAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    due_payable_amount: AmountType = field(
+    due_payable_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "DuePayableAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class ExchangedDocumentContextType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class ExchangedDocumentContextType:
     business_process_specified_document_context_parameter: Optional[
         DocumentContextParameterType
     ] = field(
@@ -160,45 +168,53 @@ class ExchangedDocumentContextType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    guideline_specified_document_context_parameter: DocumentContextParameterType = field(
+    guideline_specified_document_context_parameter: Optional[
+        DocumentContextParameterType
+    ] = field(
+        default=None,
         metadata={
             "name": "GuidelineSpecifiedDocumentContextParameter",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class HeaderTradeSettlementType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    invoice_currency_code: CurrencyCodeType = field(
+@dataclass
+class HeaderTradeSettlementType:
+    invoice_currency_code: Optional[CurrencyCodeType] = field(
+        default=None,
         metadata={
             "name": "InvoiceCurrencyCode",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    specified_trade_settlement_header_monetary_summation: TradeSettlementHeaderMonetarySummationType = field(
+    specified_trade_settlement_header_monetary_summation: Optional[
+        TradeSettlementHeaderMonetarySummationType
+    ] = field(
+        default=None,
         metadata={
             "name": "SpecifiedTradeSettlementHeaderMonetarySummation",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TradePartyType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    name: TextType = field(
+@dataclass
+class TradePartyType:
+    name: Optional[TextType] = field(
+        default=None,
         metadata={
             "name": "Name",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     specified_legal_organization: Optional[LegalOrganizationType] = field(
         default=None,
@@ -227,8 +243,8 @@ class TradePartyType(BaseModel):
     )
 
 
-class HeaderTradeAgreementType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class HeaderTradeAgreementType:
     buyer_reference: Optional[TextType] = field(
         default=None,
         metadata={
@@ -237,21 +253,23 @@ class HeaderTradeAgreementType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    seller_trade_party: TradePartyType = field(
+    seller_trade_party: Optional[TradePartyType] = field(
+        default=None,
         metadata={
             "name": "SellerTradeParty",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    buyer_trade_party: TradePartyType = field(
+    buyer_trade_party: Optional[TradePartyType] = field(
+        default=None,
         metadata={
             "name": "BuyerTradeParty",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     buyer_order_referenced_document: Optional[ReferencedDocumentType] = field(
         default=None,
@@ -263,29 +281,38 @@ class HeaderTradeAgreementType(BaseModel):
     )
 
 
-class SupplyChainTradeTransactionType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    applicable_header_trade_agreement: HeaderTradeAgreementType = field(
-        metadata={
-            "name": "ApplicableHeaderTradeAgreement",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            "required": True,
-        }
+@dataclass
+class SupplyChainTradeTransactionType:
+    applicable_header_trade_agreement: Optional[HeaderTradeAgreementType] = (
+        field(
+            default=None,
+            metadata={
+                "name": "ApplicableHeaderTradeAgreement",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+                "required": True,
+            },
+        )
     )
-    applicable_header_trade_delivery: HeaderTradeDeliveryType = field(
-        metadata={
-            "name": "ApplicableHeaderTradeDelivery",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            "required": True,
-        }
+    applicable_header_trade_delivery: Optional[HeaderTradeDeliveryType] = (
+        field(
+            default=None,
+            metadata={
+                "name": "ApplicableHeaderTradeDelivery",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+                "required": True,
+            },
+        )
     )
-    applicable_header_trade_settlement: HeaderTradeSettlementType = field(
-        metadata={
-            "name": "ApplicableHeaderTradeSettlement",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            "required": True,
-        }
+    applicable_header_trade_settlement: Optional[HeaderTradeSettlementType] = (
+        field(
+            default=None,
+            metadata={
+                "name": "ApplicableHeaderTradeSettlement",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+                "required": True,
+            },
+        )
     )

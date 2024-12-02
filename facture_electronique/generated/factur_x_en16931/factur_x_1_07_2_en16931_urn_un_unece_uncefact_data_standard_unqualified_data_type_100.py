@@ -1,18 +1,17 @@
+from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Optional
-
-from pydantic import BaseModel, ConfigDict
-from xsdata_pydantic.fields import field
 
 __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100"
 
 
-class AmountType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    value: Decimal = field(
+@dataclass
+class AmountType:
+    value: Optional[Decimal] = field(
+        default=None,
         metadata={
             "required": True,
-        }
+        },
     )
     currency_id: Optional[str] = field(
         default=None,
@@ -23,31 +22,34 @@ class AmountType(BaseModel):
     )
 
 
-class BinaryObjectType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    value: bytes = field(
+@dataclass
+class BinaryObjectType:
+    value: Optional[bytes] = field(
+        default=None,
         metadata={
             "required": True,
             "format": "base64",
-        }
+        },
     )
-    mime_code: str = field(
+    mime_code: Optional[str] = field(
+        default=None,
         metadata={
             "name": "mimeCode",
             "type": "Attribute",
             "required": True,
-        }
+        },
     )
-    filename: str = field(
+    filename: Optional[str] = field(
+        default=None,
         metadata={
             "type": "Attribute",
             "required": True,
-        }
+        },
     )
 
 
-class CodeType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class CodeType:
     value: str = field(
         default="",
         metadata={
@@ -70,65 +72,69 @@ class CodeType(BaseModel):
     )
 
 
-class DateTimeType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    date_time_string: "DateTimeType.DateTimeString" = field(
+@dataclass
+class DateTimeType:
+    date_time_string: Optional["DateTimeType.DateTimeString"] = field(
+        default=None,
         metadata={
             "name": "DateTimeString",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
             "required": True,
-        }
+        },
     )
 
-    class DateTimeString(BaseModel):
-        model_config = ConfigDict(defer_build=True)
+    @dataclass
+    class DateTimeString:
         value: str = field(
             default="",
             metadata={
                 "required": True,
             },
         )
-        format: str = field(
+        format: Optional[str] = field(
+            default=None,
             metadata={
                 "type": "Attribute",
                 "required": True,
-            }
+            },
         )
 
 
-class DateType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    date_string: "DateType.DateString" = field(
+@dataclass
+class DateType:
+    date_string: Optional["DateType.DateString"] = field(
+        default=None,
         metadata={
             "name": "DateString",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
             "required": True,
-        }
+        },
     )
 
-    class DateString(BaseModel):
-        model_config = ConfigDict(defer_build=True)
+    @dataclass
+    class DateString:
         value: str = field(
             default="",
             metadata={
                 "required": True,
             },
         )
-        format: str = field(
+        format: Optional[str] = field(
+            default=None,
             metadata={
                 "type": "Attribute",
                 "required": True,
-            }
+            },
         )
 
 
-class Idtype(BaseModel):
+@dataclass
+class Idtype:
     class Meta:
         name = "IDType"
 
-    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -144,33 +150,36 @@ class Idtype(BaseModel):
     )
 
 
-class IndicatorType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    indicator: bool = field(
+@dataclass
+class IndicatorType:
+    indicator: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "Indicator",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
             "required": True,
-        }
+        },
     )
 
 
-class PercentType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    value: Decimal = field(
+@dataclass
+class PercentType:
+    value: Optional[Decimal] = field(
+        default=None,
         metadata={
             "required": True,
-        }
+        },
     )
 
 
-class QuantityType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    value: Decimal = field(
+@dataclass
+class QuantityType:
+    value: Optional[Decimal] = field(
+        default=None,
         metadata={
             "required": True,
-        }
+        },
     )
     unit_code: Optional[str] = field(
         default=None,
@@ -181,8 +190,8 @@ class QuantityType(BaseModel):
     )
 
 
-class TextType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class TextType:
     value: str = field(
         default="",
         metadata={

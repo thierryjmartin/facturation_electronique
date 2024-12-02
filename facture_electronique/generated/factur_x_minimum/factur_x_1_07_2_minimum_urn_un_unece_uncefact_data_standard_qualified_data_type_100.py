@@ -1,14 +1,13 @@
-from pydantic import BaseModel, ConfigDict
-from xsdata_pydantic.fields import field
+from dataclasses import dataclass, field
 
 __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:QualifiedDataType:100"
 
 
-class CountryIdtype(BaseModel):
+@dataclass
+class CountryIdtype:
     class Meta:
         name = "CountryIDType"
 
-    model_config = ConfigDict(defer_build=True)
     value: str = field(
         default="",
         metadata={
@@ -17,8 +16,8 @@ class CountryIdtype(BaseModel):
     )
 
 
-class CurrencyCodeType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class CurrencyCodeType:
     value: str = field(
         default="",
         metadata={
@@ -27,8 +26,8 @@ class CurrencyCodeType(BaseModel):
     )
 
 
-class DocumentCodeType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class DocumentCodeType:
     value: str = field(
         default="",
         metadata={

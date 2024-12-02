@@ -1,7 +1,5 @@
+from dataclasses import dataclass, field
 from typing import List, Optional
-
-from pydantic import BaseModel, ConfigDict
-from xsdata_pydantic.fields import field
 
 from facture_electronique.generated.factur_x_en16931.factur_x_1_07_2_en16931_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
     AllowanceChargeReasonCodeType,
@@ -31,8 +29,8 @@ from facture_electronique.generated.factur_x_en16931.factur_x_1_07_2_en16931_urn
 __NAMESPACE__ = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
 
 
-class CreditorFinancialAccountType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class CreditorFinancialAccountType:
     ibanid: Optional[Idtype] = field(
         default=None,
         metadata={
@@ -59,44 +57,47 @@ class CreditorFinancialAccountType(BaseModel):
     )
 
 
-class CreditorFinancialInstitutionType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    bicid: Idtype = field(
+@dataclass
+class CreditorFinancialInstitutionType:
+    bicid: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "BICID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class DebtorFinancialAccountType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    ibanid: Idtype = field(
+@dataclass
+class DebtorFinancialAccountType:
+    ibanid: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "IBANID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class DocumentContextParameterType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class DocumentContextParameterType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class LegalOrganizationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class LegalOrganizationType:
     id: Optional[Idtype] = field(
         default=None,
         metadata={
@@ -115,27 +116,29 @@ class LegalOrganizationType(BaseModel):
     )
 
 
-class LineTradeDeliveryType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    billed_quantity: QuantityType = field(
+@dataclass
+class LineTradeDeliveryType:
+    billed_quantity: Optional[QuantityType] = field(
+        default=None,
         metadata={
             "name": "BilledQuantity",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class NoteType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    content: TextType = field(
+@dataclass
+class NoteType:
+    content: Optional[TextType] = field(
+        default=None,
         metadata={
             "name": "Content",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     subject_code: Optional[CodeType] = field(
         default=None,
@@ -147,48 +150,52 @@ class NoteType(BaseModel):
     )
 
 
-class ProcuringProjectType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class ProcuringProjectType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    name: TextType = field(
+    name: Optional[TextType] = field(
+        default=None,
         metadata={
             "name": "Name",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class ProductCharacteristicType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    description: TextType = field(
+@dataclass
+class ProductCharacteristicType:
+    description: Optional[TextType] = field(
+        default=None,
         metadata={
             "name": "Description",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    value: TextType = field(
+    value: Optional[TextType] = field(
+        default=None,
         metadata={
             "name": "Value",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class ProductClassificationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class ProductClassificationType:
     class_code: Optional[CodeType] = field(
         default=None,
         metadata={
@@ -199,8 +206,8 @@ class ProductClassificationType(BaseModel):
     )
 
 
-class ReferencedDocumentType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class ReferencedDocumentType:
     issuer_assigned_id: Optional[Idtype] = field(
         default=None,
         metadata={
@@ -267,8 +274,8 @@ class ReferencedDocumentType(BaseModel):
     )
 
 
-class SpecifiedPeriodType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class SpecifiedPeriodType:
     start_date_time: Optional[DateTimeType] = field(
         default=None,
         metadata={
@@ -287,44 +294,47 @@ class SpecifiedPeriodType(BaseModel):
     )
 
 
-class SupplyChainEventType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    occurrence_date_time: DateTimeType = field(
+@dataclass
+class SupplyChainEventType:
+    occurrence_date_time: Optional[DateTimeType] = field(
+        default=None,
         metadata={
             "name": "OccurrenceDateTime",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TaxRegistrationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class TaxRegistrationType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TradeAccountingAccountType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class TradeAccountingAccountType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TradeAddressType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class TradeAddressType:
     postcode_code: Optional[CodeType] = field(
         default=None,
         metadata={
@@ -365,13 +375,14 @@ class TradeAddressType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    country_id: CountryIdtype = field(
+    country_id: Optional[CountryIdtype] = field(
+        default=None,
         metadata={
             "name": "CountryID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     country_sub_division_name: Optional[TextType] = field(
         default=None,
@@ -383,20 +394,21 @@ class TradeAddressType(BaseModel):
     )
 
 
-class TradeCountryType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: CountryIdtype = field(
+@dataclass
+class TradeCountryType:
+    id: Optional[CountryIdtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TradePaymentTermsType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class TradePaymentTermsType:
     description: Optional[TextType] = field(
         default=None,
         metadata={
@@ -423,15 +435,16 @@ class TradePaymentTermsType(BaseModel):
     )
 
 
-class TradeSettlementFinancialCardType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class TradeSettlementFinancialCardType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     cardholder_name: Optional[TextType] = field(
         default=None,
@@ -443,15 +456,16 @@ class TradeSettlementFinancialCardType(BaseModel):
     )
 
 
-class TradeSettlementHeaderMonetarySummationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    line_total_amount: AmountType = field(
+@dataclass
+class TradeSettlementHeaderMonetarySummationType:
+    line_total_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "LineTotalAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     charge_total_amount: Optional[AmountType] = field(
         default=None,
@@ -469,13 +483,14 @@ class TradeSettlementHeaderMonetarySummationType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    tax_basis_total_amount: AmountType = field(
+    tax_basis_total_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "TaxBasisTotalAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     tax_total_amount: List[AmountType] = field(
         default_factory=list,
@@ -494,13 +509,14 @@ class TradeSettlementHeaderMonetarySummationType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    grand_total_amount: AmountType = field(
+    grand_total_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "GrandTotalAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     total_prepaid_amount: Optional[AmountType] = field(
         default=None,
@@ -510,30 +526,32 @@ class TradeSettlementHeaderMonetarySummationType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    due_payable_amount: AmountType = field(
+    due_payable_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "DuePayableAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TradeSettlementLineMonetarySummationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    line_total_amount: AmountType = field(
+@dataclass
+class TradeSettlementLineMonetarySummationType:
+    line_total_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "LineTotalAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class TradeTaxType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class TradeTaxType:
     calculated_amount: Optional[AmountType] = field(
         default=None,
         metadata={
@@ -542,13 +560,14 @@ class TradeTaxType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    type_code: TaxTypeCodeType = field(
+    type_code: Optional[TaxTypeCodeType] = field(
+        default=None,
         metadata={
             "name": "TypeCode",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     exemption_reason: Optional[TextType] = field(
         default=None,
@@ -566,13 +585,14 @@ class TradeTaxType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    category_code: TaxCategoryCodeType = field(
+    category_code: Optional[TaxCategoryCodeType] = field(
+        default=None,
         metadata={
             "name": "CategoryCode",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     exemption_reason_code: Optional[CodeType] = field(
         default=None,
@@ -608,8 +628,8 @@ class TradeTaxType(BaseModel):
     )
 
 
-class UniversalCommunicationType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class UniversalCommunicationType:
     uriid: Optional[Idtype] = field(
         default=None,
         metadata={
@@ -628,15 +648,16 @@ class UniversalCommunicationType(BaseModel):
     )
 
 
-class DocumentLineDocumentType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    line_id: Idtype = field(
+@dataclass
+class DocumentLineDocumentType:
+    line_id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "LineID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     included_note: Optional[NoteType] = field(
         default=None,
@@ -648,8 +669,8 @@ class DocumentLineDocumentType(BaseModel):
     )
 
 
-class ExchangedDocumentContextType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class ExchangedDocumentContextType:
     business_process_specified_document_context_parameter: Optional[
         DocumentContextParameterType
     ] = field(
@@ -660,41 +681,47 @@ class ExchangedDocumentContextType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    guideline_specified_document_context_parameter: DocumentContextParameterType = field(
+    guideline_specified_document_context_parameter: Optional[
+        DocumentContextParameterType
+    ] = field(
+        default=None,
         metadata={
             "name": "GuidelineSpecifiedDocumentContextParameter",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class ExchangedDocumentType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    id: Idtype = field(
+@dataclass
+class ExchangedDocumentType:
+    id: Optional[Idtype] = field(
+        default=None,
         metadata={
             "name": "ID",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    type_code: DocumentCodeType = field(
+    type_code: Optional[DocumentCodeType] = field(
+        default=None,
         metadata={
             "name": "TypeCode",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    issue_date_time: DateTimeType = field(
+    issue_date_time: Optional[DateTimeType] = field(
+        default=None,
         metadata={
             "name": "IssueDateTime",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     included_note: List[NoteType] = field(
         default_factory=list,
@@ -706,15 +733,16 @@ class ExchangedDocumentType(BaseModel):
     )
 
 
-class TradeAllowanceChargeType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    charge_indicator: IndicatorType = field(
+@dataclass
+class TradeAllowanceChargeType:
+    charge_indicator: Optional[IndicatorType] = field(
+        default=None,
         metadata={
             "name": "ChargeIndicator",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     calculation_percent: Optional[PercentType] = field(
         default=None,
@@ -732,13 +760,14 @@ class TradeAllowanceChargeType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    actual_amount: AmountType = field(
+    actual_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "ActualAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     reason_code: Optional[AllowanceChargeReasonCodeType] = field(
         default=None,
@@ -766,8 +795,8 @@ class TradeAllowanceChargeType(BaseModel):
     )
 
 
-class TradeContactType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class TradeContactType:
     person_name: Optional[TextType] = field(
         default=None,
         metadata={
@@ -806,8 +835,8 @@ class TradeContactType(BaseModel):
     )
 
 
-class TradeProductType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class TradeProductType:
     global_id: Optional[Idtype] = field(
         default=None,
         metadata={
@@ -832,13 +861,14 @@ class TradeProductType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    name: TextType = field(
+    name: Optional[TextType] = field(
+        default=None,
         metadata={
             "name": "Name",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     description: Optional[TextType] = field(
         default=None,
@@ -874,15 +904,16 @@ class TradeProductType(BaseModel):
     )
 
 
-class TradeSettlementPaymentMeansType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    type_code: PaymentMeansCodeType = field(
+@dataclass
+class TradeSettlementPaymentMeansType:
+    type_code: Optional[PaymentMeansCodeType] = field(
+        default=None,
         metadata={
             "name": "TypeCode",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     information: Optional[TextType] = field(
         default=None,
@@ -934,15 +965,16 @@ class TradeSettlementPaymentMeansType(BaseModel):
     )
 
 
-class LineTradeSettlementType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    applicable_trade_tax: TradeTaxType = field(
+@dataclass
+class LineTradeSettlementType:
+    applicable_trade_tax: Optional[TradeTaxType] = field(
+        default=None,
         metadata={
             "name": "ApplicableTradeTax",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     billing_specified_period: Optional[SpecifiedPeriodType] = field(
         default=None,
@@ -960,13 +992,16 @@ class LineTradeSettlementType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    specified_trade_settlement_line_monetary_summation: TradeSettlementLineMonetarySummationType = field(
+    specified_trade_settlement_line_monetary_summation: Optional[
+        TradeSettlementLineMonetarySummationType
+    ] = field(
+        default=None,
         metadata={
             "name": "SpecifiedTradeSettlementLineMonetarySummation",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     additional_referenced_document: Optional[ReferencedDocumentType] = field(
         default=None,
@@ -988,8 +1023,8 @@ class LineTradeSettlementType(BaseModel):
     )
 
 
-class TradePartyType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class TradePartyType:
     id: List[Idtype] = field(
         default_factory=list,
         metadata={
@@ -1065,15 +1100,16 @@ class TradePartyType(BaseModel):
     )
 
 
-class TradePriceType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    charge_amount: AmountType = field(
+@dataclass
+class TradePriceType:
+    charge_amount: Optional[AmountType] = field(
+        default=None,
         metadata={
             "name": "ChargeAmount",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     basis_quantity: Optional[QuantityType] = field(
         default=None,
@@ -1093,8 +1129,8 @@ class TradePriceType(BaseModel):
     )
 
 
-class HeaderTradeAgreementType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class HeaderTradeAgreementType:
     buyer_reference: Optional[TextType] = field(
         default=None,
         metadata={
@@ -1103,21 +1139,23 @@ class HeaderTradeAgreementType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    seller_trade_party: TradePartyType = field(
+    seller_trade_party: Optional[TradePartyType] = field(
+        default=None,
         metadata={
             "name": "SellerTradeParty",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    buyer_trade_party: TradePartyType = field(
+    buyer_trade_party: Optional[TradePartyType] = field(
+        default=None,
         metadata={
             "name": "BuyerTradeParty",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     seller_tax_representative_trade_party: Optional[TradePartyType] = field(
         default=None,
@@ -1169,8 +1207,8 @@ class HeaderTradeAgreementType(BaseModel):
     )
 
 
-class HeaderTradeDeliveryType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class HeaderTradeDeliveryType:
     ship_to_trade_party: Optional[TradePartyType] = field(
         default=None,
         metadata={
@@ -1209,8 +1247,8 @@ class HeaderTradeDeliveryType(BaseModel):
     )
 
 
-class HeaderTradeSettlementType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class HeaderTradeSettlementType:
     creditor_reference_id: Optional[Idtype] = field(
         default=None,
         metadata={
@@ -1235,13 +1273,14 @@ class HeaderTradeSettlementType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    invoice_currency_code: CurrencyCodeType = field(
+    invoice_currency_code: Optional[CurrencyCodeType] = field(
+        default=None,
         metadata={
             "name": "InvoiceCurrencyCode",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     payee_trade_party: Optional[TradePartyType] = field(
         default=None,
@@ -1294,13 +1333,16 @@ class HeaderTradeSettlementType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    specified_trade_settlement_header_monetary_summation: TradeSettlementHeaderMonetarySummationType = field(
+    specified_trade_settlement_header_monetary_summation: Optional[
+        TradeSettlementHeaderMonetarySummationType
+    ] = field(
+        default=None,
         metadata={
             "name": "SpecifiedTradeSettlementHeaderMonetarySummation",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
     invoice_referenced_document: List[ReferencedDocumentType] = field(
         default_factory=list,
@@ -1322,8 +1364,8 @@ class HeaderTradeSettlementType(BaseModel):
     )
 
 
-class LineTradeAgreementType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class LineTradeAgreementType:
     buyer_order_referenced_document: Optional[ReferencedDocumentType] = field(
         default=None,
         metadata={
@@ -1340,62 +1382,70 @@ class LineTradeAgreementType(BaseModel):
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    net_price_product_trade_price: TradePriceType = field(
+    net_price_product_trade_price: Optional[TradePriceType] = field(
+        default=None,
         metadata={
             "name": "NetPriceProductTradePrice",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class SupplyChainTradeLineItemType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
-    associated_document_line_document: DocumentLineDocumentType = field(
-        metadata={
-            "name": "AssociatedDocumentLineDocument",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            "required": True,
-        }
+@dataclass
+class SupplyChainTradeLineItemType:
+    associated_document_line_document: Optional[DocumentLineDocumentType] = (
+        field(
+            default=None,
+            metadata={
+                "name": "AssociatedDocumentLineDocument",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+                "required": True,
+            },
+        )
     )
-    specified_trade_product: TradeProductType = field(
+    specified_trade_product: Optional[TradeProductType] = field(
+        default=None,
         metadata={
             "name": "SpecifiedTradeProduct",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    specified_line_trade_agreement: LineTradeAgreementType = field(
+    specified_line_trade_agreement: Optional[LineTradeAgreementType] = field(
+        default=None,
         metadata={
             "name": "SpecifiedLineTradeAgreement",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    specified_line_trade_delivery: LineTradeDeliveryType = field(
+    specified_line_trade_delivery: Optional[LineTradeDeliveryType] = field(
+        default=None,
         metadata={
             "name": "SpecifiedLineTradeDelivery",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
-    specified_line_trade_settlement: LineTradeSettlementType = field(
+    specified_line_trade_settlement: Optional[LineTradeSettlementType] = field(
+        default=None,
         metadata={
             "name": "SpecifiedLineTradeSettlement",
             "type": "Element",
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             "required": True,
-        }
+        },
     )
 
 
-class SupplyChainTradeTransactionType(BaseModel):
-    model_config = ConfigDict(defer_build=True)
+@dataclass
+class SupplyChainTradeTransactionType:
     included_supply_chain_trade_line_item: List[
         SupplyChainTradeLineItemType
     ] = field(
@@ -1407,27 +1457,36 @@ class SupplyChainTradeTransactionType(BaseModel):
             "min_occurs": 1,
         },
     )
-    applicable_header_trade_agreement: HeaderTradeAgreementType = field(
-        metadata={
-            "name": "ApplicableHeaderTradeAgreement",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            "required": True,
-        }
+    applicable_header_trade_agreement: Optional[HeaderTradeAgreementType] = (
+        field(
+            default=None,
+            metadata={
+                "name": "ApplicableHeaderTradeAgreement",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+                "required": True,
+            },
+        )
     )
-    applicable_header_trade_delivery: HeaderTradeDeliveryType = field(
-        metadata={
-            "name": "ApplicableHeaderTradeDelivery",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            "required": True,
-        }
+    applicable_header_trade_delivery: Optional[HeaderTradeDeliveryType] = (
+        field(
+            default=None,
+            metadata={
+                "name": "ApplicableHeaderTradeDelivery",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+                "required": True,
+            },
+        )
     )
-    applicable_header_trade_settlement: HeaderTradeSettlementType = field(
-        metadata={
-            "name": "ApplicableHeaderTradeSettlement",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            "required": True,
-        }
+    applicable_header_trade_settlement: Optional[HeaderTradeSettlementType] = (
+        field(
+            default=None,
+            metadata={
+                "name": "ApplicableHeaderTradeSettlement",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+                "required": True,
+            },
+        )
     )
