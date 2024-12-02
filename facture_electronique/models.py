@@ -217,7 +217,7 @@ class Facture(BaseModel):
 						res = list()
 						for val in data[elt[0]]:
 							del val[elt[1]]
-							res.append(elt)
+							res.append(val)
 						data[elt[0]] = res
 					else:
 						del data[elt[0]][elt[1]]
