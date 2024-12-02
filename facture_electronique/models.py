@@ -193,13 +193,16 @@ class Facture(BaseModel):
 	commentaire: Optional[str] # max 200 cars
 
 	def to_chorus_pro_payload(self) -> dict:
-		data = self.dict(by_alias=True, exclude_unset=True)
+		data = self.model_dump(by_alias=True, exclude_unset=True)
 		cle_a_detruire = [ # des champs sont pour facturx mais ne fonctionnent pas dans la payload cpro
 			("date_echeance_paiement", ),
 			("fournisseur", "pays_code_iso"),
 			("fournisseur", "nom"),
+			("fournisseur", "adresse_postale"),
+			("fournisseur", "numero_tva_intra"),
 			("fournisseur", "siret"),
 			("destinataire", "nom"),
+			("destinataire", "adresse_postale"),
 			("montant_total", "acompte")
 		]
 		for elt in cle_a_detruire:
