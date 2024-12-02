@@ -376,8 +376,8 @@ if __name__ == '__main__':
 		#date_facture="2024-15-08", # seulement en depot PDF
 		id_utilisateur_courant=0,
 		destinataire=Destinataire(
-			code_destinataire="99986401570264"
-			# code_service_executant est absent
+			code_destinataire="99986401570264",
+			code_service_executant='' # est absent
 		),
 		fournisseur=Fournisseur(
 			id_fournisseur=identifiant_cpro,
@@ -503,8 +503,8 @@ if __name__ == '__main__':
 				ligne_un='adresse du destinataire',
 				nom_ville='PARIS',
 				pays_code_iso='FR',
-			)
-			# code_service_executant est absent
+			),
+			code_service_executant='',
 		),
 		fournisseur=Fournisseur(
 			id_fournisseur=identifiant_cpro,

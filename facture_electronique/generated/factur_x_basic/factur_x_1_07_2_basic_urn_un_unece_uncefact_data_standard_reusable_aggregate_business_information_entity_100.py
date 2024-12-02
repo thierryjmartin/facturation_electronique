@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 from xsdata_pydantic.fields import field
 
-from generated.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
+from facture_electronique.generated.factur_x_basic.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
     AllowanceChargeReasonCodeType,
     CountryIdtype,
     CurrencyCodeType,
@@ -14,7 +14,7 @@ from generated.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_qualifi
     TaxTypeCodeType,
     TimeReferenceCodeType,
 )
-from generated.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_unqualified_data_type_100 import (
+from facture_electronique.generated.factur_x_basic.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_unqualified_data_type_100 import (
     AmountType,
     CodeType,
     DateTimeType,

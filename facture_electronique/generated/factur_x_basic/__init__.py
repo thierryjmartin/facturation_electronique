@@ -1,8 +1,8 @@
-from generated.factur_x_1_07_2_basic import (
+from facture_electronique.generated.factur_x_basic.factur_x_1_07_2_basic import (
     CrossIndustryInvoice,
     CrossIndustryInvoiceType,
 )
-from generated.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
+from facture_electronique.generated.factur_x_basic.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
     AllowanceChargeReasonCodeType,
     CountryIdtype,
     CurrencyCodeType,
@@ -13,7 +13,7 @@ from generated.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_qualifi
     TaxTypeCodeType,
     TimeReferenceCodeType,
 )
-from generated.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_reusable_aggregate_business_information_entity_100 import (
+from facture_electronique.generated.factur_x_basic.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_reusable_aggregate_business_information_entity_100 import (
     CreditorFinancialAccountType,
     DebtorFinancialAccountType,
     DocumentContextParameterType,
@@ -47,7 +47,7 @@ from generated.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_reusabl
     TradeTaxType,
     UniversalCommunicationType,
 )
-from generated.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_unqualified_data_type_100 import (
+from facture_electronique.generated.factur_x_basic.factur_x_1_07_2_basic_urn_un_unece_uncefact_data_standard_unqualified_data_type_100 import (
     AmountType,
     CodeType,
     DateTimeType,

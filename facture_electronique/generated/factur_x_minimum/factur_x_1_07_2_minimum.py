@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from xsdata_pydantic.fields import field
 
-from generated.factur_x_1_07_2_minimum_urn_un_unece_uncefact_data_standard_reusable_aggregate_business_information_entity_100 import (
+from facture_electronique.generated.factur_x_minimum.factur_x_1_07_2_minimum_urn_un_unece_uncefact_data_standard_reusable_aggregate_business_information_entity_100 import (
     ExchangedDocumentContextType,
     ExchangedDocumentType,
     SupplyChainTradeTransactionType,

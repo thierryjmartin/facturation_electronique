@@ -3,12 +3,12 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 from xsdata_pydantic.fields import field
 
-from generated.factur_x_1_07_2_minimum_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
+from facture_electronique.generated.factur_x_minimum.factur_x_1_07_2_minimum_urn_un_unece_uncefact_data_standard_qualified_data_type_100 import (
     CountryIdtype,
     CurrencyCodeType,
     DocumentCodeType,
 )
-from generated.factur_x_1_07_2_minimum_urn_un_unece_uncefact_data_standard_unqualified_data_type_100 import (
+from facture_electronique.generated.factur_x_minimum.factur_x_1_07_2_minimum_urn_un_unece_uncefact_data_standard_unqualified_data_type_100 import (
     AmountType,
     DateTimeType,
     Idtype,
