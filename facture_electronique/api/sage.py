@@ -26,7 +26,7 @@ class SAGEAPI:
 
 	def envoyer_facture(self, facture: dict) -> dict:
 		"""
-		Envoyer une facture à DPGF
+		Envoyer une facture à SAGE
 		"""
 		response = self.client.post('/factures', json=facture)
 		return response.json()

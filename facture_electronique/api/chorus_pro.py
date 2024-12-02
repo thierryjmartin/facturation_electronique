@@ -1,5 +1,6 @@
 import requests
 import base64
+
 from ..utils.http_client import HttpClient
 try:
 	from ..config import *
@@ -167,7 +168,7 @@ if __name__ == '__main__':
 	#	identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
 	#print(identifiant_cpro)
 
-	identifiant_cpro = "12345"
+	identifiant_cpro = 12345
 
 	# identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
 
@@ -370,7 +371,7 @@ if __name__ == '__main__':
 	from ..models import *
 
 	exemple_facture_mode_api = Facture(
-		mode_depot="SAISIE_API",
+		mode_depot=ModeDepot("SAISIE_API"),
 		# numero_facture_saisi="20240000000000000013", # ce champ n'est pas utilié en mode_depot saisie_api
 		#date_facture="2024-15-08", # seulement en depot PDF
 		id_utilisateur_courant=0,
@@ -388,13 +389,13 @@ if __name__ == '__main__':
 		),
 		references=References(
 			devise_facture="EUR",
-			type_facture="FACTURE",
-			type_tva="TVA_SUR_DEBIT",
+			type_facture=TypeFacture("FACTURE"),
+			type_tva=TypeTVA("TVA_SUR_DEBIT"),
 			motif_exoneration_tva=None,
 			numero_marche="VABFM001",
 			numero_bon_commande=None,
 			numero_facture_origine=None,
-			mode_paiement="ESPECE"
+			mode_paiement=ModePaiement("ESPECE")
 		),
 		ligne_poste=[
 			LignePoste(
@@ -485,7 +486,7 @@ if __name__ == '__main__':
 	convert_to_pdfa(file_path, file_path_pdfa)
 
 	exemple_facture_mode_pdf = Facture(
-		mode_depot="DEPOT_PDF_API",
+		mode_depot=ModeDepot("DEPOT_PDF_API"),
 		numero_facture_saisi="20240000000000000109", # ce champ n'est pas utilisé en mode_depot saisie_api
 		date_facture="2024-10-18", # seulement en depot PDF
 		date_echeance_paiement="2014-12-18",
@@ -524,13 +525,13 @@ if __name__ == '__main__':
 		),
 		references=References(
 			devise_facture="EUR",
-			type_facture="FACTURE",
-			type_tva="TVA_SUR_DEBIT",
+			type_facture=TypeFacture("FACTURE"),
+			type_tva=TypeTVA("TVA_SUR_DEBIT"),
 			motif_exoneration_tva=None,
 			numero_marche="VABFM001",
 			numero_bon_commande="coucou",
 			numero_facture_origine=None,
-			mode_paiement="ESPECE"
+			mode_paiement=ModePaiement("ESPECE")
 		),
 		montant_total=MontantTotal(
 			montant_ht_total=1326.00,
@@ -553,7 +554,7 @@ if __name__ == '__main__':
 				ligne_poste_montant_remise_HT=5,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=20,
-				ligne_poste_tva_categorie = 'S',
+				ligne_poste_tva_categorie = TvaCategories('S'),
 				ligne_poste_code_raison_reduction='parce que je suis sympa'
 			),
 			LignePoste(
@@ -566,7 +567,7 @@ if __name__ == '__main__':
 				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=2.1,
-				ligne_poste_tva_categorie = 'S'
+				ligne_poste_tva_categorie = TvaCategories('S')
 			),
 			LignePoste(
 				ligne_poste_numero=3,
@@ -578,7 +579,7 @@ if __name__ == '__main__':
 				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=5,
-				ligne_poste_tva_categorie = 'S'
+				ligne_poste_tva_categorie = TvaCategories('S')
 			),
 			LignePoste(
 				ligne_poste_numero=4,
@@ -590,7 +591,7 @@ if __name__ == '__main__':
 				ligne_poste_montant_remise_HT=0,
 				ligne_poste_taux_tva='',
 				ligne_poste_taux_tva_manuel=20,
-				ligne_poste_tva_categorie = 'S'
+				ligne_poste_tva_categorie = TvaCategories('S')
 			)
 		],
 		ligne_tva=[
@@ -599,21 +600,21 @@ if __name__ == '__main__':
 				ligne_tva_taux=None,
 				ligne_tva_montant_base_ht_par_taux=510.00,
 				ligne_tva_montant_tva_par_taux=102.00,
-				ligne_tva_categorie='S'
+				ligne_tva_categorie=TvaCategories('S')
 			),
 			LigneTva(
 				ligne_tva_taux_manuel=2.1,
 				ligne_tva_taux=None,
 				ligne_tva_montant_base_ht_par_taux=432.00,
 				ligne_tva_montant_tva_par_taux=9.072,
-				ligne_tva_categorie='S'
+				ligne_tva_categorie=TvaCategories('S')
 			),
 			LigneTva(
 				ligne_tva_taux_manuel=5,
 				ligne_tva_taux=None,
 				ligne_tva_montant_base_ht_par_taux=384.00,
 				ligne_tva_montant_tva_par_taux=19.20,
-				ligne_tva_categorie='S'
+				ligne_tva_categorie=TvaCategories('S')
 			)
 		],
 	)
