@@ -1,9 +1,10 @@
 import os
 import copy
 from datetime import datetime
+from decimal import Decimal
 
 from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
-from ..generated import factur_x_minimum, factur_x_basic
+from ..generated import factur_x_minimum, factur_x_basic, factur_x_en16931
 from ..exceptions import InvalidDataFacturxError, XSLTValidationError
 
 LEVEL_MINIMUM = 'minimum'
@@ -18,6 +19,8 @@ nsmap = {
 }
 
 format_decimal = "%.2f"
+def to_decimal(value: float) -> Decimal:
+	return Decimal(format_decimal % value)
 
 def _parse_date_chorus_vers_facturx(date_str: str) -> str:
 	return datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y%m%d")
@@ -39,7 +42,7 @@ def get_facturx_mode_paiement(facture: Facture) -> str:
 	}
 	return equiv[facture.references.mode_paiement]
 
-def get_facturx_quantity_units(unite: Facture) -> str:
+def get_facturx_quantity_units(unite: str) -> str:
 	"""sont les suivantes:
 		LTR = Litre (1 dm3)
 		MTQ = Mètre cube
@@ -91,10 +94,10 @@ def gen_facturx_minimum(facture: Facture) -> factur_x_minimum.CrossIndustryInvoi
 		applicable_header_trade_settlement=factur_x_minimum.HeaderTradeSettlementType(
 			invoice_currency_code=factur_x_minimum.CurrencyCodeType(value=facture.references.devise_facture),
 			specified_trade_settlement_header_monetary_summation=factur_x_minimum.TradeSettlementHeaderMonetarySummationType(
-				tax_basis_total_amount=factur_x_minimum.AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
-				tax_total_amount=[factur_x_minimum.AmountType(value=format_decimal % facture.montant_total.montant_TVA, currency_id=facture.references.devise_facture), ],
-				grand_total_amount=factur_x_minimum.AmountType(value=format_decimal % facture.montant_total.montant_ttc_total),
-				due_payable_amount=factur_x_minimum.AmountType(value=format_decimal % facture.montant_total.montant_a_payer)
+				tax_basis_total_amount=factur_x_minimum.AmountType(value=to_decimal(facture.montant_total.montant_ht_total)),
+				tax_total_amount=[factur_x_minimum.AmountType(value=to_decimal(facture.montant_total.montant_TVA), currency_id=facture.references.devise_facture), ],
+				grand_total_amount=factur_x_minimum.AmountType(value=to_decimal(facture.montant_total.montant_ttc_total)),
+				due_payable_amount=factur_x_minimum.AmountType(value=to_decimal(facture.montant_total.montant_a_payer))
 			)
 		),
 	)
@@ -114,11 +117,11 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 	if ligne.ligne_poste_montant_remise_HT:
 		trade_allowance_charge = factur_x_basic.TradeAllowanceChargeType(
 					charge_indicator=factur_x_basic.IndicatorType(indicator=False),
-					actual_amount=factur_x_basic.AmountType(value=format_decimal % (ligne.ligne_poste_montant_remise_HT * ligne.ligne_poste_quantite)),
+					actual_amount=factur_x_basic.AmountType(value=to_decimal(ligne.ligne_poste_montant_remise_HT * ligne.ligne_poste_quantite)),
 		)
 
 		trade_allowance_charge_trade_agreement = copy.deepcopy(trade_allowance_charge)
-		trade_allowance_charge_trade_agreement.actual_amount.value=format_decimal % ligne.ligne_poste_montant_remise_HT
+		trade_allowance_charge_trade_agreement.actual_amount.value=to_decimal(ligne.ligne_poste_montant_remise_HT)
 
 		if ligne.ligne_poste_code_raison_reduction_code:
 			trade_allowance_charge.reason_code = factur_x_basic.AllowanceChargeReasonCodeType(
@@ -139,18 +142,18 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 		),
 		specified_line_trade_agreement=factur_x_basic.LineTradeAgreementType(
 			gross_price_product_trade_price = factur_x_basic.TradePriceType(
-				charge_amount = factur_x_basic.AmountType(value=format_decimal % ligne.ligne_poste_montant_unitaire_HT),
-				basis_quantity = factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne_unit_code),
+				charge_amount = factur_x_basic.AmountType(value=to_decimal(ligne.ligne_poste_montant_unitaire_HT)),
+				basis_quantity = factur_x_basic.QuantityType(value=to_decimal(ligne.ligne_poste_quantite), unit_code=ligne_unit_code),
 				applied_trade_allowance_charge = trade_allowance_charge_trade_agreement if trade_allowance_charge_trade_agreement else None,
 			),
 			net_price_product_trade_price = factur_x_basic.TradePriceType(
-				charge_amount=factur_x_basic.AmountType(value="%.2f" % (ligne.ligne_poste_montant_unitaire_HT - ligne.ligne_poste_montant_remise_HT)),
-				basis_quantity=factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne_unit_code),
+				charge_amount=factur_x_basic.AmountType(value=to_decimal(ligne.ligne_poste_montant_unitaire_HT - ligne.ligne_poste_montant_remise_HT)),
+				basis_quantity=factur_x_basic.QuantityType(value=to_decimal(ligne.ligne_poste_quantite), unit_code=ligne_unit_code),
 				# applied_trade_allowance_charge=factur_x_basic.TradeAllowanceChargeType()
 			),
 		),
 		specified_line_trade_delivery=factur_x_basic.LineTradeDeliveryType(
-			billed_quantity=factur_x_basic.QuantityType(value=format_decimal % ligne.ligne_poste_quantite, unit_code=ligne_unit_code)
+			billed_quantity=factur_x_basic.QuantityType(value=to_decimal(ligne.ligne_poste_quantite), unit_code=ligne_unit_code)
 		),
 		specified_line_trade_settlement=factur_x_basic.LineTradeSettlementType(
 			applicable_trade_tax=factur_x_basic.TradeTaxType(
@@ -161,7 +164,7 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 				category_code=factur_x_basic.TaxCategoryCodeType(value=ligne.ligne_poste_tva_categorie),
 				#exemption_reason_code=factur_x_basic.CodeType(),
 				#due_date_type_code=factur_x_basic.TimeReferenceCodeType(),
-				rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % ligne.ligne_poste_taux_tva_manuel),
+				rate_applicable_percent=factur_x_basic.PercentType(value=to_decimal(ligne.ligne_poste_taux_tva_manuel)),
 			),
 			billing_specified_period=factur_x_basic.SpecifiedPeriodType(
 				start_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(date_debut_retenue), format="102")),
@@ -177,11 +180,11 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 
 def _ligne_tva_facturx_basic(ligne_tva: LigneTva) -> factur_x_basic.TradeTaxType:
 	return factur_x_basic.TradeTaxType(
-		calculated_amount=factur_x_basic.AmountType(value=format_decimal % ligne_tva.ligne_tva_montant_tva_par_taux),
+		calculated_amount=factur_x_basic.AmountType(value=to_decimal(ligne_tva.ligne_tva_montant_tva_par_taux)),
 		type_code=factur_x_basic.TaxTypeCodeType(value='VAT'),
-		basis_amount=factur_x_basic.AmountType(value=format_decimal % ligne_tva.ligne_tva_montant_base_ht_par_taux),
+		basis_amount=factur_x_basic.AmountType(value=to_decimal(ligne_tva.ligne_tva_montant_base_ht_par_taux)),
 		category_code=factur_x_basic.TaxCategoryCodeType(value=ligne_tva.ligne_tva_categorie),
-		rate_applicable_percent=factur_x_basic.PercentType(value=format_decimal % ligne_tva.ligne_tva_taux_manuel),
+		rate_applicable_percent=factur_x_basic.PercentType(value=to_decimal(ligne_tva.ligne_tva_taux_manuel)),
 	)
 
 def est_valide_pour_facturx_basic(facture: Facture) -> None:
@@ -231,13 +234,13 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 			#invoice_referenced_document=[factur_x_basic.ReferencedDocumentType(),], # Numéro de facture antérieure ?
 			#receivable_specified_trade_accounting_account=factur_x_basic.TradeAccountingAccountType(),
 			specified_trade_settlement_header_monetary_summation=factur_x_basic.TradeSettlementHeaderMonetarySummationType(
-				line_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
-				allowance_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_remise_globale_TTC),
-				tax_basis_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ht_total),
-				tax_total_amount=[factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_TVA, currency_id=facture.references.devise_facture), ],
-				grand_total_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_ttc_total),
-				total_prepaid_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.acompte),
-				due_payable_amount=factur_x_basic.AmountType(value=format_decimal % facture.montant_total.montant_a_payer)
+				line_total_amount=factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_ht_total)),
+				allowance_total_amount=factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_remise_globale_TTC)),
+				tax_basis_total_amount=factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_ht_total)),
+				tax_total_amount=[factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_TVA), currency_id=facture.references.devise_facture), ],
+				grand_total_amount=factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_ttc_total)),
+				total_prepaid_amount=factur_x_basic.AmountType(value= to_decimal(facture.montant_total.acompte)),
+				due_payable_amount=factur_x_basic.AmountType(value= to_decimal(facture.montant_total.montant_a_payer))
 			)
 		),
 	)
@@ -245,6 +248,18 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 		exchanged_document_context=exchanged_document_context,
 		exchanged_document=exchanged_document,
 		supply_chain_trade_transaction=supply_chain_trade_transaction,
+	)
+	return f
+
+def est_valide_facturx_en16931(facture: Facture) -> None:
+	est_valide_pour_facturx_basic(facture)
+
+def gen_facturx_en16931(facture: Facture) -> factur_x_en16931.CrossIndustryInvoice:
+	est_valide_facturx_en16931(facture)
+	f=factur_x_en16931.CrossIndustryInvoice(
+		exchanged_document_context=None,#exchanged_document_context,
+		exchanged_document=None,#exchanged_document,
+		supply_chain_trade_transaction=None,#supply_chain_trade_transaction,
 	)
 	return f
 
@@ -270,10 +285,10 @@ def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
 		document = proc.parse_xml(xml_text=xml_data)
 		executable = xsltproc.compile_stylesheet(stylesheet_file=chemin_xldt)
 		output = executable.transform_to_string(xdm_node=document)
-		pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^"]+)<\/svrl:text>')
+		pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^"]+)</svrl:text>')
 		matches = pattern.findall(output)
 		if not matches:
-			return
+			return False
 		res = ""
 		for match in matches:
 			test_expr, location, message = match

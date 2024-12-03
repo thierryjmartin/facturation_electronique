@@ -487,7 +487,7 @@ if __name__ == '__main__':
 
 	exemple_facture_mode_pdf = Facture(
 		mode_depot=ModeDepot("DEPOT_PDF_API"),
-		numero_facture_saisi="20240000000000000109", # ce champ n'est pas utilisé en mode_depot saisie_api
+		numero_facture_saisi="20240000000000000110", # ce champ n'est pas utilisé en mode_depot saisie_api
 		date_facture="2024-10-18", # seulement en depot PDF
 		date_echeance_paiement="2014-12-18",
 		id_utilisateur_courant=0,

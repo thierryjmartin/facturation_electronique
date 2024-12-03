@@ -235,6 +235,9 @@ class Facture(BaseModel):
 		from .utils.facturx import gen_facturx_basic
 		return gen_facturx_basic(self)
 
+	def to_facturx_en16931(self):
+		from .utils.facturx import gen_facturx_en16931
+		return gen_facturx_en16931(self)
 
 
 
