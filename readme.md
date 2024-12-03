@@ -43,7 +43,9 @@ DPGF_API_KEY = 'votre-api-key-dpgf'
 
 ## Utilisation
 
-Voir le script api/chorus_pro.py
+Un exemple d'utilisation est dans le script api/chorus_pro.py
+On utilise l'API Chorus Pro pour retrouver les identifiants de personnes morales.
+On génère une facture en instanciant la classe Facture. On modifie le PDF de la facture pour le transformer en PDF/A Factur-X que l'on envoie à Chorus Pro.
 
 ## Contribution
 Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes :
@@ -58,3 +60,6 @@ Ce projet est sous licence MIT.
 
 ## Auteur
 Developpé par Thierry Martin
+
+## Changelog
+0.1.12 Mise à jour pour le support de Factur-X 1.0.7.2
