@@ -29,14 +29,12 @@ Exemple d'un fichier config.py :
    ```python
 from .template_config import *
 
+PISTE_CLIENT_ID = "votre-clientid-piste"
+PISTE_CLIENT_SECRET = "votre-secret-piste"
 
 # Configuration API Chorus Pro
 CHORUS_PRO_BASE_URL = 'https://chorus-pro.gouv.fr/api'
 CHORUS_PRO_API_KEY = 'votre-api-key-chorus-pro'
-
-# Configuration API DPGF
-DPGF_BASE_URL = 'https://dpgf-partenaire.fr/api'
-DPGF_API_KEY = 'votre-api-key-dpgf'
 
 # Autres configurations...
    ```
@@ -44,6 +42,9 @@ DPGF_API_KEY = 'votre-api-key-dpgf'
 ## Utilisation
 
 Un exemple d'utilisation est dans le script api/chorus_pro.py
+   ```bash
+ python -m facture_electronique.api.chorus_pro
+ ```
 On utilise l'API Chorus Pro pour retrouver les identifiants de personnes morales.
 On génère une facture en instanciant la classe Facture. On modifie le PDF de la facture pour le transformer en PDF/A Factur-X que l'on envoie à Chorus Pro.
 
@@ -54,6 +55,12 @@ Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes
     Créez une branche pour votre fonctionnalité : git checkout -b nouvelle-fonctionnalité.
     Faites vos modifications et testez-les.
     Soumettez une merge request.
+
+## Petite note technique
+Le code dans generated est généré par cette commande qui convertit les xsd factur-x en classes python
+   ```bash
+ xsdata generate xsd/facturx-minimum/Factur-X_1.07.2_MINIMUM.xsd
+```
 
 ## Licence
 Ce projet est sous licence MIT.
