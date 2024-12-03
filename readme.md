@@ -69,4 +69,5 @@ Ce projet est sous licence MIT.
 Developpé par Thierry Martin
 
 ## Changelog
+0.1.13 Génération de Factur-X EN16931 (en plus de minimum ou basic)
 0.1.12 Mise à jour pour le support de Factur-X 1.0.7.2
