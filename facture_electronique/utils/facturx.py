@@ -13,7 +13,7 @@ FACTURX_BASIC = "factur-x-basic"
 FACTURX_EN16931 = "factur-x-en16931"
 
 def get_factur_x_module(
-		factur_x_module_str: Literal['factur_x_basic', 'factur_x_en16931']
+		factur_x_module_str: Literal[FACTURX_BASIC, FACTURX_EN16931]
 ) -> Type:
 	"""
 	Returns the Factur-X module based on the input string.
@@ -34,25 +34,6 @@ def get_factur_x_module(
 	if factur_x_module_str not in module_map:
 		raise ValueError(f"Invalid module: {factur_x_module_str}. Expected 'factur_x_basic' or 'factur_x_en16931'.")
 	return module_map[factur_x_module_str]
-
-
-
-def inject_factur_x_module(func: Callable):
-	"""
-	A decorator to inject the Factur-X module into the decorated function.
-
-	The decorated function must accept `factur_x_module_str` as a keyword argument.
-
-	Args:
-		func (Callable): The function to be decorated.
-
-	Returns:
-		Callable: The decorated function with the Factur-X module injected.
-	"""
-	def wrapper(*args, factur_x_module_str: str, **kwargs):
-		factur_x_module = get_factur_x_module(factur_x_module_str)
-		return func(*args, factur_x_module=factur_x_module, **kwargs)
-	return wrapper
 
 def _float_vers_decimal_facturx(value: float) -> Decimal:
 	"""convertit un float en Decimal voulu par factur-x"""
@@ -229,11 +210,17 @@ def est_valide_pour_facturx_basic(facture: Facture) -> None:
 	if facture.montant_total.montant_remise_globale_TTC:
 		raise InvalidDataFacturxError("On ne peut pas mettre une remise TTC dans Facturx basic, il faut dispatch la remise sur les différentes lignes.")
 
-@inject_factur_x_module
-def gen_facturx_basic_ou_en_16931(facture: Facture, factur_x_module: Type) -> Union[factur_x_basic.CrossIndustryInvoice, factur_x_en16931.CrossIndustryInvoice]:
+def gen_facturx_basic_ou_en_16931(facture: Facture, factur_x_module_str: Literal[FACTURX_BASIC, FACTURX_EN16931]) -> Union[factur_x_basic.CrossIndustryInvoice, factur_x_en16931.CrossIndustryInvoice]:
+	factur_x_module = get_factur_x_module(factur_x_module_str)
+
 	est_valide_pour_facturx_basic(facture)
+
+	document_context_type_parameter = {
+		FACTURX_BASIC: "urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic",
+		FACTURX_EN16931: "urn:cen.eu:en16931:2017"
+	}
 	exchanged_document_context = factur_x_module.ExchangedDocumentContextType(
-		guideline_specified_document_context_parameter=factur_x_module.DocumentContextParameterType(id=factur_x_module.Idtype(value="urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic"))
+		guideline_specified_document_context_parameter=factur_x_module.DocumentContextParameterType(id=factur_x_module.Idtype(value=document_context_type_parameter[factur_x_module_str]))
 	)
 	exchanged_document = factur_x_module.ExchangedDocumentType(
 		id=factur_x_module.Idtype(value=facture.numero_facture_saisi),
