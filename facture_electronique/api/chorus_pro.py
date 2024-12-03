@@ -624,13 +624,15 @@ if __name__ == '__main__':
 		xml_from_facture_xsdata,
 		valider_xml_xldt,
 		chemin_xldt_basic,
-		chemin_xldt_minimum
+		chemin_xldt_minimum,
+		chemin_xldt_en16931
 	)
 
 	file_path_facturx_mini = file_path + '.facturx.minmum.pdf'
 	file_path_facturx_basic = file_path + '.facturx.basic.pdf'
+	file_path_facturx_en16931 = file_path + '.facturx.en16931.pdf'
 
-
+	# test generation factur-x minimum
 	xml = xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum())
 	valider_xml_xldt(xml, chemin_xldt_minimum)
 	facturx.generate_from_file(
@@ -641,7 +643,6 @@ if __name__ == '__main__':
 		level='minimum',
 		check_xsd=False,
 	)
-
 	facturx.generate_from_file(
 		file_path_pdfa,
 		xml,
@@ -651,6 +652,7 @@ if __name__ == '__main__':
 		check_xsd=True,
 	)
 
+	# test generation factur-x basic
 	xml = xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_basic())
 	valider_xml_xldt(xml, chemin_xldt_basic)
 	facturx.generate_from_file(
@@ -661,8 +663,6 @@ if __name__ == '__main__':
 		level='basic',
 		check_xsd=False,
 	)
-
-
 	facturx.generate_from_file(
 		file_path_pdfa,
 		xml,
@@ -672,8 +672,27 @@ if __name__ == '__main__':
 		check_xsd=True,
 	)
 
+	# test generation factur-x EN16931
+	xml = xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_en16931())
+	valider_xml_xldt(xml, chemin_xldt_en16931)
+	facturx.generate_from_file(
+		file_path_pdfa,
+		xml,
+		output_pdf_file=file_path_facturx_en16931,
+		flavor='factur-x',
+		level='en16931',
+		check_xsd=False,
+	)
+	facturx.generate_from_file(
+		file_path_pdfa,
+		xml,
+		output_pdf_file=file_path_facturx_en16931,
+		flavor='factur-x',
+		level='en16931',
+		check_xsd=True
+	)
 
-
+	# test envoi faxctur-x basic vers chorus pro en mod pdf.
 	reponse_fichier = c.ajouter_fichier_dans_systeme(
 		file_to_base64(file_path_facturx_basic),
 		"facture.pdf",

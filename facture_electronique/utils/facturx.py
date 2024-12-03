@@ -7,22 +7,13 @@ from ..models import Facture, TypeFacture, LignePoste, ModePaiement, LigneTva
 from ..generated import factur_x_minimum, factur_x_basic, factur_x_en16931
 from ..exceptions import InvalidDataFacturxError, XSLTValidationError
 
-LEVEL_MINIMUM = 'minimum'
-LEVEL_BASIC = 'basic'
-
-nsmap = {
-	'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-	'udt': 'urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100',
-	'qdt': 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
-	'ram': 'urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100',
-	'rsm': 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
-}
-
-format_decimal = "%.2f"
-def to_decimal(value: float) -> Decimal:
+def _float_vers_decimal_facturx(value: float) -> Decimal:
+	"""convertit un float en Decimal voulu par factur-x"""
+	format_decimal = "%.2f"
 	return Decimal(format_decimal % value)
 
 def _parse_date_chorus_vers_facturx(date_str: str) -> str:
+	""" convertit une date au format chorus pro vers le format factur-x"""
 	return datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y%m%d")
 
 def get_facturx_type_code(facture: Facture) -> str:
@@ -59,23 +50,23 @@ def get_facturx_quantity_units(unite: str) -> str:
 	except KeyError:
 		return "C62"
 
-def _gen_applicable_header_trade_agreement(facturx_minimum_ou_basic, facture):
-	return facturx_minimum_ou_basic.HeaderTradeAgreementType(
-			buyer_reference=facturx_minimum_ou_basic.TextType(value=facture.destinataire.code_service_executant),
-			seller_trade_party=facturx_minimum_ou_basic.TradePartyType(
-				name=facturx_minimum_ou_basic.TextType(value=facture.fournisseur.nom),
-				specified_legal_organization=facturx_minimum_ou_basic.LegalOrganizationType(id=facturx_minimum_ou_basic.Idtype(scheme_id="0002", value=facture.fournisseur.siret)),
-				postal_trade_address=facturx_minimum_ou_basic.TradeAddressType(country_id=facturx_minimum_ou_basic.CountryIdtype(value=facture.fournisseur.adresse_postale.pays_code_iso)),
-				specified_tax_registration=[facturx_minimum_ou_basic.TaxRegistrationType(id=facturx_minimum_ou_basic.Idtype(scheme_id="VA", value=facture.fournisseur.numero_tva_intra,)),]
+def _gen_applicable_header_trade_agreement(facturx, facture):
+	return facturx.HeaderTradeAgreementType(
+			buyer_reference=facturx.TextType(value=facture.destinataire.code_service_executant),
+			seller_trade_party=facturx.TradePartyType(
+				name=facturx.TextType(value=facture.fournisseur.nom),
+				specified_legal_organization=facturx.LegalOrganizationType(id=facturx.Idtype(scheme_id="0002", value=facture.fournisseur.siret)),
+				postal_trade_address=facturx.TradeAddressType(country_id=facturx.CountryIdtype(value=facture.fournisseur.adresse_postale.pays_code_iso)),
+				specified_tax_registration=[facturx.TaxRegistrationType(id=facturx.Idtype(scheme_id="VA", value=facture.fournisseur.numero_tva_intra, )), ]
 			),
-			buyer_trade_party=facturx_minimum_ou_basic.TradePartyType(
-				name=facturx_minimum_ou_basic.TextType(value=facture.destinataire.nom),
-				specified_legal_organization=facturx_minimum_ou_basic.LegalOrganizationType(id=facturx_minimum_ou_basic.Idtype(scheme_id="0002", value=facture.destinataire.code_destinataire)),
-				postal_trade_address=facturx_minimum_ou_basic.TradeAddressType(country_id=facturx_minimum_ou_basic.CountryIdtype(value=facture.destinataire.adresse_postale.pays_code_iso)),
+			buyer_trade_party=facturx.TradePartyType(
+				name=facturx.TextType(value=facture.destinataire.nom),
+				specified_legal_organization=facturx.LegalOrganizationType(id=facturx.Idtype(scheme_id="0002", value=facture.destinataire.code_destinataire)),
+				postal_trade_address=facturx.TradeAddressType(country_id=facturx.CountryIdtype(value=facture.destinataire.adresse_postale.pays_code_iso)),
 				#specified_tax_registration=[TaxRegistrationType(), ]
 			),
-			buyer_order_referenced_document=facturx_minimum_ou_basic.ReferencedDocumentType(
-				issuer_assigned_id=facturx_minimum_ou_basic.Idtype(value=facture.references.numero_bon_commande)
+			buyer_order_referenced_document=facturx.ReferencedDocumentType(
+				issuer_assigned_id=facturx.Idtype(value=facture.references.numero_bon_commande)
 			),
 		)
 
@@ -94,10 +85,10 @@ def gen_facturx_minimum(facture: Facture) -> factur_x_minimum.CrossIndustryInvoi
 		applicable_header_trade_settlement=factur_x_minimum.HeaderTradeSettlementType(
 			invoice_currency_code=factur_x_minimum.CurrencyCodeType(value=facture.references.devise_facture),
 			specified_trade_settlement_header_monetary_summation=factur_x_minimum.TradeSettlementHeaderMonetarySummationType(
-				tax_basis_total_amount=factur_x_minimum.AmountType(value=to_decimal(facture.montant_total.montant_ht_total)),
-				tax_total_amount=[factur_x_minimum.AmountType(value=to_decimal(facture.montant_total.montant_TVA), currency_id=facture.references.devise_facture), ],
-				grand_total_amount=factur_x_minimum.AmountType(value=to_decimal(facture.montant_total.montant_ttc_total)),
-				due_payable_amount=factur_x_minimum.AmountType(value=to_decimal(facture.montant_total.montant_a_payer))
+				tax_basis_total_amount=factur_x_minimum.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_ht_total)),
+				tax_total_amount=[factur_x_minimum.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_TVA), currency_id=facture.references.devise_facture), ],
+				grand_total_amount=factur_x_minimum.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_ttc_total)),
+				due_payable_amount=factur_x_minimum.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_a_payer))
 			)
 		),
 	)
@@ -117,11 +108,11 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 	if ligne.ligne_poste_montant_remise_HT:
 		trade_allowance_charge = factur_x_basic.TradeAllowanceChargeType(
 					charge_indicator=factur_x_basic.IndicatorType(indicator=False),
-					actual_amount=factur_x_basic.AmountType(value=to_decimal(ligne.ligne_poste_montant_remise_HT * ligne.ligne_poste_quantite)),
+					actual_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(ligne.ligne_poste_montant_remise_HT * ligne.ligne_poste_quantite)),
 		)
 
 		trade_allowance_charge_trade_agreement = copy.deepcopy(trade_allowance_charge)
-		trade_allowance_charge_trade_agreement.actual_amount.value=to_decimal(ligne.ligne_poste_montant_remise_HT)
+		trade_allowance_charge_trade_agreement.actual_amount.value=_float_vers_decimal_facturx(ligne.ligne_poste_montant_remise_HT)
 
 		if ligne.ligne_poste_code_raison_reduction_code:
 			trade_allowance_charge.reason_code = factur_x_basic.AllowanceChargeReasonCodeType(
@@ -142,18 +133,18 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 		),
 		specified_line_trade_agreement=factur_x_basic.LineTradeAgreementType(
 			gross_price_product_trade_price = factur_x_basic.TradePriceType(
-				charge_amount = factur_x_basic.AmountType(value=to_decimal(ligne.ligne_poste_montant_unitaire_HT)),
-				basis_quantity = factur_x_basic.QuantityType(value=to_decimal(ligne.ligne_poste_quantite), unit_code=ligne_unit_code),
+				charge_amount = factur_x_basic.AmountType(value=_float_vers_decimal_facturx(ligne.ligne_poste_montant_unitaire_HT)),
+				basis_quantity = factur_x_basic.QuantityType(value=_float_vers_decimal_facturx(ligne.ligne_poste_quantite), unit_code=ligne_unit_code),
 				applied_trade_allowance_charge = trade_allowance_charge_trade_agreement if trade_allowance_charge_trade_agreement else None,
 			),
 			net_price_product_trade_price = factur_x_basic.TradePriceType(
-				charge_amount=factur_x_basic.AmountType(value=to_decimal(ligne.ligne_poste_montant_unitaire_HT - ligne.ligne_poste_montant_remise_HT)),
-				basis_quantity=factur_x_basic.QuantityType(value=to_decimal(ligne.ligne_poste_quantite), unit_code=ligne_unit_code),
+				charge_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(ligne.ligne_poste_montant_unitaire_HT - ligne.ligne_poste_montant_remise_HT)),
+				basis_quantity=factur_x_basic.QuantityType(value=_float_vers_decimal_facturx(ligne.ligne_poste_quantite), unit_code=ligne_unit_code),
 				# applied_trade_allowance_charge=factur_x_basic.TradeAllowanceChargeType()
 			),
 		),
 		specified_line_trade_delivery=factur_x_basic.LineTradeDeliveryType(
-			billed_quantity=factur_x_basic.QuantityType(value=to_decimal(ligne.ligne_poste_quantite), unit_code=ligne_unit_code)
+			billed_quantity=factur_x_basic.QuantityType(value=_float_vers_decimal_facturx(ligne.ligne_poste_quantite), unit_code=ligne_unit_code)
 		),
 		specified_line_trade_settlement=factur_x_basic.LineTradeSettlementType(
 			applicable_trade_tax=factur_x_basic.TradeTaxType(
@@ -164,7 +155,7 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 				category_code=factur_x_basic.TaxCategoryCodeType(value=ligne.ligne_poste_tva_categorie),
 				#exemption_reason_code=factur_x_basic.CodeType(),
 				#due_date_type_code=factur_x_basic.TimeReferenceCodeType(),
-				rate_applicable_percent=factur_x_basic.PercentType(value=to_decimal(ligne.ligne_poste_taux_tva_manuel)),
+				rate_applicable_percent=factur_x_basic.PercentType(value=_float_vers_decimal_facturx(ligne.ligne_poste_taux_tva_manuel)),
 			),
 			billing_specified_period=factur_x_basic.SpecifiedPeriodType(
 				start_date_time=factur_x_basic.DateTimeType(date_time_string=factur_x_basic.DateTimeType.DateTimeString(value=_parse_date_chorus_vers_facturx(date_debut_retenue), format="102")),
@@ -172,7 +163,7 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 			),
 			specified_trade_allowance_charge=[trade_allowance_charge, ] if trade_allowance_charge else None,
 			specified_trade_settlement_line_monetary_summation=factur_x_basic.TradeSettlementLineMonetarySummationType(
-				line_total_amount=factur_x_basic.AmountType(value=format_decimal % (ligne.ligne_poste_montant_unitaire_HT * ligne.ligne_poste_quantite)),
+				line_total_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(ligne.ligne_poste_montant_unitaire_HT * ligne.ligne_poste_quantite)),
 			),
 		),
 	)
@@ -180,11 +171,11 @@ def _ligne_poste_facturx_basic(ligne: LignePoste, facture: Facture):
 
 def _ligne_tva_facturx_basic(ligne_tva: LigneTva) -> factur_x_basic.TradeTaxType:
 	return factur_x_basic.TradeTaxType(
-		calculated_amount=factur_x_basic.AmountType(value=to_decimal(ligne_tva.ligne_tva_montant_tva_par_taux)),
+		calculated_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(ligne_tva.ligne_tva_montant_tva_par_taux)),
 		type_code=factur_x_basic.TaxTypeCodeType(value='VAT'),
-		basis_amount=factur_x_basic.AmountType(value=to_decimal(ligne_tva.ligne_tva_montant_base_ht_par_taux)),
+		basis_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(ligne_tva.ligne_tva_montant_base_ht_par_taux)),
 		category_code=factur_x_basic.TaxCategoryCodeType(value=ligne_tva.ligne_tva_categorie),
-		rate_applicable_percent=factur_x_basic.PercentType(value=to_decimal(ligne_tva.ligne_tva_taux_manuel)),
+		rate_applicable_percent=factur_x_basic.PercentType(value=_float_vers_decimal_facturx(ligne_tva.ligne_tva_taux_manuel)),
 	)
 
 def est_valide_pour_facturx_basic(facture: Facture) -> None:
@@ -234,13 +225,13 @@ def gen_facturx_basic(facture: Facture) -> factur_x_basic.CrossIndustryInvoice:
 			#invoice_referenced_document=[factur_x_basic.ReferencedDocumentType(),], # Numéro de facture antérieure ?
 			#receivable_specified_trade_accounting_account=factur_x_basic.TradeAccountingAccountType(),
 			specified_trade_settlement_header_monetary_summation=factur_x_basic.TradeSettlementHeaderMonetarySummationType(
-				line_total_amount=factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_ht_total)),
-				allowance_total_amount=factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_remise_globale_TTC)),
-				tax_basis_total_amount=factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_ht_total)),
-				tax_total_amount=[factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_TVA), currency_id=facture.references.devise_facture), ],
-				grand_total_amount=factur_x_basic.AmountType(value=to_decimal(facture.montant_total.montant_ttc_total)),
-				total_prepaid_amount=factur_x_basic.AmountType(value= to_decimal(facture.montant_total.acompte)),
-				due_payable_amount=factur_x_basic.AmountType(value= to_decimal(facture.montant_total.montant_a_payer))
+				line_total_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_ht_total)),
+				allowance_total_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_remise_globale_TTC)),
+				tax_basis_total_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_ht_total)),
+				tax_total_amount=[factur_x_basic.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_TVA), currency_id=facture.references.devise_facture), ],
+				grand_total_amount=factur_x_basic.AmountType(value=_float_vers_decimal_facturx(facture.montant_total.montant_ttc_total)),
+				total_prepaid_amount=factur_x_basic.AmountType(value= _float_vers_decimal_facturx(facture.montant_total.acompte)),
+				due_payable_amount=factur_x_basic.AmountType(value= _float_vers_decimal_facturx(facture.montant_total.montant_a_payer))
 			)
 		),
 	)
@@ -264,9 +255,19 @@ def gen_facturx_en16931(facture: Facture) -> factur_x_en16931.CrossIndustryInvoi
 	return f
 
 def xml_from_facture_xsdata(facture) -> str:
+	""" gènère un xml depuis les données sous forme de classes xsdata """
 	from xsdata.formats.dataclass.serializers import XmlSerializer
 	from xsdata.formats.dataclass.context import XmlContext
 	from xsdata.formats.dataclass.serializers.config import SerializerConfig
+
+	nsmap = {
+		'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+		'udt': 'urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100',
+		'qdt': 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
+		'ram': 'urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100',
+		'rsm': 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
+	}
+
 	config = SerializerConfig(indent="  ")
 	serializer = XmlSerializer(context=XmlContext(), config=config)
 	xml_data = serializer.render(facture, ns_map=nsmap)
@@ -275,6 +276,7 @@ def xml_from_facture_xsdata(facture) -> str:
 current_file_dir = os.path.dirname(os.path.dirname(__file__))
 chemin_xldt_minimum = os.path.join(current_file_dir, "xsd", "facturx-minimum", "_XSLT_MINIMUM", "Factur-X_1.07.2_MINIMUM.xslt")
 chemin_xldt_basic = os.path.join(current_file_dir, "xsd", "facturx-basic", "_XSLT_BASIC", "Factur-X_1.07.2_BASIC.xslt")
+chemin_xldt_en16931 = os.path.join(current_file_dir, "xsd", "facturx-EN16931", "_XSLT_EN16931", "Factur-X_1.07.2_EN16931.xslt")
 
 def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
 	from saxonche import PySaxonProcessor
