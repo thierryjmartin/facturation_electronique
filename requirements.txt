@@ -15,3 +15,6 @@ xsdata==24.9
 
 # pour valider les Factur-X avec xldt (optionnel)
 saxonche==12.5.0
+
+# pour ajouter des tampons aux PDFs
+pyHanko[pkcs11,image-support,opentype,xmp]==0.25.3

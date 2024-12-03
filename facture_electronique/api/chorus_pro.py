@@ -482,7 +482,7 @@ if __name__ == '__main__':
 	file_path = get_absolute_path("facture_electronique/exemples/dummy.pdf")
 
 	file_path_pdfa = get_absolute_path("facture_electronique/exemples/dummy.pdfa.pdf")
-	from ..utils.pdfs import convert_to_pdfa
+	from ..utils.pdfs import convert_to_pdfa, sign_pdf
 	convert_to_pdfa(file_path, file_path_pdfa)
 
 	exemple_facture_mode_pdf = Facture(
@@ -691,6 +691,26 @@ if __name__ == '__main__':
 		level='en16931',
 		check_xsd=True
 	)
+
+	# besoin d'un certificat pour cela
+	# https://learn.microsoft.com/en-us/azure/iot-hub/reference-x509-certificates
+	# pour faire un factur-x, il faudra un eseal...
+	try:
+		# l'ajout de la signature fait sauter la conformité PDF/A
+		file_path_pdfsigned = file_path + '.pdfsigned.pdf'
+		sign_pdf(
+			file_path_facturx_en16931,
+			file_path_pdfsigned,
+			get_absolute_path("facture_electronique/exemples/key.key"),
+			get_absolute_path("facture_electronique/exemples/cert.cert"),
+			""
+		)
+		file_path_pdfsigned_pdfa = file_path + '.pdfsigned.pdfa.pdf'
+		# la conversion en PDF/A fait sauter les signatures
+		convert_to_pdfa(file_path_pdfsigned, file_path_pdfsigned_pdfa)
+	except AttributeError:
+		# AttributeError est généré si les fichiers de clé et/ou certificat n'existent pas
+		pass
 
 	# test envoi faxctur-x basic vers chorus pro en mod pdf.
 	# reponse_fichier = c.ajouter_fichier_dans_systeme(

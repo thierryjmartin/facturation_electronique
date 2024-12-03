@@ -57,7 +57,7 @@ Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes
     Soumettez une merge request.
 
 ## Petite note technique
-Le code dans generated est généré par cette commande qui convertit les xsd factur-x en classes python
+Le code dans generated est généré par cette commande qui convertit les xsd Factur-X en classes python :
    ```bash
  xsdata generate xsd/facturx-minimum/Factur-X_1.07.2_MINIMUM.xsd
 ```
@@ -69,6 +69,9 @@ Ce projet est sous licence MIT.
 Developpé par Thierry Martin
 
 ## Changelog
+
+### 0.1.16
+- Ajout d'exemple de code pour signer les PDFs avec PyHanko, car cela devrait être nécessaire pour faire des Factur-X (Qualified eSeal). Pour le moment la signature casse la validité PDF/A...
 
 ### 0.1.13
 - Ajout de la génération de Factur-X EN16931 (en plus des profils Minimum et Basic).
