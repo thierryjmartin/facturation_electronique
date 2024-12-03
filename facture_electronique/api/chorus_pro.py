@@ -119,7 +119,7 @@ class ChorusProAPI:
 
 
 if __name__ == '__main__':
-	c = ChorusProAPI()
+	# c = ChorusProAPI()
 	# print(c.token)
 
 	"""
@@ -170,12 +170,12 @@ if __name__ == '__main__':
 
 	# identifiant_cpro = 12345
 
-	identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
+	# identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
 
 	# 2 .
-	c.consulter_structure(26300989)
+	# c.consulter_structure(26300989)
 	# 3 .
-	c.rechercher_services_structure(26300989)
+	# c.rechercher_services_structure(26300989)
 
 	# 4.
 
@@ -380,7 +380,7 @@ if __name__ == '__main__':
 			code_service_executant='' # est absent
 		),
 		fournisseur=Fournisseur(
-			id_fournisseur=identifiant_cpro,
+			id_fournisseur='12345', # identifiant_cpro,
 			# Les autres champs du fournisseur sont absents
 		),
 		cadre_de_facturation=CadreDeFacturation(
@@ -507,7 +507,7 @@ if __name__ == '__main__':
 			code_service_executant='',
 		),
 		fournisseur=Fournisseur(
-			id_fournisseur=identifiant_cpro,
+			id_fournisseur= 12345, #identifiant_cpro,
 			nom='Fournisseur 26073617692140',
 			siret='26073617692140',
 			numero_tva_intra='FR61529571234',
@@ -693,22 +693,22 @@ if __name__ == '__main__':
 	)
 
 	# test envoi faxctur-x basic vers chorus pro en mod pdf.
-	reponse_fichier = c.ajouter_fichier_dans_systeme(
-		file_to_base64(file_path_facturx_basic),
-		"facture.pdf",
-		guess_mime_type(file_path),
-		get_file_extension(file_path),
-	)
-
-	pj_id = reponse_fichier["pieceJointeId"]
-
-	exemple_facture_mode_pdf.piece_jointe_principale[0].piece_jointe_principale_id = pj_id
-
-	reponse_envoi_facture = c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
-
-	id_facture_cpro = reponse_envoi_facture['identifiantFactureCPP']
-
-	c.obtenir_statut_facture(id_facture_cpro)
+	# reponse_fichier = c.ajouter_fichier_dans_systeme(
+	# 	file_to_base64(file_path_facturx_basic),
+	# 	"facture.pdf",
+	# 	guess_mime_type(file_path),
+	# 	get_file_extension(file_path),
+	# )
+	#
+	# pj_id = reponse_fichier["pieceJointeId"]
+	#
+	# exemple_facture_mode_pdf.piece_jointe_principale[0].piece_jointe_principale_id = pj_id
+	#
+	# reponse_envoi_facture = c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
+	#
+	# id_facture_cpro = reponse_envoi_facture['identifiantFactureCPP']
+	#
+	# c.obtenir_statut_facture(id_facture_cpro)
 
 
 
