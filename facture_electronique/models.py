@@ -1,6 +1,7 @@
 from pydantic import BaseModel, PositiveFloat
 from enum import Enum
 from typing import List, Optional
+from dataclasses import field
 
 from .utils.strings_and_dicts import to_camel_case, transform_dict_keys
 
@@ -114,10 +115,10 @@ class PieceJointeComplementaire(BaseModel):
 
 
 class PieceJointePrincipale(BaseModel):
-	'''String : champ libre désignant la pièce jointe max 100 cars'''
+	"""String : champ libre désignant la pièce jointe max 100 cars"""
 	piece_jointe_principale_designation: str
-	'''Nombre : identifiant technique de la pièce jointe dans le système
-	obtenu par deposerPdfFacture ou ajouterFichierDansSysteme'''
+	"""Nombre : identifiant technique de la pièce jointe dans le système
+	obtenu par deposerPdfFacture ou ajouterFichierDansSysteme"""
 	piece_jointe_principale_id: Optional[int] = 0
 
 
@@ -151,13 +152,13 @@ class References(BaseModel):
 	devise_facture: str
 	mode_paiement: ModePaiement
 	motif_exoneration_tva: Optional[str] = None
-	'''1) Si le destinataire est l’état, alors le système contrôle l’existence du bon de commande (si renseigné). 
+	"""1) Si le destinataire est l’état, alors le système contrôle l’existence du bon de commande (si renseigné). 
 	   2) Si le destinataire indique, au niveau de son paramétrage, que le bon de commande est obligatoire 
 		(StructurePublique.gestionNumeroEj = TRUE ou StructurePublique.gestionNumeroEJOuCodeService et code service non renseigné), 
 		alors le système contrôle que le bon de commande est renseigné. 
-	   3) Dans tous les autres cas, ces paramètres ne sont pas contrôlés.'''
+	   3) Dans tous les autres cas, ces paramètres ne sont pas contrôlés."""
 	numero_bon_commande: Optional[str] = None
-	'''Ce paramètre est saisissable uniquement si le type de la facture est "Avoir". Sinon, le paramètre est ignoré.'''
+	"""Ce paramètre est saisissable uniquement si le type de la facture est "Avoir". Sinon, le paramètre est ignoré."""
 	numero_facture_origine: Optional[str] = None
 	numero_marche: str
 	type_facture: TypeFacture
@@ -174,8 +175,8 @@ class Facture(BaseModel):
 	cadre_de_facturation: CadreDeFacturation
 	destinataire: Destinataire
 	fournisseur: Fournisseur
-	ligne_poste: Optional[List[LignePoste]] = []
-	ligne_tva: Optional[List[LigneTva]] = []
+	ligne_poste: Optional[List[LignePoste]] = field(default_factory=list)
+	ligne_tva: Optional[List[LigneTva]] = field(default_factory=list)
 	montant_total: MontantTotal
 	piece_jointe_complementaire: Optional[List[PieceJointeComplementaire]] = None
 	piece_jointe_principale: Optional[List[PieceJointePrincipale]] = None
