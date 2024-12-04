@@ -1,5 +1,11 @@
 include readme.md
 include LICENSE
-include xsd/*
-include exemples/dummy.pdf
+include facture_electronique/xsd/*
+include facture_electronique/xsd/facturx-basic/*
+include facture_electronique/xsd/facturx-basic/_XSLT_BASIC/*
+include facture_electronique/xsd/facturx-EN16931/*
+include facture_electronique/xsd/facturx-EN16931/_XSLT_EN16931/*
+include facture_electronique/xsd/facturx-minimum/*
+include facture_electronique/xsd/facturx-minimum/_XSLT_MINIMUM/*
+include facture_electronique/exemples/dummy.pdf
 exclude facture_electronique/config.py

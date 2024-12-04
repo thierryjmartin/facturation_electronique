@@ -70,6 +70,9 @@ Developpé par Thierry Martin
 
 ## Changelog
 
+### 0.1.19
+- Ajout des XSD de factur-x au package, en particulier pour pouvoir utiliser utils.facturx.valider_xml_xldt plus facilement.
+
 ### 0.1.16
 - Ajout d'exemple de code pour signer les PDFs avec PyHanko, car cela devrait être nécessaire pour faire des Factur-X (Qualified eSeal). Pour le moment la signature casse la validité PDF/A...
 
