@@ -520,7 +520,7 @@ if __name__ == '__main__':
 			# Les autres champs du fournisseur sont absents
 		),
 		cadre_de_facturation=CadreDeFacturation(
-			code_cadre_facturation="A1_FACTURE_FOURNISSEUR",
+			code_cadre_facturation=CodeCadreFacturation("A1_FACTURE_FOURNISSEUR"),
 			code_structure_valideur=None
 		),
 		references=References(
