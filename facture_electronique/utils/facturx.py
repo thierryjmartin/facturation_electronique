@@ -288,7 +288,7 @@ def gen_facturx_en16931(facture: Facture) -> factur_x_en16931.CrossIndustryInvoi
 	est_valide_facturx_en16931(facture)
 	return gen_facturx_basic_ou_en_16931(facture, factur_x_module_str=FACTURX_EN16931)
 
-def xml_from_facture_xsdata(facture) -> str:
+def gen_xml_depuis_facture(facture) -> str:
 	""" gènère un xml depuis les données sous forme de classes xsdata """
 	from xsdata.formats.dataclass.serializers import XmlSerializer
 	from xsdata.formats.dataclass.context import XmlContext

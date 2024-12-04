@@ -621,7 +621,7 @@ if __name__ == '__main__':
 
 	import facturx
 	from ..utils.facturx import (
-		xml_from_facture_xsdata,
+		gen_xml_depuis_facture,
 		valider_xml_xldt,
 		chemin_xldt_basic,
 		chemin_xldt_minimum,
@@ -633,7 +633,7 @@ if __name__ == '__main__':
 	file_path_facturx_en16931 = file_path + '.facturx.en16931.pdf'
 
 	# test generation factur-x minimum
-	xml = xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_minimum())
+	xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_minimum())
 	valider_xml_xldt(xml, chemin_xldt_minimum)
 	facturx.generate_from_file(
 		file_path_pdfa,
@@ -653,7 +653,7 @@ if __name__ == '__main__':
 	)
 
 	# test generation factur-x basic
-	xml = xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_basic())
+	xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_basic())
 	valider_xml_xldt(xml, chemin_xldt_basic)
 	facturx.generate_from_file(
 		file_path_pdfa,
@@ -673,7 +673,7 @@ if __name__ == '__main__':
 	)
 
 	# test generation factur-x EN16931
-	xml = xml_from_facture_xsdata(exemple_facture_mode_pdf.to_facturx_en16931())
+	xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_en16931())
 	valider_xml_xldt(xml, chemin_xldt_en16931)
 	facturx.generate_from_file(
 		file_path_pdfa,
