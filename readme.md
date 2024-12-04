@@ -70,6 +70,9 @@ Developpé par Thierry Martin
 
 ## Changelog
 
+### 0.1.21
+- Libraire facturx 3.4 avec support Factur-X 1.0.7.2
+
 ### 0.1.19
 - Ajout des XSD de factur-x au package, en particulier pour pouvoir utiliser utils.facturx.valider_xml_xldt plus facilement.
 

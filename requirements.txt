@@ -5,7 +5,7 @@ requests==2.32.3
 pydantic==2.9.2
 
 # Gestion du format Factur-X (optionnel)
-factur-x==3.1
+factur-x==3.4
 
 # générer les pdf/a pour Factur-X (optionnel)
 ghostscript==0.7
