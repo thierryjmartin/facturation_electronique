@@ -1,3 +1,5 @@
 include readme.md
 include LICENSE
+include xsd/*
+include exemples/dummy.pdf
 exclude facture_electronique/config.py
