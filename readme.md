@@ -41,7 +41,7 @@ CHORUS_PRO_API_KEY = 'votre-api-key-chorus-pro'
 
 ## Utilisation
 
-Un exemple d'utilisation est dans le script api/chorus_pro.py
+Un exemple d'utilisation est dans le script exemples/exemple_*.py
    ```bash
  python -m facture_electronique.api.chorus_pro
  ```
@@ -69,9 +69,6 @@ Ce projet est sous licence MIT.
 Developpé par Thierry Martin
 
 ## Changelog
-
-### 0.1.21
-- Libraire facturx 3.4 avec support Factur-X 1.0.7.2
 
 ### 0.1.19
 - Ajout des XSD de factur-x au package, en particulier pour pouvoir utiliser utils.facturx.valider_xml_xldt plus facilement.
