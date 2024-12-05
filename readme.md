@@ -70,6 +70,9 @@ Developpé par Thierry Martin
 
 ## Changelog
 
+### 0.1.22
+- Maj validation XML via Schematron
+
 ### 0.1.19
 - Ajout des XSD de factur-x au package, en particulier pour pouvoir utiliser utils.facturx.valider_xml_xldt plus facilement.
 

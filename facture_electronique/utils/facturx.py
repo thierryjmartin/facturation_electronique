@@ -321,12 +321,12 @@ def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
 		document = proc.parse_xml(xml_text=xml_data)
 		executable = xsltproc.compile_stylesheet(stylesheet_file=chemin_xldt)
 		output = executable.transform_to_string(xdm_node=document)
-		pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^"]+)</svrl:text>')
+		pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+id="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^"]+)<\/svrl:text>')
 		matches = pattern.findall(output)
 		if not matches:
 			return False
 		res = ""
 		for match in matches:
-			test_expr, location, message = match
+			test_expr, id, location, message = match
 			res += f"Test: {test_expr}\nLocation: {location}\nMessage: {message.strip() if message else 'Pas de message'}\n\n"
 		raise XSLTValidationError(res)
