@@ -1,5 +1,6 @@
 if __name__ == '__main__':
-	# c = ChorusProAPI()
+	from facture_electronique.api.chorus_pro import ChorusProAPI
+	c = ChorusProAPI()
 	# print(c.token)
 
 	"""
@@ -58,6 +59,8 @@ if __name__ == '__main__':
 	# c.rechercher_services_structure(26300989)
 
 	# 4.
+	service = c.consulter_service_structure(id_structure=26311042, id_service=10657669)
+	print(service)
 
 	# exemple_facture = {
 	# 					  "cadreDeFacturation": {

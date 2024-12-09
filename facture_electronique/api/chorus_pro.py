@@ -102,6 +102,59 @@ class ChorusProAPI:
 		reponse = self.client.post('/structures/v1/rechercher/services', json={"idStructure": id_structure})
 		return reponse.json()
 
+	def consulter_service_structure(self, id_structure: int, id_service: int) -> dict:
+		"""
+		Consult a specific service associated with a given structure by their respective IDs.
+
+		Sends a POST request to the endpoint '/structures/v1/consulter/service' to retrieve
+		details of the service linked to a particular structure, based on the provided structure
+		and service IDs. Returns the response in JSON format.
+
+		Parameters:
+		id_structure: int
+		    The Chorus Pro ID of the structure whose service details are to be consulted.
+		id_service: int
+		    The Chorus Pro ID of the service to be consulted within the structure.
+
+		Returns:
+		dict
+		    {
+			  "adressePostale": {
+				"adresse": "string",
+				"codePostal": "string",
+				"complementAdresse1": "string",
+				"complementAdresse2": "string",
+				"fax": "string",
+				"indicatifFax": "string",
+				"indicatifTelephone": "string",
+				"pays": "string",
+				"telephone": "string",
+				"ville": "string"
+			  },
+			  "codeRetour": 0,
+			  "informationsGenerales": {
+				"codeService": "string",
+				"descriptionService": "string",
+				"nomService": "string"
+			  },
+			  "libelle": "TRA_MSG_00.000",
+			  "nbResultatsParPage": 0,
+			  "pageCourante": 0,
+			  "pages": 0,
+			  "parametres": {
+				"dateCreation": "2024-12-09T13:18:46.376Z",
+				"dateDebutValidite": "2024-12-09T13:18:46.376Z",
+				"dateFinValidite": "2024-12-09T13:18:46.376Z",
+				"dateModification": "2024-12-09T13:18:46.376Z",
+				"miseEnPaiement": true,
+				"numeroEngagement": true
+			  },
+			  "total": 0
+			}
+		"""
+		reponse = self.client.post('/structures/v1/consulter/service', json={"idStructure": id_structure, 'idService': id_service})
+		return reponse.json()
+
 	def obtenir_identifiant_cpro_depuis_siret(self, siret:str, type_identifiant:str='SIRET') -> int:
 		# "SIRET", "UE_HORS_FRANCE", "HORS_UE", "RIDET", "TAHITI", "AUTRE", "PARTICULIER"
 		payload = {
