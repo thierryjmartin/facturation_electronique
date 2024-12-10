@@ -95,7 +95,37 @@ class ChorusProAPI:
 		return reponse.json()
 
 	def rechercher_structure(self, payload) -> dict:
+		""" La méthode rechercherStructure permet à un gestionnaire de rechercher des structures. """
 		reponse = self.client.post('/structures/v1/rechercher', json=payload)
+		return reponse.json()
+
+	def rechercher_organisation_siren(self, payload) -> dict:
+		"""
+		FIXME n'a pas l'air de fonctionner... l'url n'est pas reconnue par le serveur
+		Cette méthode peut rechercher les données d'une structure de type SIREN. Pour les recherches multicritères,
+		le champ '_fields' permet de préciser les champs retournés par l'API. Par exemple, si on met dans le corps
+		'_fields' : ['libelleOrganisation', 'raisonSociale', 'adresseElectronique'],
+		la demande de retour ne contiendra que ces champs.
+		Exemple [{ 'raisonSociale' : 'DIRECTION GENERALE DE L'AVIATION CIVILE ' , 'libelleOrganisation' :
+		'TEST', 'adresseElectronique' : 'test@gmail.com', }]. Pour le tri, nous mettrons un tableau '_sort'.
+		Les données de réponse seront triées par les champs de ce tableau.
+		Par exemple : '_sort': ['libelleOrganisation','adresse','identifiant'].
+		Pour le tri par ordre décroissant, nous utiliserons le même tableau mais avec le nom '_desc'.
+		Par exemple : '_desc': ['ville','pays']. L'attribut structure doit être spécifié pour la recherche.
+		"""
+		reponse = self.client.post('/organisations/v1/siren/recherche', json=payload)
+		return reponse.json()
+
+	def rechercher_structure_via_organisation(self, payload) -> dict:
+		"""
+		Cette méthode permet de rechercher les données sur les structures
+		Pour la recherche multicritères, le champ '_fields' permet de déterminer les champs retournés par l'API.
+		Par exemple si l'on met dans le body '_fields': ['typeOrganisation', 'raisonSociale', 'numeroEjDoitEtreRenseigne'],
+		les retours de la requête ne comprendront que ces champs exemple [{ 'raisonSociale':
+		'DIRECTION GENERALE DE L'AVIATION CIVILE', 'typeOrganisation': 'PUBLIQUE', 'numeroEjDoitEtreRenseigne': true, }]
+		Un attribut de la structure doit être renseigné pour la recherche.
+		"""
+		reponse = self.client.post('/organisations/v1/structures/recherche', json=payload)
 		return reponse.json()
 
 	def rechercher_services_structure(self, id_structure: int) -> dict:

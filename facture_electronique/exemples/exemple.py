@@ -59,8 +59,226 @@ if __name__ == '__main__':
 	# c.rechercher_services_structure(26300989)
 
 	# 4.
-	service = c.consulter_service_structure(id_structure=26311042, id_service=10657669)
-	print(service)
+	#service = c.consulter_service_structure(id_structure=26311042, id_service=10657669)
+	#print(service)
+
+	payload_recherche_organisation_siren = {
+	  "libelleOrganisation": {
+		"op": "CONTAINS",
+		"val": "TEST"
+	  },
+	  "status": {
+		"op": "CONTAINS",
+		"val": "ACTIF"
+	  },
+	  "identifiant": {
+		"op": "CONTAINS",
+		"val": "36252187900034"
+	  },
+	  "adresse": {
+		"op": "CONTAINS",
+		"val": "4 rue du pot de fer"
+	  },
+	  "codePostal": {
+		"op": "CONTAINS",
+		"val": "75010"
+	  },
+	  "ville": {
+		"op": "CONTAINS",
+		"val": "PARIS"
+	  },
+	  "pays": {
+		"op": "CONTAINS",
+		"val": "FRANCE"
+	  },
+	  "adresseElectronique": {
+		"op": "CONTAINS",
+		"val": "test@gmail.com"
+	  },
+	  "nonDiffusibleInsee": {
+		"op": "=",
+		"val": True
+	  },
+	  "raisonSociale": {
+		"op": "CONTAINS",
+		"val": "SASS"
+	  },
+	  "categorieJuridique": {
+		"op": "CONTAINS",
+		"val": "exe"
+	  },
+	  "categorieEntreprise": {
+		"op": "CONTAINS",
+		"val": "str"
+	  },
+	  "_sort": [
+		"libelleOrganisation",
+		"adresse",
+		"identifiant"
+	  ],
+	  "_desc": [
+		"ville",
+		"pays"
+	  ],
+	  "_fields": [
+		"identifiant",
+		"adresse",
+		"pays"
+	  ]
+	}
+	# n'a pas l'air de fonctionner ?
+	#c.rechercher_organisation_siren(payload_recherche_organisation_siren)
+	#print(c)
+
+	payload_recherche_organisation_structure = {
+	  "libelleOrganisation": {
+		"op": "CONTAINS",
+		"val": "TEST"
+	  },
+	  # "numeroTvaIntracommunautaire": {
+		# "op": "CONTAINS",
+		# "val": "FR12345677891"
+	  # },
+	  # "typeOrganisation": {
+		# "op": "CONTAINS",
+		# "val": "PUBLIQUE"
+	  # },
+	  # "contactPrincipal": {
+		# "op": "CONTAINS",
+		# "val": "550e8400e29b41d4a716446655440000"
+	  # },
+	  # "organisationParent": {
+		# "op": "CONTAINS",
+		# "val": "550e8400e29b41d4a716446655440000"
+	  # },
+	  # "estCentreGestionAgricole": {
+		# "op": "CONTAINS",
+		# "val": False
+	  # },
+	  # "gestionNumeroEJOuCodeService": {
+		# "op": "CONTAINS",
+		# "val": False
+	  # },
+	  # "numeroEjDoitEtreRenseigne": {
+		# "op": "CONTAINS",
+		# "val": False
+	  # },
+	  # "statutMiseEnPaiementNestPasRemonte": {
+		# "op": "CONTAINS",
+		# "val": False
+	  # },
+	  # "numeroPacage": {
+		# "op": "CONTAINS",
+		# "val": "ACZA0132532"
+	  # },
+	  # "status": {
+		# "op": "CONTAINS",
+		# "val": "ACTIF"
+	  # },
+	  # "identifiant": {
+		# "op": "CONTAINS",
+		# "val": "36252187900034"
+	  # },
+	  # "typeIdentifiant": {
+		# "op": "CONTAINS",
+		# "val": "SIRET"
+	  # },
+	  # "categorieFournisseurMemoireId": {
+		# "op": "CONTAINS",
+		# "val": "JKGUH987698"
+	  # },
+	  # "categorieBeneficiaireId": {
+		# "op": "CONTAINS",
+		# "val": "ASC1234"
+	  # },
+	  # "adresse": {
+		# "op": "CONTAINS",
+		# "val": "4 rue du pot de fer"
+	  # },
+	  # "codePostal": {
+		# "op": "CONTAINS",
+		# "val": "75010"
+	  # },
+	  # "ville": {
+		# "op": "CONTAINS",
+		# "val": "PARIS"
+	  # },
+	  # "pays": {
+		# "op": "CONTAINS",
+		# "val": "FRANCE"
+	  # },
+	  # "adresseElectronique": {
+		# "op": "CONTAINS",
+		# "val": "test@gmail.com"
+	  # },
+	  # "telephone": {
+		# "op": "CONTAINS",
+		# "val": "0633333333"
+	  # },
+	  # "recevoirCyclesViesEdi": {
+		# "op": "CONTAINS",
+		# "val": True
+	  # },
+	  # "emetteurFluxEdi": {
+		# "op": "CONTAINS",
+		# "val": True
+	  # },
+	  # "nonDiffusibleInsee": {
+		# "op": "CONTAINS",
+		# "val": True
+	  # },
+	  # "numeroRcsStructure": {
+		# "op": "CONTAINS",
+		# "val": "123123"
+	  # },
+	  # "codeServiceDoitEtreRenseigne": {
+		# "op": "CONTAINS",
+		# "val": False
+	  # },
+	  # "avecMOA": {
+		# "op": "CONTAINS",
+		# "val": True
+	  # },
+	  # "estMOAUniquement": {
+		# "op": "CONTAINS",
+		# "val": True
+	  # },
+	  # "structureOrigine": {
+		# "op": "CONTAINS",
+		# "val": "1234"
+	  # },
+	  # "raisonSociale": {
+		# "op": "CONTAINS",
+		# "val": "SASS"
+	  # },
+	  # "categorieJuridique": {
+		# "op": "CONTAINS",
+		# "val": "exe"
+	  # },
+	  # "categorieEntreprise": {
+		# "op": "CONTAINS",
+		# "val": "str"
+	  # },
+	  "_sort": [
+		"typeOrganisation",
+		"raisonSociale",
+		"numeroEjDoitEtreRenseigne"
+	  ],
+	  "_desc": [
+		"raisonSociale",
+		"typeOrganisation"
+	  ],
+	  #"_fields": [
+		#"identifiant",
+		#"typeIdentifiant",
+	    #libelleOrganisation",
+	  #]
+	}
+	# Apparement il vaut mieux utiliser rechercher_structure pour trouver les infos pour remplir les factures.
+	# l'intérêt de la recherche ici était surtout d'avoir des opérateurs mais bon...
+	#res = c.rechercher_structure_via_organisation(payload_recherche_organisation_structure)
+	#for e in res:
+	#	print(e)
 
 	# exemple_facture = {
 	# 					  "cadreDeFacturation": {
