@@ -94,14 +94,11 @@ class ChorusProAPI:
 		reponse = self.client.post('/structures/v1/consulter', json={'codeLangue': 'fr', 'idStructureCPP': id_structure})
 		return reponse.json()
 
-	def rechercher_structure(self, payload) -> dict:
-		""" La méthode rechercherStructure permet à un gestionnaire de rechercher des structures. """
-		reponse = self.client.post('/structures/v1/rechercher', json=payload)
-		return reponse.json()
 
 	def rechercher_organisation_siren(self, payload) -> dict:
 		"""
 		FIXME n'a pas l'air de fonctionner... l'url n'est pas reconnue par le serveur
+		https://communaute.chorus-pro.gouv.fr/documentation/base-sirene-des-entreprises-et-de-leurs-etablissements/
 		Cette méthode peut rechercher les données d'une structure de type SIREN. Pour les recherches multicritères,
 		le champ '_fields' permet de préciser les champs retournés par l'API. Par exemple, si on met dans le corps
 		'_fields' : ['libelleOrganisation', 'raisonSociale', 'adresseElectronique'],
@@ -118,6 +115,7 @@ class ChorusProAPI:
 
 	def rechercher_structure_via_organisation(self, payload) -> dict:
 		"""
+		https://communaute.chorus-pro.gouv.fr/documentation/base-sirene-des-entreprises-et-de-leurs-etablissements/
 		Cette méthode permet de rechercher les données sur les structures
 		Pour la recherche multicritères, le champ '_fields' permet de déterminer les champs retournés par l'API.
 		Par exemple si l'on met dans le body '_fields': ['typeOrganisation', 'raisonSociale', 'numeroEjDoitEtreRenseigne'],
@@ -127,6 +125,15 @@ class ChorusProAPI:
 		"""
 		reponse = self.client.post('/organisations/v1/structures/recherche', json=payload)
 		return reponse.json()
+
+	def rechercher_structure(self, payload) -> dict:
+		"""
+		 La méthode rechercherStructure permet à un gestionnaire de rechercher des structures.
+		 https://communaute.chorus-pro.gouv.fr/documentation/guide-dutilisation-de-lannuaire-des-structures-publiques-dans-chorus-pro/
+		"""
+		reponse = self.client.post('/structures/v1/rechercher', json=payload)
+		return reponse.json()
+
 
 	def rechercher_services_structure(self, id_structure: int) -> dict:
 		reponse = self.client.post('/structures/v1/rechercher/services', json={"idStructure": id_structure})
