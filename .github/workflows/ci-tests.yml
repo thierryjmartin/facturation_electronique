@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         # Liste des versions de Python à tester
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       # Étape 1 : Récupère le code source de votre dépôt
