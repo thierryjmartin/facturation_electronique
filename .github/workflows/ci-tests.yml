@@ -1,52 +1,36 @@
-# Nom du workflow qui apparaîtra dans l'interface GitHub Actions
 name: CI - Tests Python
 
-# Déclencheurs du workflow
 on:
-  # S'exécute à chaque push sur la branche 'main' ou 'master'
   push:
-    branches: [ "main"  ]
-  # S'exécute également à chaque ouverture ou mise à jour de Pull Request vers ces branches
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
-  # Nom du job (peut être ce que vous voulez)
   tester:
-    # L'environnement d'exécution. 'ubuntu-latest' est le plus rapide et le moins cher.
     runs-on: ubuntu-latest
-
-    # Stratégie pour exécuter le job sur plusieurs versions de Python
     strategy:
-      # Ne pas annuler les autres jobs si l'un d'eux échoue
       fail-fast: false
       matrix:
-        # Liste des versions de Python à tester
         python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
-      # Étape 1 : Récupère le code source de votre dépôt
       - name: Récupération du code
         uses: actions/checkout@v4
 
-      # Étape 2 : Configure l'environnement Python avec la version de la matrice
       - name: Configuration de Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Étape 3 : Mise en cache des dépendances pour accélérer les exécutions futures
       - name: Mise en cache des dépendances Pip
         uses: actions/cache@v4
         with:
-          # Chemin du cache de pip
           path: ~/.cache/pip
-          # Clé unique pour le cache. Il sera invalidé uniquement si requirements.txt change.
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # Étape 4 : Installation des dépendances
       - name: Installation des dépendances et du projet
         run: |
           python -m pip install --upgrade pip
@@ -54,6 +38,10 @@ jobs:
           pip install pytest
           pip install -e .
 
-      # Étape 5 : Exécution des tests avec pytest
-      - name: Exécution des tests
-        run: pytest
+      - name: Exécution des tests et génération du rapport de couverture
+        run: pytest --cov=facturation --cov-report=xml
+
+      - name: Envoi du rapport de couverture à Codecov
+        uses: codecov/codecov-action@v4
+        with:
+        token: ${{ secrets.CODECOV_TOKEN }}
