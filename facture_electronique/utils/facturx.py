@@ -96,7 +96,7 @@ def _gen_applicable_header_trade_agreement(facturx, facture):
 				#specified_tax_registration=[TaxRegistrationType(), ]
 			),
 			buyer_order_referenced_document=facturx.ReferencedDocumentType(
-				issue_assigned_id=facturx.Idtype(value=facture.references.numero_bon_commande)
+				issuer_assigned_id=facturx.Idtype(value=facture.references.numero_bon_commande)
 			),
 		)
 
@@ -154,12 +154,12 @@ def _ligne_poste_facturx_basic_ou_en16931(ligne: LigneDePoste, facture: FactureF
 
 	suply_chain_trade_line = factur_x_module.SupplyChainTradeLineItemType(
 		associated_document_line_document=factur_x_module.DocumentLineDocumentType(
-			line_id= factur_x_module.Idtype(value=str(ligne.numero)) #, scheme_id=), 
+			line_id= factur_x_module.Idtype(value=str(ligne.numero)) #, scheme_id=),
 			# included_note = factur_x_module.NoteType(content=, subject_code=),
 		),
 		specified_trade_product=factur_x_module.TradeProductType(
 			#global_id=factur_x_module.Idtype(value=ligne.reference, scheme_id=''),
-			name=factur_x_module.TextType(value=ligne.reference + " " + ligne.denomination)
+			name=factur_x_module.TextType(value=(ligne.reference or "") + " " + ligne.denomination)
 		),
 		specified_line_trade_agreement=factur_x_module.LineTradeAgreementType(
 			gross_price_product_trade_price = factur_x_module.TradePriceType(
@@ -242,7 +242,7 @@ def gen_facturx_basic_ou_en_16931(facture: FactureFacturX, factur_x_module_str: 
 				type_code=factur_x_module.PaymentMeansCodeType(value=get_facturx_mode_paiement(facture)),
 				# payer_party_debtor_financial_account=factur_x_module.DebtorFinancialAccountType(ibanid=),
 				# payee_party_creditor_financial_account=factur_x_module.CreditorFinancialAccountType(ibanid=,proprietary_id=,)
-			),], 
+			),],
 			applicable_trade_tax=[_ligne_tva_facturx_basic_ou_en_16931(ligne_tva, factur_x_module) for ligne_tva in facture.lignes_de_tva],
 			# billing_specified_period=factur_x_module.SpecifiedPeriodType(),
 			#specified_trade_allowance_charge=[factur_x_module.TradeAllowanceChargeType(
@@ -254,7 +254,7 @@ def gen_facturx_basic_ou_en_16931(facture: FactureFacturX, factur_x_module_str: 
 			#		category_code=factur_x_module.TaxCategoryCodeType(value=CategorieTVA.tva_cat_S),
 			#		rate_applicable_percent=factur_x_module.PercentType(value=format_decimal % facture.lignes_de_tva[0].taux_manuel)
 			#	)
-			#),], 
+			#),],
 			specified_trade_payment_terms=factur_x_module.TradePaymentTermsType(
 				due_date_date_time=factur_x_module.DateTimeType(date_time_string=factur_x_module.DateTimeType.DateTimeString(format="102", value=_parse_date_chorus_vers_facturx(facture.date_echeance_paiement))),
 			),

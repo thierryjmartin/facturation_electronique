@@ -97,6 +97,10 @@ Developpé par Thierry Martin
 
 ## Changelog
 
+### 0.2.1
+- **Fix** : Correction de plusieurs `TypeError` dans la logique de génération Factur-X (`utils/facturx.py`) liés à la gestion des champs optionnels (`None`).
+- **Tests** : Ajout d'une suite de tests dédiée (`tests/test_facturx.py`) pour la génération des factures Factur-X.
+
 ### 0.2.0
 - Refactoring majeur des modèles de données (`Facture` -> `FactureChorus` / `FactureFacturX`).
 - Harmonisation des noms de champs en français.
