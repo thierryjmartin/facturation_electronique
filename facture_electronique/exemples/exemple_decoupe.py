@@ -135,9 +135,7 @@ if __name__ == '__main__':
 	chorus_pdf_invoice = FactureChorus(
 		**facturx_invoice.model_dump(exclude={"numero_facture", "date_echeance_paiement"}),
 		numero_facture_saisi=facturx_invoice.numero_facture,
-		date_facture=facturx_invoice.date_facture,
 	)
-
 	# # Logique d'envoi (décommenter pour utiliser)
 	# reponse_fichier = c.ajouter_fichier_dans_systeme(
 	# 	file_to_base64(facturx_output),
