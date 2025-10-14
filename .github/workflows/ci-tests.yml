@@ -47,11 +47,12 @@ jobs:
             ${{ runner.os }}-pip-
 
       # Étape 4 : Installation des dépendances
-      - name: Installation des dépendances
+      - name: Installation des dépendances et du projet
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
+          pip install -e .
 
       # Étape 5 : Exécution des tests avec pytest
       - name: Exécution des tests
