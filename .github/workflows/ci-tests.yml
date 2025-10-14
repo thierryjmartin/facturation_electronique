@@ -39,7 +39,7 @@ jobs:
           pip install -e .
 
       - name: Exécution des tests et génération du rapport de couverture
-        run: pytest --cov=facturation --cov-report=xml
+        run: pytest --cov=facture_electronique --cov-report=xml
 
       - name: Envoi du rapport de couverture à Codecov
         uses: codecov/codecov-action@v5
