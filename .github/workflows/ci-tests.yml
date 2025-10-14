@@ -42,6 +42,6 @@ jobs:
         run: pytest --cov=facturation --cov-report=xml
 
       - name: Envoi du rapport de couverture à Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
