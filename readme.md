@@ -3,64 +3,91 @@
 ## Description
 `Facturation Electronique` est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, et d'autres partenaires privés. Elle supporte également le format **Factur-X** pour la création et l'envoi de factures électroniques.
 
-Le concept repose sur l'instanciation d’une classe **Facture** (actuellement largement inspirée de l’API Chorus Pro), qui fournit ensuite les outils nécessaires pour interagir avec diverses API publiques, principalement Chorus Pro, ainsi qu’avec des plateformes de dématérialisation partenaires telles que Qonto, Sage, et Pennylane. La vérification de cohérence et de logique des factures s'appuie sur le format Factur-X, pris en charge par Chorus Pro, et particulièrement adapté pour les contrôles de cohérence avancés.
+Le concept repose sur l'instanciation de classes Pydantic dédiées (`FactureChorus` et `FactureFacturX`), qui fournissent ensuite les outils nécessaires pour interagir avec diverses API publiques (Chorus Pro) et générer des factures conformes.
 
 ## Fonctionnalités
-- **Chorus Pro** : Ce module permet la création, l'envoi et le suivi des factures destinées aux entités publiques. Il intègre également des fonctionnalités de recherche d’entités via le SIRET, permettant par exemple de retrouver l’identifiant Chorus Pro d’une entité.
-- **Factur-X** : Ce module prend en charge la génération de factures au format PDF/Factur-X, en particulier les profils minimum et basic. Il valide le fichier factur-x.xml en conformité avec les schémas XSD via le module facturx. De plus, il offre la possibilité d'une validation plus poussée du fichier XML en appliquant les règles avancées définies dans les fichiers XSLT, ce que le module facturx ne propose pas nativement, via la fonction valider_xml_xslt.
+- **Chorus Pro** : Création, envoi et suivi des factures destinées aux entités publiques.
+- **Factur-X** : Génération de factures au format PDF/A-3 avec XML embarqué (profils MINIMUM, BASIC, EN16931), avec des fonctions de validation avancées (XSD et Schematron).
 
 ## Installation
 
-1. Clonez ce dépôt ou téléchargez-le :
-
-   ```bash
-   git clone https://github.com/thierryjmartin/facturation_electronique.git
-    ```
-   
-2. Installez les dépendances à l'aide du fichier requirements.txt :
-   ```bash
-   pip install -r requirements.txt
-    ```
-## Configuration
-
-Vous devez fournir vos clés API et les URL des différentes plateformes dans un fichier de configuration ou via des variables d'environnement.
-
-Exemple d'un fichier config.py :
-   ```python
-from .template_config import *
-
-PISTE_CLIENT_ID = "votre-clientid-piste"
-PISTE_CLIENT_SECRET = "votre-secret-piste"
-
-# Configuration API Chorus Pro
-CHORUS_PRO_BASE_URL = 'https://chorus-pro.gouv.fr/api'
-CHORUS_PRO_API_KEY = 'votre-api-key-chorus-pro'
-
-# Autres configurations...
-   ```
+```bash
+git clone https://github.com/thierryjmartin/facturation_electronique.git
+cd facturation_electronique
+pip install -r requirements.txt
+```
 
 ## Utilisation
 
-Un exemple d'utilisation est dans le script exemples/exemple_*.py
-   ```bash
- python -m facture_electronique.api.chorus_pro
- ```
-On utilise l'API Chorus Pro pour retrouver les identifiants de personnes morales.
-On génère une facture en instanciant la classe Facture. On modifie le PDF de la facture pour le transformer en PDF/A Factur-X que l'on envoie à Chorus Pro.
+Voici un exemple rapide pour créer une facture destinée à l'API Chorus Pro et une autre au format Factur-X.
+
+> Pour un exemple complet, consultez le fichier `facture_electronique/exemples/exemple_decoupe.py`.
+
+```python
+from facture_electronique.models import *
+
+# 1. Créer une facture simple pour l'API Chorus Pro
+facture_chorus = FactureChorus(
+    mode_depot=ModeDepot.SAISIE_API,
+    destinataire=Destinataire(code_destinataire="123456789"), # SIRET du client
+    fournisseur=Fournisseur(id_fournisseur=9876), # Votre ID Chorus Pro
+    cadre_de_facturation=CadreDeFacturation(code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR),
+    references=References(
+        type_facture=TypeFacture.FACTURE,
+        type_tva=TypeTVA.SUR_DEBIT,
+        mode_paiement=ModePaiement.VIREMENT,
+    ),
+    montant_total=MontantTotal(
+        montant_ht_total=100.0,
+        montant_tva=20.0,
+        montant_ttc_total=120.0,
+        montant_a_payer=120.0,
+    ),
+    lignes_de_poste=[LigneDePoste(numero=1, denomination="Test", quantite=1, unite="pce", montant_unitaire_ht=100.0)]
+)
+
+# Générer le payload JSON pour l'API
+# payload = facture_chorus.to_api_payload()
+# api.envoyer_facture(payload)
+
+
+# 2. Créer une facture pour générer un fichier Factur-X
+facture_fx = FactureFacturX(
+    mode_depot=ModeDepot.DEPOT_PDF_API,
+    numero_facture="FX-2024-001",
+    date_facture="2024-10-18",
+    date_echeance_paiement="2024-11-18",
+    destinataire=Destinataire(
+        code_destinataire="99986401570264",
+        nom="Client Principal SA",
+    ),
+    fournisseur=Fournisseur(
+        id_fournisseur=12345,
+        siret="26073617692140",
+        nom="Mon Entreprise SAS",
+    ),
+    cadre_de_facturation=CadreDeFacturation(code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR),
+    references=References(
+        type_facture=TypeFacture.FACTURE,
+        type_tva=TypeTVA.SUR_DEBIT,
+        mode_paiement=ModePaiement.VIREMENT,
+    ),
+    montant_total=MontantTotal(
+        montant_ht_total=1000.0,
+        montant_tva=200.0,
+        montant_ttc_total=1200.0,
+        montant_a_payer=1200.0,
+    ),
+    lignes_de_poste=[LigneDePoste(numero=1, denomination="Prestation", quantite=10, unite="heure", montant_unitaire_ht=100.0)]
+)
+
+# Générer le XML Factur-X (profil EN16931)
+# xml_content = facture_fx.to_facturx_en16931()
+# ... puis l'intégrer à un PDF pour obtenir la facture finale.
+```
 
 ## Contribution
-Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes :
-
-    Clonez le dépôt.
-    Créez une branche pour votre fonctionnalité : git checkout -b nouvelle-fonctionnalité.
-    Faites vos modifications et testez-les.
-    Soumettez une merge request.
-
-## Petite note technique
-Le code dans generated est généré par cette commande qui convertit les xsd Factur-X en classes python :
-   ```bash
- xsdata generate xsd/facturx-minimum/Factur-X_1.07.2_MINIMUM.xsd
-```
+Les contributions sont les bienvenues ! Veuillez cloner le dépôt, créer une branche et soumettre une Pull Request.
 
 ## Licence
 Ce projet est sous licence MIT.
@@ -69,6 +96,15 @@ Ce projet est sous licence MIT.
 Developpé par Thierry Martin
 
 ## Changelog
+
+### 0.2.0
+- Refactoring majeur des modèles de données (`Facture` -> `FactureChorus` / `FactureFacturX`).
+- Harmonisation des noms de champs en français.
+- Ajout de tests unitaires pour les modèles.
+- Mise à jour de la documentation et des exemples.
+
+### 0.1.24
+- Modernisation de la gestion des dépendances avec `pip-tools`.
 
 ### 0.1.22
 - Maj validation XML via Schematron

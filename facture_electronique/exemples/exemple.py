@@ -62,416 +62,9 @@ if __name__ == '__main__':
 	#service = c.consulter_service_structure(id_structure=26311042, id_service=10657669)
 	#print(service)
 
-	payload_recherche_organisation_siren = {
-	  "libelleOrganisation": {
-		"op": "CONTAINS",
-		"val": "TEST"
-	  },
-	  "status": {
-		"op": "CONTAINS",
-		"val": "ACTIF"
-	  },
-	  "identifiant": {
-		"op": "CONTAINS",
-		"val": "36252187900034"
-	  },
-	  "adresse": {
-		"op": "CONTAINS",
-		"val": "4 rue du pot de fer"
-	  },
-	  "codePostal": {
-		"op": "CONTAINS",
-		"val": "75010"
-	  },
-	  "ville": {
-		"op": "CONTAINS",
-		"val": "PARIS"
-	  },
-	  "pays": {
-		"op": "CONTAINS",
-		"val": "FRANCE"
-	  },
-	  "adresseElectronique": {
-		"op": "CONTAINS",
-		"val": "test@gmail.com"
-	  },
-	  "nonDiffusibleInsee": {
-		"op": "=",
-		"val": True
-	  },
-	  "raisonSociale": {
-		"op": "CONTAINS",
-		"val": "SASS"
-	  },
-	  "categorieJuridique": {
-		"op": "CONTAINS",
-		"val": "exe"
-	  },
-	  "categorieEntreprise": {
-		"op": "CONTAINS",
-		"val": "str"
-	  },
-	  "_sort": [
-		"libelleOrganisation",
-		"adresse",
-		"identifiant"
-	  ],
-	  "_desc": [
-		"ville",
-		"pays"
-	  ],
-	  "_fields": [
-		"identifiant",
-		"adresse",
-		"pays"
-	  ]
-	}
-	# n'a pas l'air de fonctionner ?
-	#c.rechercher_organisation_siren(payload_recherche_organisation_siren)
-	#print(c)
+	from facture_electronique.models import *
 
-	payload_recherche_organisation_structure = {
-	  "libelleOrganisation": {
-		"op": "CONTAINS",
-		"val": "TEST"
-	  },
-	  # "numeroTvaIntracommunautaire": {
-		# "op": "CONTAINS",
-		# "val": "FR12345677891"
-	  # },
-	  # "typeOrganisation": {
-		# "op": "CONTAINS",
-		# "val": "PUBLIQUE"
-	  # },
-	  # "contactPrincipal": {
-		# "op": "CONTAINS",
-		# "val": "550e8400e29b41d4a716446655440000"
-	  # },
-	  # "organisationParent": {
-		# "op": "CONTAINS",
-		# "val": "550e8400e29b41d4a716446655440000"
-	  # },
-	  # "estCentreGestionAgricole": {
-		# "op": "CONTAINS",
-		# "val": False
-	  # },
-	  # "gestionNumeroEJOuCodeService": {
-		# "op": "CONTAINS",
-		# "val": False
-	  # },
-	  # "numeroEjDoitEtreRenseigne": {
-		# "op": "CONTAINS",
-		# "val": False
-	  # },
-	  # "statutMiseEnPaiementNestPasRemonte": {
-		# "op": "CONTAINS",
-		# "val": False
-	  # },
-	  # "numeroPacage": {
-		# "op": "CONTAINS",
-		# "val": "ACZA0132532"
-	  # },
-	  # "status": {
-		# "op": "CONTAINS",
-		# "val": "ACTIF"
-	  # },
-	  # "identifiant": {
-		# "op": "CONTAINS",
-		# "val": "36252187900034"
-	  # },
-	  # "typeIdentifiant": {
-		# "op": "CONTAINS",
-		# "val": "SIRET"
-	  # },
-	  # "categorieFournisseurMemoireId": {
-		# "op": "CONTAINS",
-		# "val": "JKGUH987698"
-	  # },
-	  # "categorieBeneficiaireId": {
-		# "op": "CONTAINS",
-		# "val": "ASC1234"
-	  # },
-	  # "adresse": {
-		# "op": "CONTAINS",
-		# "val": "4 rue du pot de fer"
-	  # },
-	  # "codePostal": {
-		# "op": "CONTAINS",
-		# "val": "75010"
-	  # },
-	  # "ville": {
-		# "op": "CONTAINS",
-		# "val": "PARIS"
-	  # },
-	  # "pays": {
-		# "op": "CONTAINS",
-		# "val": "FRANCE"
-	  # },
-	  # "adresseElectronique": {
-		# "op": "CONTAINS",
-		# "val": "test@gmail.com"
-	  # },
-	  # "telephone": {
-		# "op": "CONTAINS",
-		# "val": "0633333333"
-	  # },
-	  # "recevoirCyclesViesEdi": {
-		# "op": "CONTAINS",
-		# "val": True
-	  # },
-	  # "emetteurFluxEdi": {
-		# "op": "CONTAINS",
-		# "val": True
-	  # },
-	  # "nonDiffusibleInsee": {
-		# "op": "CONTAINS",
-		# "val": True
-	  # },
-	  # "numeroRcsStructure": {
-		# "op": "CONTAINS",
-		# "val": "123123"
-	  # },
-	  # "codeServiceDoitEtreRenseigne": {
-		# "op": "CONTAINS",
-		# "val": False
-	  # },
-	  # "avecMOA": {
-		# "op": "CONTAINS",
-		# "val": True
-	  # },
-	  # "estMOAUniquement": {
-		# "op": "CONTAINS",
-		# "val": True
-	  # },
-	  # "structureOrigine": {
-		# "op": "CONTAINS",
-		# "val": "1234"
-	  # },
-	  # "raisonSociale": {
-		# "op": "CONTAINS",
-		# "val": "SASS"
-	  # },
-	  # "categorieJuridique": {
-		# "op": "CONTAINS",
-		# "val": "exe"
-	  # },
-	  # "categorieEntreprise": {
-		# "op": "CONTAINS",
-		# "val": "str"
-	  # },
-	  "_sort": [
-		"typeOrganisation",
-		"raisonSociale",
-		"numeroEjDoitEtreRenseigne"
-	  ],
-	  "_desc": [
-		"raisonSociale",
-		"typeOrganisation"
-	  ],
-	  #"_fields": [
-		#"identifiant",
-		#"typeIdentifiant",
-	    #libelleOrganisation",
-	  #]
-	}
-	# Apparement il vaut mieux utiliser rechercher_structure pour trouver les infos pour remplir les factures.
-	# l'intérêt de la recherche ici était surtout d'avoir des opérateurs mais bon...
-	#res = c.rechercher_structure_via_organisation(payload_recherche_organisation_structure)
-	#for e in res:
-	#	print(e)
-
-	# exemple_facture = {
-	# 					  "cadreDeFacturation": {
-	# 						"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
-	# 						"codeServiceValideur": "string",
-	# 						"codeStructureValideur": "string"
-	# 					  },
-	# 					  "commentaire": "string",
-	# 					  "dateFacture": "2024-10-08T11:30:23.463Z",
-	# 					  "destinataire": {
-	# 						"codeDestinataire": "string",
-	# 						"codeServiceExecutant": "string"
-	# 					  },
-	# 					  "fournisseur": {
-	# 						"codeCoordonneesBancairesFournisseur": 0,
-	# 						"idFournisseur": "26073617692140",
-	# 						"idServiceFournisseur": "SERVICE_PRIVE_1_26073617692140",
-	# 					  },
-	# 					  "idUtilisateurCourant": 0,
-	# 					  "lignePoste": [
-	# 						{
-	# 						  "lignePosteDenomination": "string",
-	# 						  "lignePosteMontantRemiseHT": 0,
-	# 						  "lignePosteMontantUnitaireHT": 0,
-	# 						  "lignePosteNumero": 0,
-	# 						  "lignePosteQuantite": 0,
-	# 						  "lignePosteReference": "string",
-	# 						  "lignePosteTauxTva": "string",
-	# 						  "lignePosteTauxTvaManuel": 0,
-	# 						  "lignePosteUnite": "string"
-	# 						}
-	# 					  ],
-	# 					  "ligneTva": [
-	# 						{
-	# 						  "ligneTvaMontantBaseHtParTaux": 0,
-	# 						  "ligneTvaMontantTvaParTaux": 0,
-	# 						  "ligneTvaTaux": "string",
-	# 						  "ligneTvaTauxManuel": 0
-	# 						}
-	# 					  ],
-	# 					  "modeDepot": "SAISIE_API",
-	# 					  "montantTotal": {
-	# 						"montantAPayer": 0,
-	# 						"montantHtTotal": 0,
-	# 						"montantRemiseGlobaleTTC": 0,
-	# 						"montantTVA": 0,
-	# 						"montantTtcTotal": 0,
-	# 						"motifRemiseGlobaleTTC": "string"
-	# 					  },
-	# 					  "numeroFactureSaisi": "string",
-	# 					  "pieceJointeComplementaire": [
-	# 						{
-	# 						  "pieceJointeComplementaireDesignation": "string",
-	# 						  "pieceJointeComplementaireId": 0,
-	# 						  "pieceJointeComplementaireIdLiaison": 0,
-	# 						  "pieceJointeComplementaireNumeroLigneFacture": 0,
-	# 						  "pieceJointeComplementaireType": "string"
-	# 						}
-	# 					  ],
-	# 					  "pieceJointePrincipale": [
-	# 						{
-	# 						  "pieceJointePrincipaleDesignation": "string",
-	# 						  "pieceJointePrincipaleId": 0
-	# 						}
-	# 					  ],
-	# 					  "references": {
-	# 						"deviseFacture": "string",
-	# 						"modePaiement": "CHEQUE",
-	# 						"motifExonerationTva": "string",
-	# 						"numeroBonCommande": "string",
-	# 						"numeroFactureOrigine": "string",
-	# 						"numeroMarche": "string",
-	# 						"typeFacture": "AVOIR",
-	# 						"typeTva": "TVA_SUR_DEBIT"
-	# 					  }
-	# 					}
-
-	# exemple_facture = {
-	# 	"modeDepot": "SAISIE_API",
-	# 	"numeroFactureSaisi": None,
-	#
-	# 	"destinataire": {
-	# 		"codeDestinataire": "99986401570264", # SIRET  trouvé via une recherche...
-	# 		#"codeServiceExecutant": "DIRINFRA"
-	# 	},
-	# 	"fournisseur": {
-	# 		# j'ai retrouvé ce code en faisant une recherche de fournisseur..., j'aurais pu chercher par siret ?
-	# 		# le SIRET de mon fournisseur 26073617692140
-	# 		"idFournisseur": 26300989,
-	# 		#"typeIdentifiantFournisseur": "SIRET",
-	# 	#	"idServiceFournisseur": 26073617692140,
-	# 	#	"codeCoordonneesBancairesFournisseur": 132
-	# 	},
-	# 	"cadreDeFacturation": {
-	# 		"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR",
-	# 		"codeStructureValideur": None
-	# 	},
-	# 	"references": {
-	# 		"deviseFacture": "EUR",
-	# 		"typeFacture": "FACTURE",
-	# 		"typeTva": "TVA_SUR_DEBIT",
-	# 		"motifExonerationTva": None,
-	# 		"numeroMarche": "VABFM001",
-	# 		"numeroBonCommande": None,
-	# 		"numeroFactureOrigine": None,
-	# 		"modePaiement": "ESPECE"
-	# 	},
-	# 	"lignePoste": [
-	# 		{
-	# 			"lignePosteNumero": 1,
-	# 			"lignePosteReference": "R1",
-	# 			"lignePosteDenomination": "D1",
-	# 			"lignePosteQuantite": 10,
-	# 			"lignePosteUnite": "lot",
-	# 			"lignePosteMontantUnitaireHT": 50.000000,
-	# 			"lignePosteMontantRemiseHT": None,
-	# 			#"lignePosteTauxTva": "TVA5",
-	# 			"lignePosteTauxTva": None,
-	# 			#"lignePosteTauxTvaManuel": None
-	# 			"lignePosteTauxTvaManuel": 20
-	# 		}
-	# 		, {
-	# 			"lignePosteNumero": 2,
-	# 			"lignePosteReference": "R2",
-	# 			"lignePosteDenomination": "D2",
-	# 			"lignePosteQuantite": 12,
-	# 			"lignePosteUnite": "Kg",
-	# 			"lignePosteMontantUnitaireHT": 36.000000,
-	# 			"lignePosteMontantRemiseHT": None,
-	# 			"lignePosteTauxTva": None,
-	# 			"lignePosteTauxTvaManuel": 2.1
-	# 		}
-	# 		, {
-	# 			"lignePosteNumero": 3,
-	# 			"lignePosteReference": "R3",
-	# 			"lignePosteDenomination": "D3",
-	# 			"lignePosteQuantite": 16,
-	# 			"lignePosteUnite": "lot",
-	# 			"lignePosteMontantUnitaireHT": 24.000000,
-	# 			"lignePosteMontantRemiseHT": None,
-	# 			"lignePosteTauxTva": None,
-	# 			"lignePosteTauxTvaManuel": 5
-	# 		}
-	# 		, {
-	# 			"lignePosteNumero": 4,
-	# 			"lignePosteReference": "XX",
-	# 			"lignePosteDenomination": "XX",
-	# 			"lignePosteQuantite": 1,
-	# 			"lignePosteUnite": "lot",
-	# 			"lignePosteMontantUnitaireHT": 10.000000,
-	# 			"lignePosteMontantRemiseHT": None,
-	# 			#"lignePosteTauxTva": "TVA5",
-	# 			"lignePosteTauxTva": None,
-	# 			#"lignePosteTauxTvaManuel": None
-	# 			"lignePosteTauxTvaManuel": 20
-	# 		}
-	# 	],
-	# 	"ligneTva": [
-	# 		{
-	# 			#"ligneTvaTauxManuel": None,
-	# 			#"ligneTvaTaux": "TVA5",
-	# 			"ligneTvaTauxManuel": 20,
-	# 			"ligneTvaTaux": None,
-	# 			"ligneTvaMontantBaseHtParTaux": 510.000000,
-	# 			"ligneTvaMontantTvaParTaux": 102.000000
-	# 		},
-	# 		{
-	# 			"ligneTvaTauxManuel": 2.1,
-	# 			"ligneTvaTaux": None,
-	# 			"ligneTvaMontantBaseHtParTaux": 432.000000,
-	# 			"ligneTvaMontantTvaParTaux": 9.072000
-	# 		}
-	# 		, {
-	# 			"ligneTvaTauxManuel": 5,
-	# 			"ligneTvaTaux": None,
-	# 			"ligneTvaMontantBaseHtParTaux": 384.000000,
-	# 			"ligneTvaMontantTvaParTaux": 19.200000
-	# 		}
-	# 	],
-	# 	"montantTotal": {
-	# 		"montantHtTotal": 1326.000000,
-	# 		"montantTVA": 130.272000,
-	# 		"montantTtcTotal": 1406.272000,
-	# 		"montantRemiseGlobaleTTC": 50.000000,
-	# 		"motifRemiseGlobaleTTC": "Geste commercial",
-	# 		"montantAPayer": 1400.000000
-	# 	},
-	# 	"commentaire": "Création_VABF_SoumettreFacture"
-	# }
-
-	from ..models import *
-
-	exemple_facture_mode_api = Facture(
+	exemple_facture_mode_api = FactureChorus(
 		mode_depot=ModeDepot("SAISIE_API"),
 		# numero_facture_saisi="20240000000000000013", # ce champ n'est pas utilié en mode_depot saisie_api
 		#date_facture="2024-15-08", # seulement en depot PDF
@@ -498,104 +91,105 @@ if __name__ == '__main__':
 			numero_facture_origine=None,
 			mode_paiement=ModePaiement("ESPECE")
 		),
-		ligne_poste=[
-			LignePoste(
-				ligne_poste_numero=1,
-				ligne_poste_reference="R1",
-				ligne_poste_denomination="D1",
-				ligne_poste_quantite=10,
-				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_HT=50.00,
-				ligne_poste_montant_remise_HT=0,
-				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=20
+		lignes_de_poste=[
+			LigneDePoste(
+				numero=1,
+				reference="R1",
+				denomination="D1",
+				quantite=10,
+				unite="lot",
+				montant_unitaire_ht=50.00,
+				montant_remise_ht=0,
+				taux_tva='',
+				taux_tva_manuel=20
 			),
-			LignePoste(
-				ligne_poste_numero=2,
-				ligne_poste_reference="R2",
-				ligne_poste_denomination="D2",
-				ligne_poste_quantite=12,
-				ligne_poste_unite="Kg",
-				ligne_poste_montant_unitaire_HT=36.00,
-				ligne_poste_montant_remise_HT=0,
-				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=2.1
+			LigneDePoste(
+				numero=2,
+				reference="R2",
+				denomination="D2",
+				quantite=12,
+				unite="Kg",
+				montant_unitaire_ht=36.00,
+				montant_remise_ht=0,
+				taux_tva='',
+				taux_tva_manuel=2.1
 			),
-			LignePoste(
-				ligne_poste_numero=3,
-				ligne_poste_reference="R3",
-				ligne_poste_denomination="D3",
-				ligne_poste_quantite=16,
-				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_HT=24.00,
-				ligne_poste_montant_remise_HT=0,
-				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=5
+			LigneDePoste(
+				numero=3,
+				reference="R3",
+				denomination="D3",
+				quantite=16,
+				unite="lot",
+				montant_unitaire_ht=24.00,
+				montant_remise_ht=0,
+				taux_tva='',
+				taux_tva_manuel=5
 			),
-			LignePoste(
-				ligne_poste_numero=4,
-				ligne_poste_reference="XX",
-				ligne_poste_denomination="XX",
-				ligne_poste_quantite=1,
-				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_HT=10.00,
-				ligne_poste_montant_remise_HT=0,
-				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=20
+			LigneDePoste(
+				numero=4,
+				reference="XX",
+				denomination="XX",
+				quantite=1,
+				unite="lot",
+				montant_unitaire_ht=10.00,
+				montant_remise_ht=0,
+				taux_tva='',
+				taux_tva_manuel=20
 			)
 		],
-		ligne_tva=[
-			LigneTva(
-				ligne_tva_taux_manuel=20,
-				ligne_tva_taux=None,
-				ligne_tva_montant_base_ht_par_taux=510.00,
-				ligne_tva_montant_tva_par_taux=102.00
+		lignes_de_tva=[
+			LigneDeTVA(
+				taux_manuel=20,
+				taux=None,
+				montant_base_ht=510.00,
+				montant_tva=102.00
 			),
-			LigneTva(
-				ligne_tva_taux_manuel=2.1,
-				ligne_tva_taux=None,
-				ligne_tva_montant_base_ht_par_taux=432.00,
-				ligne_tva_montant_tva_par_taux=9.072
+			LigneDeTVA(
+				taux_manuel=2.1,
+				taux=None,
+				montant_base_ht=432.00,
+				montant_tva=9.072
 			),
-			LigneTva(
-				ligne_tva_taux_manuel=5,
-				ligne_tva_taux=None,
-				ligne_tva_montant_base_ht_par_taux=384.00,
-				ligne_tva_montant_tva_par_taux=19.20
+			LigneDeTVA(
+				taux_manuel=5,
+				taux=None,
+				montant_base_ht=384.00,
+				montant_tva=19.20
 			)
 		],
 		montant_total=MontantTotal(
 			montant_ht_total=1326.00,
-			montant_TVA=130.272,
+			montant_tva=130.272,
 			montant_ttc_total=1406.272,
-			montant_remise_globale_TTC=50.00,
-			motif_remise_globale_TTC="Geste commercial",
+			montant_remise_globale_ttc=50.00,
+			motif_remise_globale_ttc="Geste commercial",
 			montant_a_payer=1400.00
 		),
 		commentaire="Création_VABF_SoumettreFacture"
 	)
 
 
-	# c.envoyer_facture(exemple_facture_mode_api.to_chorus_pro_payload())
+	# c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
 	# print(exemple_facture.to_facturx_basic())
 
-	from ..utils.files import *
+	from facture_electronique.utils.files import *
 	file_path = get_absolute_path("facture_electronique/exemples/dummy.pdf")
 
 	file_path_pdfa = get_absolute_path("facture_electronique/exemples/dummy.pdfa.pdf")
-	from ..utils.pdfs import convert_to_pdfa, sign_pdf
+	from facture_electronique.utils.pdfs import convert_to_pdfa, sign_pdf
 	convert_to_pdfa(file_path, file_path_pdfa)
 
-	exemple_facture_mode_pdf = Facture(
+	exemple_facture_mode_pdf = FactureFacturX(
 		mode_depot=ModeDepot("DEPOT_PDF_API"),
-		numero_facture_saisi="20240000000000000110", # ce champ n'est pas utilisé en mode_depot saisie_api
+		numero_facture="20240000000000000110",
 		date_facture="2024-10-18", # seulement en depot PDF
 		date_echeance_paiement="2014-12-18",
 		id_utilisateur_courant=0,
-		piece_jointe_principale = [PieceJointePrincipale(
-			piece_jointe_principale_designation = 'facture',
-			# piece_jointe_principale_id = pj_id
-		)],
+		# piece_jointe_principale n'est plus dans FactureFacturX, il faut créer une FactureChorus pour l'envoi API
+		# piece_jointe_principale = [PieceJointePrincipale(
+		# 	designation = 'facture',
+		# 	# id = pj_id
+		# )],
 		destinataire=Destinataire(
 			nom="acheteur 99986401570264",
 			code_destinataire="99986401570264",
@@ -636,92 +230,92 @@ if __name__ == '__main__':
 		),
 		montant_total=MontantTotal(
 			montant_ht_total=1326.00,
-			montant_TVA=130.272,
+			montant_tva=130.272,
 			montant_ttc_total=1456.272,
-			montant_remise_globale_TTC=0.00,
-			motif_remise_globale_TTC="",
+			montant_remise_globale_ttc=0.00,
+			motif_remise_globale_ttc="",
 			acompte=56.272,
 			montant_a_payer=1400.00
 		),
 		commentaire = 'voici mon commentaire',
-		ligne_poste=[
-			LignePoste(
-				ligne_poste_numero=1,
-				ligne_poste_reference="R1",
-				ligne_poste_denomination="D1",
-				ligne_poste_quantite=10,
-				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_HT=50.00,
-				ligne_poste_montant_remise_HT=5,
-				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=20,
-				ligne_poste_tva_categorie = TvaCategories('S'),
-				ligne_poste_code_raison_reduction='parce que je suis sympa'
+		lignes_de_poste=[
+			LigneDePoste(
+				numero=1,
+				reference="R1",
+				denomination="D1",
+				quantite=10,
+				unite="lot",
+				montant_unitaire_ht=50.00,
+				montant_remise_ht=5,
+				taux_tva='',
+				taux_tva_manuel=20,
+				categorie_tva = CategorieTVA('S'),
+				raison_reduction='parce que je suis sympa'
 			),
-			LignePoste(
-				ligne_poste_numero=2,
-				ligne_poste_reference="R2",
-				ligne_poste_denomination="D2",
-				ligne_poste_quantite=12,
-				ligne_poste_unite="Kg",
-				ligne_poste_montant_unitaire_HT=36.00,
-				ligne_poste_montant_remise_HT=0,
-				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=2.1,
-				ligne_poste_tva_categorie = TvaCategories('S')
+			LigneDePoste(
+				numero=2,
+				reference="R2",
+				denomination="D2",
+				quantite=12,
+				unite="Kg",
+				montant_unitaire_ht=36.00,
+				montant_remise_ht=0,
+				taux_tva='',
+				taux_tva_manuel=2.1,
+				categorie_tva = CategorieTVA('S')
 			),
-			LignePoste(
-				ligne_poste_numero=3,
-				ligne_poste_reference="R3",
-				ligne_poste_denomination="D3",
-				ligne_poste_quantite=16,
-				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_HT=24.00,
-				ligne_poste_montant_remise_HT=0,
-				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=5,
-				ligne_poste_tva_categorie = TvaCategories('S')
+			LigneDePoste(
+				numero=3,
+				reference="R3",
+				denomination="D3",
+				quantite=16,
+				unite="lot",
+				montant_unitaire_ht=24.00,
+				montant_remise_ht=0,
+				taux_tva='',
+				taux_tva_manuel=5,
+				categorie_tva = CategorieTVA('S')
 			),
-			LignePoste(
-				ligne_poste_numero=4,
-				ligne_poste_reference="XX",
-				ligne_poste_denomination="XX",
-				ligne_poste_quantite=1,
-				ligne_poste_unite="lot",
-				ligne_poste_montant_unitaire_HT=10.00,
-				ligne_poste_montant_remise_HT=0,
-				ligne_poste_taux_tva='',
-				ligne_poste_taux_tva_manuel=20,
-				ligne_poste_tva_categorie = TvaCategories('S')
+			LigneDePoste(
+				numero=4,
+				reference="XX",
+				denomination="XX",
+				quantite=1,
+				unite="lot",
+				montant_unitaire_ht=10.00,
+				montant_remise_ht=0,
+				taux_tva='',
+				taux_tva_manuel=20,
+				categorie_tva = CategorieTVA('S')
 			)
 		],
-		ligne_tva=[
-			LigneTva(
-				ligne_tva_taux_manuel=20,
-				ligne_tva_taux=None,
-				ligne_tva_montant_base_ht_par_taux=510.00,
-				ligne_tva_montant_tva_par_taux=102.00,
-				ligne_tva_categorie=TvaCategories('S')
+		lignes_de_tva=[
+			LigneDeTVA(
+				taux_manuel=20,
+				taux=None,
+				montant_base_ht=510.00,
+				montant_tva=102.00,
+				categorie=CategorieTVA('S')
 			),
-			LigneTva(
-				ligne_tva_taux_manuel=2.1,
-				ligne_tva_taux=None,
-				ligne_tva_montant_base_ht_par_taux=432.00,
-				ligne_tva_montant_tva_par_taux=9.072,
-				ligne_tva_categorie=TvaCategories('S')
+			LigneDeTVA(
+				taux_manuel=2.1,
+				taux=None,
+				montant_base_ht=432.00,
+				montant_tva=9.072,
+				categorie=CategorieTVA('S')
 			),
-			LigneTva(
-				ligne_tva_taux_manuel=5,
-				ligne_tva_taux=None,
-				ligne_tva_montant_base_ht_par_taux=384.00,
-				ligne_tva_montant_tva_par_taux=19.20,
-				ligne_tva_categorie=TvaCategories('S')
+			LigneDeTVA(
+				taux_manuel=5,
+				taux=None,
+				montant_base_ht=384.00,
+				montant_tva=19.20,
+				categorie=CategorieTVA('S')
 			)
 		],
 	)
 
 	import facturx
-	from ..utils.facturx import (
+	from facture_electronique.utils.facturx import (
 		gen_xml_depuis_facture,
 		valider_xml_xldt,
 		chemin_xldt_basic,
@@ -814,6 +408,8 @@ if __name__ == '__main__':
 		pass
 
 	# test envoi faxctur-x basic vers chorus pro en mod pdf.
+	# # Pour envoyer la facture via l'API, il faut maintenant créer une instance de FactureChorus
+	# # à partir de notre FactureFacturX
 	# reponse_fichier = c.ajouter_fichier_dans_systeme(
 	# 	file_to_base64(file_path_facturx_basic),
 	# 	"facture.pdf",
@@ -823,13 +419,16 @@ if __name__ == '__main__':
 	#
 	# pj_id = reponse_fichier["pieceJointeId"]
 	#
-	# exemple_facture_mode_pdf.piece_jointe_principale[0].piece_jointe_principale_id = pj_id
+	# # On convertit le modèle FacturX en Chorus et on ajoute la pièce jointe
+	# facture_chorus_pour_envoi = FactureChorus(
+	# 	**exemple_facture_mode_pdf.model_dump(exclude={"numero_facture", "date_echeance_paiement"}),
+	# 	numero_facture_saisi=exemple_facture_mode_pdf.numero_facture,
+	# 	date_facture=exemple_facture_mode_pdf.date_facture,
+	# 	pìeces_jointes_principales=[PieceJointePrincipale(designation="facture", id=pj_id)]
+	# )
 	#
-	# reponse_envoi_facture = c.envoyer_facture(exemple_facture_mode_pdf.to_chorus_pro_payload())
+	# reponse_envoi_facture = c.envoyer_facture(facture_chorus_pour_envoi.to_api_payload())
 	#
 	# id_facture_cpro = reponse_envoi_facture['identifiantFactureCPP']
 	#
 	# c.obtenir_statut_facture(id_facture_cpro)
-
-
-

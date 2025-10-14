@@ -1,232 +1,209 @@
-from pydantic import BaseModel, PositiveFloat
+from pydantic import BaseModel, PositiveFloat, Field, ConfigDict
 from enum import Enum
 from typing import List, Optional
-from dataclasses import field
+from gettext import gettext as _
 
-from .utils.strings_and_dicts import to_camel_case, transform_dict_keys
+from .utils.strings_and_dicts import to_camel_case
+
+
+FRENCH_CAMEL_CASE_CONFIG = ConfigDict(
+	alias_generator=to_camel_case,
+	populate_by_name=True,
+)
 
 
 class CodeCadreFacturation(str, Enum):
-	a1 = "A1_FACTURE_FOURNISSEUR"
-	a2 = "A2_FACTURE_FOURNISSEUR_DEJA_PAYEE"
-	a3 = "A9_FACTURE_SOUSTRAITANT"
-	a4 = "A12_FACTURE_COTRAITANT"
+	A1_FACTURE_FOURNISSEUR = "A1_FACTURE_FOURNISSEUR"
+	A2_FACTURE_FOURNISSEUR_DEJA_PAYEE = "A2_FACTURE_FOURNISSEUR_DEJA_PAYEE"
+	A9_FACTURE_SOUSTRAITANT = "A9_FACTURE_SOUSTRAITANT"
+	A12_FACTURE_COTRAITANT = "A12_FACTURE_COTRAITANT"
 
 
 class CadreDeFacturation(BaseModel):
-	code_cadre_facturation: str
-	code_service_valideur: Optional[CodeCadreFacturation] = "A1_FACTURE_FOURNISSEUR"
-	"""Si le cadre de facturation est un cadre de facturation de cotraitant ou de sous-traitant (A9, A12) alors le valideur doit obligatoirement être renseigné."""
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	code_cadre_facturation: CodeCadreFacturation
+	code_service_valideur: Optional[str] = None
 	code_structure_valideur: Optional[str] = None
 
 
 class AdressePostale(BaseModel):
+	model_config = FRENCH_CAMEL_CASE_CONFIG
 	code_postal: Optional[str] = None
 	ligne_un: Optional[str] = None
 	ligne_deux: Optional[str] = None
 	nom_ville: Optional[str] = None
-	pays_code_iso: Optional[str] = ''
+	pays_code_iso: Optional[str] = 'FR'
 
 
 class Destinataire(BaseModel):
-	nom: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
-	adresse_postale: Optional[AdressePostale] = None  # utilisé dans facturx mais pas dans l'API Chorus
-	code_destinataire: str # SIRET
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	code_destinataire: str  # SIRET
 	code_service_executant: Optional[str] = None
+	nom: Optional[str] = None
+	adresse_postale: Optional[AdressePostale] = None
 
 
 class Fournisseur(BaseModel):
-	nom: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
-	siret: Optional[str] = ''  # utilisé dans facturx mais pas dans l'API Chorus
-	numero_tva_intra: Optional[str] = '' # utilisé dans facturx mais pas dans l'API Chorus
-	adresse_postale: Optional[AdressePostale] = None  # utilisé dans facturx mais pas dans l'API Chorus
-	code_coordonnees_bancaires_fournisseur: Optional[int] = 0
-	id_fournisseur: int # identifiant chorus pro
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	id_fournisseur: int  # Identifiant Chorus Pro
+	code_coordonnees_bancaires_fournisseur: Optional[int] = None
 	id_service_fournisseur: Optional[int] = None
+	nom: Optional[str] = None
+	siret: Optional[str] = None
+	numero_tva_intra: Optional[str] = None
+	adresse_postale: Optional[AdressePostale] = None
 
 
-class TvaCategories(str, Enum):
-	# Défini dans facturx BASIC - Invoiced item VAT category code
-	# The VAT category codes are as follows:
-	tva_cat_S = 'S' # S = Standard VAT rate (standard)
-	tva_cat_zero_rated_good = 'Z' # Z = Zero rated goods (NON APPLICABLE EN FRANCE)
-	tva_cat_exempt = 'E' # E = VAT exempt
-	tva_cat_reverse_charge = 'AE' # AE = Reverse charge
-	tva_cat_intra_community_supply = 'K' # K = Intra-Community supply (specific reverse charge)
-	tva_cat_export_outside_EU = 'G' # G = Exempt VAT for Export outside EU
-	tva_cat_outside_vat_scope = 'O' # O = Outside VAT scope
-	tva_cat_canary = 'L' # L = Canary Islands
-	tva_cat_ceuta = 'M' # M = Ceuta and Mellila
+class CategorieTVA(str, Enum):
+	STANDARD = 'S'
+	ZERO = 'Z'
+	EXONEREE = 'E'
+	AUTO_LIQUIDATION = 'AE'
+	INTRA_COMMUNAUTAIRE = 'K'
+	EXPORT = 'G'
+	HORS_CHAMP = 'O'
+	CANARIES = 'L'
+	CEUTA_MELILLA = 'M'
 
 
-class RaisonReductionCode(str, Enum):
-	raison_reduction_code_advertising = 'AA' # AA = Advertising discount
-	raison_reduction_packing_supplement = 'ABL' # ABL = Packing supplement
-	raison_reduction_code_other_services = 'ADR' # ADR = Other services
-	raison_reduction_code_removal = 'ADT' # ADT = Removal
-	raison_reduction_cdoe_transportation_cost = 'FC' # FC = transportation costs
-	raison_reduction_code_financial_expences = 'FI' # FI = Financial expenses
-	raison_reduction_code_labeling = 'LA' # LA = Labeling
+class CodeRaisonReduction(str, Enum):
+	REMISE_PUBLICITAIRE = 'AA'
+	SUPPLEMENT_EMBALLAGE = 'ABL'
+	AUTRES_SERVICES = 'ADR'
+	ENLEVEMENT = 'ADT'
+	COUTS_TRANSPORT = 'FC'
+	FRAIS_FINANCIERS = 'FI'
+	ETIQUETAGE = 'LA'
 
 
-class LignePoste(BaseModel):
-	ligne_poste_numero: int
-	ligne_poste_reference: str
-	ligne_poste_denomination: str
-	ligne_poste_quantite: float
-	ligne_poste_unite: str
-	ligne_poste_montant_unitaire_HT: PositiveFloat
-	ligne_poste_montant_remise_HT: float
-	ligne_poste_taux_tva: str
-	ligne_poste_taux_tva_manuel: float
-	ligne_poste_tva_categorie: Optional[TvaCategories] = None  # pour facturx basic
-	ligne_poste_date_debut: Optional[str] = None  # pour facturx basic
-	ligne_poste_date_fin : Optional[str] = None # pour facturx basic
-	ligne_poste_code_raison_reduction_code: Optional[RaisonReductionCode] = None # pour facturx basic
-	ligne_poste_code_raison_reduction: Optional[str] = None
+class LigneDePoste(BaseModel):
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	numero: int
+	reference: Optional[str] = None
+	denomination: str
+	quantite: float
+	unite: str
+	montant_unitaire_ht: PositiveFloat
+	montant_remise_ht: Optional[float] = None
+	taux_tva: Optional[str] = None  # Ex: "TVA20"
+	taux_tva_manuel: Optional[float] = None
+	categorie_tva: Optional[CategorieTVA] = None
+	date_debut_periode: Optional[str] = None
+	date_fin_periode: Optional[str] = None
+	code_raison_reduction: Optional[CodeRaisonReduction] = None
+	raison_reduction: Optional[str] = None
 
 
-class LigneTva(BaseModel):
-	ligne_tva_montant_base_ht_par_taux: float
-	ligne_tva_montant_tva_par_taux: float
-	ligne_tva_taux: Optional[str] = None
-	ligne_tva_taux_manuel: Optional[float] = None
-	ligne_tva_categorie: Optional[TvaCategories] = None  # pour facturx basic
+class LigneDeTVA(BaseModel):
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	montant_base_ht: float
+	montant_tva: float
+	taux: Optional[str] = None
+	taux_manuel: Optional[float] = None
+	categorie: Optional[CategorieTVA] = None
 
 
 class MontantTotal(BaseModel):
-	acompte: Optional[float] = 0 # facturx basic.
-	montant_a_payer: float
+	model_config = FRENCH_CAMEL_CASE_CONFIG
 	montant_ht_total: float
-	montant_remise_globale_TTC: float # les remises globales TTC ne vont pas avec Chorus pro, il faudrait plutot des lignes de remises HT ou charges HT avec chacune leur taux de tva
-	montant_TVA: float
+	montant_tva: float
 	montant_ttc_total: float
-	motif_remise_globale_TTC: str
+	montant_a_payer: float
+	acompte: Optional[float] = None
+	montant_remise_globale_ttc: Optional[float] = None
+	motif_remise_globale_ttc: Optional[str] = None
 
 
 class PieceJointeComplementaire(BaseModel):
-	piece_jointe_complementaire_designation: str
-	"""Nombre : identifiant technique de la pièce jointe dans le système
-	RechercherPieceJointeSurStructure OU RechercherPieceJointeSurMonCompte OU AjouterFichierDansSysteme"""
-	piece_jointe_complementaire_id: int
-	piece_jointe_complementaire_id_liaison: int
-	piece_jointe_complementaire_numero_ligne_facture: int
-	piece_jointe_complementaire_type: str
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	designation: str
+	id: int
+	id_liaison: int
+	numero_ligne_facture: int
+	type: str
 
 
 class PieceJointePrincipale(BaseModel):
-	"""String : champ libre désignant la pièce jointe max 100 cars"""
-	piece_jointe_principale_designation: str
-	"""Nombre : identifiant technique de la pièce jointe dans le système
-	obtenu par deposerPdfFacture ou ajouterFichierDansSysteme"""
-	piece_jointe_principale_id: Optional[int] = 0
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	designation: str
+	id: Optional[int] = None
 
 
 class ModePaiement(str, Enum):
-	cheque = "CHEQUE"
-	prelevement = "PRELEVEMENT"
-	virement = "VIREMENT"
-	espece = "ESPECE"
-	autre = "AUTRE"
-	report = "REPORT"
+	CHEQUE = "CHEQUE"
+	PRELEVEMENT = "PRELEVEMENT"
+	VIREMENT = "VIREMENT"
+	ESPECE = "ESPECE"
+	AUTRE = "AUTRE"
+	REPORT = "REPORT"
 
 
 class TypeFacture(str, Enum):
-	facture = 'FACTURE'
-	avoir = 'AVOIR'
+	FACTURE = 'FACTURE'
+	AVOIR = 'AVOIR'
 
 
 class TypeTVA(str, Enum):
-	"""La valeur à transmettre ici est déduite des données "Régime TVA" et "Exoneration" du format E1,
-	selon la règle de gestion suivante :
-	- Si aucune ligne de récapitulatifs taxes n'est renseignée, le TypeTVA est 'SANS_TVA'
-	- Sinon si la balise RécapitulatifTaxes.Exoneration est renseignée, le TypeTVA est 'EXONERATION'
-	- Sinon, le TypeTVA est celui de la balise RegimeTVA (TVA_SUR_DEBIT ou TVA_SUR_ENCAISSEMENT)"""
-	tva_sur_debit = 'TVA_SUR_DEBIT'
-	tva_sur_encaissment = 'TVA_SUR_ENCAISSEMENT'
-	exoneration = 'EXONERATION'
-	sans_tva = 'SANS_TVA'
+	SUR_DEBIT = 'TVA_SUR_DEBIT'
+	SUR_ENCAISSEMENT = 'TVA_SUR_ENCAISSEMENT'
+	EXONERATION = 'EXONERATION'
+	SANS_TVA = 'SANS_TVA'
 
 
 class References(BaseModel):
-	devise_facture: str
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	devise_facture: str = 'EUR'
 	mode_paiement: ModePaiement
-	motif_exoneration_tva: Optional[str] = None
-	"""1) Si le destinataire est l’état, alors le système contrôle l’existence du bon de commande (si renseigné). 
-	   2) Si le destinataire indique, au niveau de son paramétrage, que le bon de commande est obligatoire 
-		(StructurePublique.gestionNumeroEj = TRUE ou StructurePublique.gestionNumeroEJOuCodeService et code service non renseigné), 
-		alors le système contrôle que le bon de commande est renseigné. 
-	   3) Dans tous les autres cas, ces paramètres ne sont pas contrôlés."""
-	numero_bon_commande: Optional[str] = None
-	"""Ce paramètre est saisissable uniquement si le type de la facture est "Avoir". Sinon, le paramètre est ignoré."""
-	numero_facture_origine: Optional[str] = None
-	numero_marche: str
 	type_facture: TypeFacture
 	type_tva: TypeTVA
+	numero_marche: Optional[str] = None
+	motif_exoneration_tva: Optional[str] = None
+	numero_bon_commande: Optional[str] = None
+	numero_facture_origine: Optional[str] = None
 
 
 class ModeDepot(str, Enum):
-	saisie_api = "SAISIE_API"
-	depot_pdf_api = "DEPOT_PDF_API"
-	depot_pdf_signe_api = "DEPOT_PDF_SIGNE_API"
+	SAISIE_API = "SAISIE_API"
+	DEPOT_PDF_API = "DEPOT_PDF_API"
+	DEPOT_PDF_SIGNE_API = "DEPOT_PDF_SIGNE_API"
 
 
-class Facture(BaseModel):
-	cadre_de_facturation: CadreDeFacturation
+# --- Modèles de base ---
+
+class FactureBase(BaseModel):
+	model_config = FRENCH_CAMEL_CASE_CONFIG
+	mode_depot: ModeDepot
 	destinataire: Destinataire
 	fournisseur: Fournisseur
-	ligne_poste: Optional[List[LignePoste]] = field(default_factory=list)
-	ligne_tva: Optional[List[LigneTva]] = field(default_factory=list)
-	montant_total: MontantTotal
-	piece_jointe_complementaire: Optional[List[PieceJointeComplementaire]] = None
-	piece_jointe_principale: Optional[List[PieceJointePrincipale]] = None
+	cadre_de_facturation: CadreDeFacturation
 	references: References
-
-	"""Obligatoire si le mode de Dépôt est "DEPOT_PDF_API" ou "DEPOT_PDF_SIGNE_API". Cet identifiant est unique par fournisseur. 
-	En saisie API, le numeroFacture n’est pas pris en compte mais généré automatiquement par Chorus Pro. Valeur alphanumérique"""
-	numero_facture_saisi: Optional[str] = None
-	"""Obligatoire si le mode de Dépôt est "DEPOT_PDF_API" ou "DEPOT_PDF_SIGNE_API". Format date : AAAA-MM-JJ
-	La date d'émission de la facture doit être antérieure ou égale à la date de dépôt de la facture dans le système."""
-	date_facture: Optional[str] = None
-	date_echeance_paiement: Optional[str] = None # obligatoire pour facturx basic
+	montant_total: MontantTotal
+	lignes_de_poste: List[LigneDePoste] = Field(default_factory=list)
+	lignes_de_tva: List[LigneDeTVA] = Field(default_factory=list)
+	commentaire: Optional[str] = None
 	id_utilisateur_courant: Optional[int] = 0
-	mode_depot: ModeDepot
-	commentaire: Optional[str] # max 200 cars
+	pieces_jointes_complementaires: Optional[List[PieceJointeComplementaire]] = None
 
-	def to_chorus_pro_payload(self) -> dict:
-		data = self.model_dump(by_alias=True, exclude_unset=True)
-		cle_a_detruire = [ # des champs sont pour facturx mais ne fonctionnent pas dans la payload cpro
-			("date_echeance_paiement", ),
-			("fournisseur", "pays_code_iso"),
-			("fournisseur", "nom"),
-			("fournisseur", "adresse_postale"),
-			("fournisseur", "numero_tva_intra"),
-			("fournisseur", "siret"),
-			("destinataire", "nom"),
-			("destinataire", "adresse_postale"),
-			("montant_total", "acompte"),
-			("ligne_tva", "ligne_tva_categorie"),
-			("ligne_poste", "ligne_poste_code_raison_reduction"),
-			("ligne_poste", "ligne_poste_tva_categorie"),
-		]
-		for elt in cle_a_detruire:
-			try:
-				if len(elt) == 1:
-					del data[elt[0]]
-				else:
-					if isinstance(data[elt[0]], list):
-						res = list()
-						for val in data[elt[0]]:
-							del val[elt[1]]
-							res.append(val)
-						data[elt[0]] = res
-					else:
-						del data[elt[0]][elt[1]]
-			except KeyError:
-				# element inexistant, c'est ce qu'on veut
-				continue
-		transformed_data = transform_dict_keys(data, to_camel_case)
-		return transformed_data
+
+# --- Modèle pour l'API Chorus Pro ---
+
+class FactureChorus(FactureBase):
+	numero_facture_saisi: Optional[str] = None
+	date_facture: Optional[str] = None
+	pieces_jointes_principales: Optional[List[PieceJointePrincipale]] = None
+
+	def to_api_payload(self) -> dict:
+		"""Génère le payload JSON pour l'API Chorus Pro."""
+		# Pydantic s'occupe de la conversion en camelCase grâce à la config
+		return self.model_dump(by_alias=True, exclude_unset=True)
+
+
+# --- Modèle pour la génération Factur-X ---
+
+class FactureFacturX(FactureBase):
+	numero_facture: str
+	date_facture: str
+	date_echeance_paiement: str
 
 	def to_facturx_minimum(self):
 		from .utils.facturx import gen_facturx_minimum
@@ -239,6 +216,3 @@ class Facture(BaseModel):
 	def to_facturx_en16931(self):
 		from .utils.facturx import gen_facturx_en16931
 		return gen_facturx_en16931(self)
-
-
-
