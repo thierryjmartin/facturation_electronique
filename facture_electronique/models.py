@@ -81,7 +81,15 @@ class LigneDePoste(BaseModel):
     numero: int
     reference: Optional[str] = None
     denomination: str
-    quantite: float
+    quantite: Annotated[
+        Decimal,
+        Field(
+            gt=0,
+            max_digits=12,
+            decimal_places=4,
+            description="Quantité facturée pour cette ligne.",
+        ),
+    ]
     unite: str
     montant_unitaire_ht: Annotated[
         Decimal,
@@ -104,7 +112,17 @@ class LigneDePoste(BaseModel):
         ]
     ] = None
     taux_tva: Optional[str] = None  # Ex: "TVA20"
-    taux_tva_manuel: Optional[float] = None
+    taux_tva_manuel: Optional[
+        Annotated[
+            Decimal,
+            Field(
+                ge=0,
+                max_digits=12,
+                decimal_places=4,
+                description="Taux de TVA avec valeur manuelle.",
+            ),
+        ]
+    ] = None
     categorie_tva: Optional[CategorieTVA] = None
     date_debut_periode: Optional[str] = None
     date_fin_periode: Optional[str] = None
@@ -133,7 +151,15 @@ class LigneDeTVA(BaseModel):
         ),
     ]
     taux: Optional[str] = None
-    taux_manuel: Optional[float] = None
+    taux_manuel: Annotated[
+        Decimal,
+        Field(
+            ge=0,
+            max_digits=12,
+            decimal_places=4,
+            description="Taux de TVA avec valeur manuelle.",
+        ),
+    ] = None
     categorie: Optional[CategorieTVA] = None
 
 

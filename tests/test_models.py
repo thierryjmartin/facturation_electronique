@@ -42,7 +42,7 @@ def test_creation_facture_chorus_simple():
             LigneDePoste(
                 numero=1,
                 denomination="Test",
-                quantite=1,
+                quantite=Decimal("1"),
                 unite="pce",
                 montant_unitaire_ht=Decimal("100.0"),
             )
@@ -51,7 +51,7 @@ def test_creation_facture_chorus_simple():
             LigneDeTVA(
                 montant_base_ht=Decimal("100.0"),
                 montant_tva=Decimal("20.0"),
-                taux_manuel=20.0,
+                taux_manuel=Decimal("20.0"),
             )
         ],
     )

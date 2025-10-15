@@ -59,31 +59,31 @@ if __name__ == "__main__":
                 numero=1,
                 reference="R1",
                 denomination="D1",
-                quantite=10,
+                quantite=Decimal("10"),
                 unite="lot",
                 montant_unitaire_ht=Decimal("50.00"),
-                taux_tva_manuel=20,
+                taux_tva_manuel=Decimal("20"),
             ),
             LigneDePoste(
                 numero=2,
                 reference="R2",
                 denomination="D2",
-                quantite=12,
+                quantite=Decimal("12"),
                 unite="Kg",
                 montant_unitaire_ht=Decimal("36.00"),
-                taux_tva_manuel=2.1,
+                taux_tva_manuel=Decimal("2.1"),
             ),
         ],
         lignes_de_tva=[
             LigneDeTVA(
                 montant_base_ht=Decimal("500.00"),
                 montant_tva=Decimal("100.00"),
-                taux_manuel=20,
+                taux_manuel=Decimal("20"),
             ),
             LigneDeTVA(
                 montant_base_ht=Decimal("432.00"),
                 montant_tva=Decimal("9.07"),
-                taux_manuel=2.1,
+                taux_manuel=Decimal("2.1"),
             ),
         ],
         montant_total=MontantTotal(
@@ -135,11 +135,11 @@ if __name__ == "__main__":
             LigneDePoste(
                 numero=1,
                 denomination="Prestation de conseil",
-                quantite=10,
+                quantite=Decimal("10"),
                 unite="heure",
                 montant_unitaire_ht=Decimal("100.00"),
                 categorie_tva=CategorieTVA.STANDARD,
-                taux_tva_manuel=20,
+                taux_tva_manuel=Decimal("20"),
             )
         ],
         lignes_de_tva=[
@@ -147,7 +147,7 @@ if __name__ == "__main__":
                 montant_base_ht=Decimal("1000.00"),
                 montant_tva=Decimal("200.00"),
                 categorie=CategorieTVA.STANDARD,
-                taux_manuel=20,
+                taux_manuel=Decimal("20"),
             )
         ],
         montant_total=MontantTotal(
