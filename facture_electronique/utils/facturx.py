@@ -1,10 +1,10 @@
-import os
 import re
 import copy
 from datetime import datetime
 from decimal import Decimal
 from types import ModuleType
 from typing import Literal, Union, Final
+from importlib import resources
 from saxonche import PySaxonProcessor
 
 from ..models import FactureFacturX, TypeFacture, LigneDePoste, ModePaiement, LigneDeTVA
@@ -521,29 +521,6 @@ def gen_xml_depuis_facture(facture) -> str:
     return xml_data
 
 
-current_file_dir = os.path.dirname(os.path.dirname(__file__))
-chemin_xldt_minimum = os.path.join(
-    current_file_dir,
-    "xsd",
-    "facturx-minimum",
-    "_XSLT_MINIMUM",
-    "Factur-X_1.07.2_MINIMUM.xslt",
-)
-chemin_xldt_basic = os.path.join(
-    current_file_dir,
-    "xsd",
-    "facturx-basic",
-    "_XSLT_BASIC",
-    "Factur-X_1.07.2_BASIC.xslt",
-)
-chemin_xldt_en16931 = os.path.join(
-    current_file_dir,
-    "xsd",
-    "facturx-EN16931",
-    "_XSLT_EN16931",
-    "Factur-X_1.07.2_EN16931.xslt",
-)
-
 REGEX_ASSERTION_ECHOUEE_SVRL = re.compile(
     r"""
 	<svrl:failed-assert          # Balise d'ouverture
@@ -565,25 +542,67 @@ REGEX_ASSERTION_ECHOUEE_SVRL = re.compile(
 )
 
 
-def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
-    original_cwd = os.getcwd()
-    xslt_dir = os.path.dirname(chemin_xldt)
-    xslt_filename = os.path.basename(chemin_xldt)
+def valider_xml_xldt(xml_data: str, profil: str) -> bool:
+    """
+    Valide un contenu XML en utilisant le fichier XSLT de validation approprié.
+
+    Cette fonction utilise importlib.resources pour accéder de manière robuste
+    aux fichiers XSLT empaquetés avec la bibliothèque, sans jamais manipuler
+    le répertoire de travail actuel (os.chdir).
+
+    :param xml_data: La chaîne de caractères contenant le XML de la facture.
+    :param profil: Le profil de validation.
+    :return: True si la validation réussit (ne lève pas d'exception).
+    :raises XSLTValidationError: Si des assertions de validation échouent.
+    :raises ValueError: Si le profil est inconnu.
+    """
+    # 1. Sélectionner la bonne ressource XSLT en fonction du profil
     try:
-        os.chdir(xslt_dir)
+        if profil == FACTURX_MINIMUM:
+            ref_xslt = resources.files(
+                "facture_electronique.xsd.facturx-minimum._XSLT_MINIMUM"
+            ).joinpath("Factur-X_1.07.2_MINIMUM.xslt")
+        elif profil == FACTURX_BASIC:
+            ref_xslt = resources.files(
+                "facture_electronique.xsd.facturx-basic._XSLT_BASIC"
+            ).joinpath("Factur-X_1.07.2_BASIC.xslt")
+        elif profil == FACTURX_EN16931:
+            ref_xslt = resources.files(
+                "facture_electronique.xsd.facturx-EN16931._XSLT_EN16931"
+            ).joinpath("Factur-X_1.07.2_EN16931.xslt")
+        else:
+            raise ValueError(f"Profil de validation inconnu : '{profil}'")
+    except (ModuleNotFoundError, FileNotFoundError):
+        raise FileNotFoundError(
+            f"La ressource XSLT pour le profil '{profil}' n'a pas pu être trouvée. "
+            "Vérifiez que les fichiers sont bien inclus dans le paquet via pyproject.toml."
+        )
+
+    # 2. Utiliser la ressource dans un contexte sécurisé
+    # `as_file` garantit que la ressource est disponible sur le disque (même si le paquet est un zip)
+    # et nous donne un chemin physique temporaire (objet pathlib.Path).
+    with resources.as_file(ref_xslt) as chemin_xslt_physique:
         with PySaxonProcessor(license=False) as proc:
             xsltproc = proc.new_xslt30_processor()
             document = proc.parse_xml(xml_text=xml_data)
-            executable = xsltproc.compile_stylesheet(stylesheet_file=xslt_filename)
+
+            executable = xsltproc.compile_stylesheet(
+                stylesheet_file=str(chemin_xslt_physique),
+                base_uri=chemin_xslt_physique.parent.as_uri(),
+            )
             output = executable.transform_to_string(xdm_node=document)
-            # pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+id="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^<]+)<\/svrl:text>')
             matches = REGEX_ASSERTION_ECHOUEE_SVRL.findall(output)
-            if not matches:
-                return False
-            res = ""
-            for match in matches:
-                test_expr, id, location, message = match
-                res += f"Test: {test_expr}\nLocation: {location}\nMessage: {message.strip() if message else 'Pas de message'}\n\n"
-            raise XSLTValidationError(res)
-    finally:
-        os.chdir(original_cwd)
+
+            # La logique de gestion des erreurs reste la même
+            if matches:
+                messages_erreur = []
+                for test_expr, id_err, location, message in matches:
+                    message_propre = message.strip() if message else "Pas de message"
+                    messages_erreur.append(
+                        f"Test: {test_expr}\nLocation: {location}\nMessage: {message_propre}"
+                    )
+                raise XSLTValidationError("\n\n".join(messages_erreur))
+
+            # Si aucune erreur n'est trouvée (la logique originale retournait False, ce qui semble incorrect)
+            # S'il n'y a pas de "failed-assert", la validation est réussie.
+            return True

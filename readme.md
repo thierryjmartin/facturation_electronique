@@ -142,6 +142,9 @@ Développé par Thierry Martin
 
 ## Changelog
 
+### 0.5.3
+- version plus robuste de validation des XML factur-X
+
 ### 0.5.2
 - mise à jour de `__init__.py` de manière à exposer l'API.
 

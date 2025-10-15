@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "facture_electronique"
-version = "0.5.2"
+version = "0.5.3"
 description = "Facturation Electronique SDK est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, et d'autres partenaires privés. Elle supporte également le format Factur-X pour la création et l'envoi de factures électroniques."
 readme = { file = "readme.md", content-type = "text/markdown" }
 authors = [{ name = "Thierry Martin", email = "thierry.martin.2008@gadz.org" }]
@@ -58,6 +58,9 @@ dev = [
 "Homepage" = "https://github.com/thierryjmartin/facturation_electronique"
 "Source Code" = "https://github.com/thierryjmartin/facturation_electronique"
 
+[tool.setuptools]
+package-data = { "facture_electronique" = ["xsd/**/*.xslt", "xsd/**/*.xsd"] }
+
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["*"]
+include = ["facture_electronique*"]

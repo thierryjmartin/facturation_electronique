@@ -339,9 +339,9 @@ if __name__ == "__main__":
     from facture_electronique.utils.facturx import (
         gen_xml_depuis_facture,
         valider_xml_xldt,
-        chemin_xldt_basic,
-        chemin_xldt_minimum,
-        chemin_xldt_en16931,
+        FACTURX_MINIMUM,
+        FACTURX_BASIC,
+        FACTURX_EN16931,
     )
 
     file_path_facturx_mini = file_path + ".facturx.minmum.pdf"
@@ -350,7 +350,7 @@ if __name__ == "__main__":
 
     # test generation factur-x minimum
     xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_minimum())
-    valider_xml_xldt(xml, chemin_xldt_minimum)
+    valider_xml_xldt(xml, FACTURX_MINIMUM)
     facturx.generate_from_file(
         file_path_pdfa,
         xml,
@@ -370,7 +370,7 @@ if __name__ == "__main__":
 
     # test generation factur-x basic
     xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_basic())
-    valider_xml_xldt(xml, chemin_xldt_basic)
+    valider_xml_xldt(xml, FACTURX_BASIC)
     facturx.generate_from_file(
         file_path_pdfa,
         xml,
@@ -390,7 +390,7 @@ if __name__ == "__main__":
 
     # test generation factur-x EN16931
     xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_en16931())
-    valider_xml_xldt(xml, chemin_xldt_en16931)
+    valider_xml_xldt(xml, FACTURX_EN16931)
     facturx.generate_from_file(
         file_path_pdfa,
         xml,

@@ -25,9 +25,9 @@ from facture_electronique.utils.facturx import (
     gen_facturx_en16931,
     gen_xml_depuis_facture,
     valider_xml_xldt,
-    chemin_xldt_minimum,
-    chemin_xldt_basic,
-    chemin_xldt_en16931,
+    FACTURX_MINIMUM,
+    FACTURX_BASIC,
+    FACTURX_EN16931,
 )
 from facture_electronique.exceptions import XSLTValidationError
 
@@ -164,17 +164,17 @@ def test_valider_xml_xldt(sample_facture):
     # Test MINIMUM profile
     facturx_min_obj = sample_facture.to_facturx_minimum()
     xml_min_output = gen_xml_depuis_facture(facturx_min_obj)
-    assert valider_xml_xldt(xml_min_output, chemin_xldt_minimum) is False
+    assert valider_xml_xldt(xml_min_output, FACTURX_MINIMUM) is True
 
     # Test BASIC profile
     facturx_basic_obj = sample_facture.to_facturx_basic()
     xml_basic_output = gen_xml_depuis_facture(facturx_basic_obj)
-    assert valider_xml_xldt(xml_basic_output, chemin_xldt_basic) is False
+    assert valider_xml_xldt(xml_basic_output, FACTURX_BASIC) is True
 
     # Test EN16931 profile
     facturx_en16931_obj = sample_facture.to_facturx_en16931()
     xml_en16931_output = gen_xml_depuis_facture(facturx_en16931_obj)
-    assert valider_xml_xldt(xml_en16931_output, chemin_xldt_en16931) is False
+    assert valider_xml_xldt(xml_en16931_output, FACTURX_EN16931) is True
 
     # Test for an invalid XML
     # Let's break the XML by removing the invoice number, which is mandatory
@@ -183,4 +183,4 @@ def test_valider_xml_xldt(sample_facture):
     facturx_invalid_obj = invalid_facture.to_facturx_en16931()
     xml_invalid_output = gen_xml_depuis_facture(facturx_invalid_obj)
     with pytest.raises(XSLTValidationError):
-        valider_xml_xldt(xml_invalid_output, chemin_xldt_en16931)
+        valider_xml_xldt(xml_invalid_output, FACTURX_EN16931)
