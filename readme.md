@@ -110,7 +110,7 @@ Developpé par Thierry Martin
 ## Changelog
 
 ### 0.4.0
-- Gestion des dépendances centrlalisée via pyproject.toml
+- Gestion des dépendances centralisée via pyproject.toml
 
 ### 0.3.0
 - Utilisation du type Decimal de préférence
