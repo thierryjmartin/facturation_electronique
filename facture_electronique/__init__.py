@@ -32,6 +32,7 @@ from .models import (
     TypeFacture,
     TypeTVA,
 )
+from .exceptions import XSLTValidationError
 from .utils.facturx import (
     FACTURX_BASIC,
     FACTURX_EN16931,
@@ -97,4 +98,6 @@ __all__ = [
     # Strings and dicts utils
     "to_camel_case",
     "transform_dict_keys",
+    # Exceptions
+    "XSLTValidationError",
 ]
