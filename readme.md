@@ -142,6 +142,9 @@ Développé par Thierry Martin
 
 ## Changelog
 
+### 0.5.2
+- mise à jour de `__init__.py` de manière à exposer l'API.
+
 ### 0.5.0
 - **Changement majeur (non rétrocompatible)** : Refonte complète de la gestion de la configuration pour les clients API.
   - Suppression du système fragile basé sur l'import d'un fichier `config.py` ou `template_config.py`.
