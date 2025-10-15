@@ -20,9 +20,6 @@ class ChorusProAPI:
         identifiant_cpro: str = None,
         mot_de_passe_cpro: str = None,
     ):
-        """
-        Le constructeur ne fait plus d'appels réseau. Il se contente de stocker la configuration.
-        """
         self.sandbox = sandbox
 
         # La logique de chargement de la configuration reste la même, elle est excellente
