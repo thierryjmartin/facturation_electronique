@@ -109,6 +109,12 @@ Developpé par Thierry Martin
 
 ## Changelog
 
+### 0.4.0
+- Gestion des dépendances centrlalisée via pyproject.toml
+
+### 0.3.0
+- Utilisation du type Decimal de préférence
+
 ### 0.2.1
 - **Fix** : Correction de plusieurs `TypeError` dans la logique de génération Factur-X (`utils/facturx.py`) liés à la gestion des champs optionnels (`None`).
 - **Tests** : Ajout d'une suite de tests dédiée (`tests/test_facturx.py`) pour la génération des factures Factur-X.
