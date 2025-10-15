@@ -23,7 +23,9 @@ from facture_electronique.generated.factur_x_basic.factur_x_1_07_2_basic_urn_un_
     TextType,
 )
 
-__NAMESPACE__ = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
+__NAMESPACE__ = (
+    "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
+)
 
 
 @dataclass
@@ -704,9 +706,7 @@ class TradeSettlementPaymentMeansType:
             "required": True,
         },
     )
-    payer_party_debtor_financial_account: Optional[
-        DebtorFinancialAccountType
-    ] = field(
+    payer_party_debtor_financial_account: Optional[DebtorFinancialAccountType] = field(
         default=None,
         metadata={
             "name": "PayerPartyDebtorFinancialAccount",
@@ -714,15 +714,15 @@ class TradeSettlementPaymentMeansType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    payee_party_creditor_financial_account: Optional[
-        CreditorFinancialAccountType
-    ] = field(
-        default=None,
-        metadata={
-            "name": "PayeePartyCreditorFinancialAccount",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-        },
+    payee_party_creditor_financial_account: Optional[CreditorFinancialAccountType] = (
+        field(
+            default=None,
+            metadata={
+                "name": "PayeePartyCreditorFinancialAccount",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            },
+        )
     )
 
 
@@ -798,15 +798,13 @@ class HeaderTradeDeliveryType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    despatch_advice_referenced_document: Optional[ReferencedDocumentType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "DespatchAdviceReferencedDocument",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            },
-        )
+    despatch_advice_referenced_document: Optional[ReferencedDocumentType] = field(
+        default=None,
+        metadata={
+            "name": "DespatchAdviceReferencedDocument",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
     )
 
 
@@ -853,15 +851,15 @@ class HeaderTradeSettlementType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    specified_trade_settlement_payment_means: List[
-        TradeSettlementPaymentMeansType
-    ] = field(
-        default_factory=list,
-        metadata={
-            "name": "SpecifiedTradeSettlementPaymentMeans",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-        },
+    specified_trade_settlement_payment_means: List[TradeSettlementPaymentMeansType] = (
+        field(
+            default_factory=list,
+            metadata={
+                "name": "SpecifiedTradeSettlementPaymentMeans",
+                "type": "Element",
+                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            },
+        )
     )
     applicable_trade_tax: List[TradeTaxType] = field(
         default_factory=list,
@@ -1019,16 +1017,14 @@ class LineTradeAgreementType:
 
 @dataclass
 class SupplyChainTradeLineItemType:
-    associated_document_line_document: Optional[DocumentLineDocumentType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "AssociatedDocumentLineDocument",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-                "required": True,
-            },
-        )
+    associated_document_line_document: Optional[DocumentLineDocumentType] = field(
+        default=None,
+        metadata={
+            "name": "AssociatedDocumentLineDocument",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            "required": True,
+        },
     )
     specified_trade_product: Optional[TradeProductType] = field(
         default=None,
@@ -1070,9 +1066,7 @@ class SupplyChainTradeLineItemType:
 
 @dataclass
 class SupplyChainTradeTransactionType:
-    included_supply_chain_trade_line_item: List[
-        SupplyChainTradeLineItemType
-    ] = field(
+    included_supply_chain_trade_line_item: List[SupplyChainTradeLineItemType] = field(
         default_factory=list,
         metadata={
             "name": "IncludedSupplyChainTradeLineItem",
@@ -1081,36 +1075,30 @@ class SupplyChainTradeTransactionType:
             "min_occurs": 1,
         },
     )
-    applicable_header_trade_agreement: Optional[HeaderTradeAgreementType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "ApplicableHeaderTradeAgreement",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-                "required": True,
-            },
-        )
+    applicable_header_trade_agreement: Optional[HeaderTradeAgreementType] = field(
+        default=None,
+        metadata={
+            "name": "ApplicableHeaderTradeAgreement",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            "required": True,
+        },
     )
-    applicable_header_trade_delivery: Optional[HeaderTradeDeliveryType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "ApplicableHeaderTradeDelivery",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-                "required": True,
-            },
-        )
+    applicable_header_trade_delivery: Optional[HeaderTradeDeliveryType] = field(
+        default=None,
+        metadata={
+            "name": "ApplicableHeaderTradeDelivery",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            "required": True,
+        },
     )
-    applicable_header_trade_settlement: Optional[HeaderTradeSettlementType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "ApplicableHeaderTradeSettlement",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-                "required": True,
-            },
-        )
+    applicable_header_trade_settlement: Optional[HeaderTradeSettlementType] = field(
+        default=None,
+        metadata={
+            "name": "ApplicableHeaderTradeSettlement",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            "required": True,
+        },
     )

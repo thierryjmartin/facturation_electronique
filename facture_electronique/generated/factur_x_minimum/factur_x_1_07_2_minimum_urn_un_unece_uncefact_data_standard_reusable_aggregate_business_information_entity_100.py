@@ -13,7 +13,9 @@ from facture_electronique.generated.factur_x_minimum.factur_x_1_07_2_minimum_urn
     TextType,
 )
 
-__NAMESPACE__ = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
+__NAMESPACE__ = (
+    "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
+)
 
 
 @dataclass
@@ -283,36 +285,30 @@ class HeaderTradeAgreementType:
 
 @dataclass
 class SupplyChainTradeTransactionType:
-    applicable_header_trade_agreement: Optional[HeaderTradeAgreementType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "ApplicableHeaderTradeAgreement",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-                "required": True,
-            },
-        )
+    applicable_header_trade_agreement: Optional[HeaderTradeAgreementType] = field(
+        default=None,
+        metadata={
+            "name": "ApplicableHeaderTradeAgreement",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            "required": True,
+        },
     )
-    applicable_header_trade_delivery: Optional[HeaderTradeDeliveryType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "ApplicableHeaderTradeDelivery",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-                "required": True,
-            },
-        )
+    applicable_header_trade_delivery: Optional[HeaderTradeDeliveryType] = field(
+        default=None,
+        metadata={
+            "name": "ApplicableHeaderTradeDelivery",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            "required": True,
+        },
     )
-    applicable_header_trade_settlement: Optional[HeaderTradeSettlementType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "ApplicableHeaderTradeSettlement",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-                "required": True,
-            },
-        )
+    applicable_header_trade_settlement: Optional[HeaderTradeSettlementType] = field(
+        default=None,
+        metadata={
+            "name": "ApplicableHeaderTradeSettlement",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            "required": True,
+        },
     )

@@ -30,9 +30,7 @@ class CrossIndustryInvoiceType:
             "required": True,
         },
     )
-    supply_chain_trade_transaction: Optional[
-        SupplyChainTradeTransactionType
-    ] = field(
+    supply_chain_trade_transaction: Optional[SupplyChainTradeTransactionType] = field(
         default=None,
         metadata={
             "name": "SupplyChainTradeTransaction",
@@ -46,6 +44,4 @@ class CrossIndustryInvoiceType:
 @dataclass
 class CrossIndustryInvoice(CrossIndustryInvoiceType):
     class Meta:
-        namespace = (
-            "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"
-        )
+        namespace = "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100"

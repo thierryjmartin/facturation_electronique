@@ -3,7 +3,7 @@ def to_camel_case(text):
     words = s.split()
     if len(words) == 0:
         return text
-    return words[0] + ''.join(word[0].upper() + word[1:] for word in words[1:])
+    return words[0] + "".join(word[0].upper() + word[1:] for word in words[1:])
 
 
 def transform_dict_keys(d: dict, transform_func) -> dict:
@@ -15,11 +15,11 @@ def transform_dict_keys(d: dict, transform_func) -> dict:
     :return: Nouveau dictionnaire avec les clés transformées.
     """
     if isinstance(d, dict):
-        return {transform_func(k): transform_dict_keys(v, transform_func) for k, v in d.items()}
+        return {
+            transform_func(k): transform_dict_keys(v, transform_func)
+            for k, v in d.items()
+        }
     elif isinstance(d, list):
         return [transform_dict_keys(item, transform_func) for item in d]
     else:
         return d
-
-
-
