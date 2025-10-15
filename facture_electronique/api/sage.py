@@ -1,19 +1,10 @@
-from ..utils.http_client import HttpClient
+import os
 
-try:
-    from ..config import (
-        SAGE_CLIENT_ID,
-        SAGE_CLIENT_SECRET,
-        SAGE_BASE_URL,
-        SAGE_SANDBOX_BASE_URL,
-    )
-except ImportError:
-    from ..template_config import (
-        SAGE_CLIENT_ID,
-        SAGE_CLIENT_SECRET,
-        SAGE_BASE_URL,
-        SAGE_SANDBOX_BASE_URL,
-    )
+from ..utils.http_client import HttpClient
+from ..exceptions import ErreurConfiguration
+
+SAGE_BASE_URL = ""
+SAGE_SANDBOX_BASE_URL = ""
 
 
 class SAGEAPI:
@@ -25,8 +16,14 @@ class SAGEAPI:
         client_secret: str = "",
     ):
         self.sandbox = sandbox
-        self.client_id = client_id or SAGE_CLIENT_ID
-        self.client_secret = client_secret or SAGE_CLIENT_SECRET
+        self.client_id = client_id or os.getenv("SAGE_CLIENT_ID")
+        if not self.client_id:
+            raise ErreurConfiguration("SAGE_CLIENT_ID")
+
+        self.client_secret = client_secret or os.getenv("SAGE_CLIENT_SECRET")
+        if not self.client_secret:
+            raise ErreurConfiguration("SAGE_CLIENT_SECRET")
+
         self.base_url = SAGE_BASE_URL
         if self.sandbox:
             self.base_url = SAGE_SANDBOX_BASE_URL

@@ -1,19 +1,11 @@
-from ..utils.http_client import HttpClient
+import os
 
-try:
-    from ..config import (
-        PENNYLANE_CLIENT_ID,
-        PENNYLANE_CLIENT_SECRET,
-        PENNYLANE_BASE_URL,
-        PENNYLANE_SANDBOX_BASE_URL,
-    )
-except ImportError:
-    from ..template_config import (
-        PENNYLANE_CLIENT_ID,
-        PENNYLANE_CLIENT_SECRET,
-        PENNYLANE_BASE_URL,
-        PENNYLANE_SANDBOX_BASE_URL,
-    )
+from ..utils.http_client import HttpClient
+from ..exceptions import ErreurConfiguration
+
+PENNYLANE_API_VERSION = "/v1"
+PENNYLANE_BASE_URL = "https://app.pennylane.com/api/external"
+PENNYLANE_SANDBOX_BASE_URL = "<PENNYLANE_BASE_URL>"
 
 
 class PennylaneAPI:
@@ -24,8 +16,14 @@ class PennylaneAPI:
         client_secret: str = "",
     ):
         self.sandbox = sandbox
-        self.client_id = client_id or PENNYLANE_CLIENT_ID
-        self.client_secret = client_secret or PENNYLANE_CLIENT_SECRET
+        self.client_id = client_id or os.getenv("PENNYLANE_CLIENT_ID")
+        if not self.client_id:
+            raise ErreurConfiguration("PENNYLANE_CLIENT_ID")
+
+        self.client_secret = client_secret or os.getenv("PENNYLANE_CLIENT_SECRET")
+        if not self.client_secret:
+            raise ErreurConfiguration("PENNYLANE_CLIENT_SECRET")
+
         self.base_url = PENNYLANE_BASE_URL
         if self.sandbox:
             self.base_url = PENNYLANE_SANDBOX_BASE_URL

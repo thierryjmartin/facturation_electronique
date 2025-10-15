@@ -17,44 +17,77 @@ Le concept repose sur l'instanciation de classes Pydantic dédiées (`FactureCho
 
 ## Installation
 
+Le paquet est disponible sur PyPI :
+```bash
+pip install facture-electronique
+```
+
+Pour le développement, clonez le dépôt et installez les dépendances :
 ```bash
 git clone https://github.com/thierryjmartin/facturation_electronique.git
 cd facturation_electronique
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 ```
+
+## Configuration
+
+Les interactions avec les API (comme Chorus Pro) nécessitent des identifiants. Cette bibliothèque se configure via des **variables d'environnement**.
+
+Pour le développement local, copiez le fichier `.env.example` en `.env` à la racine de votre projet, puis remplissez les valeurs :
+
+```bash
+cp .env.example .env
+```
+N'oubliez pas d'ajouter le fichier `.env` à votre `.gitignore`.
+
+Les classes API, comme `ChorusProAPI`, liront automatiquement ces variables. Vous pouvez également les fournir explicitement lors de l'instanciation.
+
 
 ## Utilisation
 
-Voici un exemple rapide pour créer une facture destinée à l'API Chorus Pro et une autre au format Factur-X.
+Voici un exemple rapide pour interagir avec l'API Chorus Pro et créer une facture au format Factur-X.
 
 > Pour un exemple complet, consultez le fichier `facture_electronique/exemples/exemple_decoupe.py`.
 
 ```python
+from decimal import Decimal
 from facture_electronique.models import *
 
-# 1. Créer une facture simple pour l'API Chorus Pro
-facture_chorus = FactureChorus(
-    mode_depot=ModeDepot.SAISIE_API,
-    destinataire=Destinataire(code_destinataire="123456789"), # SIRET du client
-    fournisseur=Fournisseur(id_fournisseur=9876), # Votre ID Chorus Pro
-    cadre_de_facturation=CadreDeFacturation(code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR),
-    references=References(
+# 1. Utiliser l'API Chorus Pro
+
+# a. Instancier le client API (lit la configuration depuis l'environnement)
+# from facture_electronique.api.chorus_pro import ChorusProAPI
+# from dotenv import load_dotenv
+#
+# # Charger les variables du fichier .env
+# load_dotenv()
+#
+# client_chorus = ChorusProAPI(sandbox=True)
+
+# b. Créer l'objet facture pour l'API
+donnees_facture_chorus = {
+    "mode_depot": ModeDepot.SAISIE_API,
+    "destinataire": Destinataire(code_destinataire="123456789"), # SIRET du client
+    "fournisseur": Fournisseur(id_fournisseur=9876), # Votre ID Chorus Pro
+    "cadre_de_facturation": CadreDeFacturation(code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR),
+    "references": References(
         type_facture=TypeFacture.FACTURE,
         type_tva=TypeTVA.SUR_DEBIT,
         mode_paiement=ModePaiement.VIREMENT,
     ),
-    montant_total=MontantTotal(
-        montant_ht_total=100.0,
-        montant_tva=20.0,
-        montant_ttc_total=120.0,
-        montant_a_payer=120.0,
+    "montant_total": MontantTotal(
+        montant_ht_total=Decimal('100.0'),
+        montant_tva=Decimal('20.0'),
+        montant_ttc_total=Decimal('120.0'),
+        montant_a_payer=Decimal('120.0'),
     ),
-    lignes_de_poste=[LigneDePoste(numero=1, denomination="Test", quantite=1, unite="pce", montant_unitaire_ht=100.0)]
-)
+    "lignes_de_poste": [LigneDePoste(numero=1, denomination="Test", quantite=1, unite="pce", montant_unitaire_ht=100.0)],
+}
+facture_chorus = FactureChorus(**donnees_facture_chorus)
 
-# Générer le payload JSON pour l'API
+# c. Envoyer la facture via l'API
 # payload = facture_chorus.to_api_payload()
-# api.envoyer_facture(payload)
+# client_chorus.envoyer_facture(payload)
 
 
 # 2. Créer une facture pour générer un fichier Factur-X
@@ -79,10 +112,10 @@ facture_fx = FactureFacturX(
         mode_paiement=ModePaiement.VIREMENT,
     ),
     montant_total=MontantTotal(
-        montant_ht_total=1000.0,
-        montant_tva=200.0,
-        montant_ttc_total=1200.0,
-        montant_a_payer=1200.0,
+        montant_ht_total=Decimal('1000.0'),
+        montant_tva=Decimal('200.0'),
+        montant_ttc_total=Decimal('1200.0'),
+        montant_a_payer=Decimal('1200.0'),
     ),
     lignes_de_poste=[LigneDePoste(numero=1, denomination="Prestation", quantite=10, unite="heure", montant_unitaire_ht=100.0)]
 )
@@ -93,9 +126,9 @@ facture_fx = FactureFacturX(
 ```
 
 ## Petite note technique
-Le code dans generated est généré par cette commande qui convertit les xsd Factur-X en classes python :
-   ```bash
- xsdata generate xsd/facturx-minimum/Factur-X_1.07.2_MINIMUM.xsd
+Le code dans le répertoire `generated` est généré à partir des schémas XSD officiels de Factur-X à l'aide de la commande `xsdata`:
+```bash
+xsdata generate xsd/facturx-minimum/Factur-X_1.07.2_MINIMUM.xsd
 ```
 
 ## Contribution
@@ -105,9 +138,17 @@ Les contributions sont les bienvenues ! Veuillez cloner le dépôt, créer une b
 Ce projet est sous licence MIT.
 
 ## Auteur
-Developpé par Thierry Martin
+Développé par Thierry Martin
 
 ## Changelog
+
+### 0.5.0
+- **Changement majeur (non rétrocompatible)** : Refonte complète de la gestion de la configuration pour les clients API.
+  - Suppression du système fragile basé sur l'import d'un fichier `config.py` ou `template_config.py`.
+  - La configuration se fait désormais via des **variables d'environnement** (recommandé) ou en passant les identifiants directement au constructeur de la classe API.
+  - Introduction d'une nouvelle exception `ErreurConfiguration` levée lorsque des identifiants requis sont manquants.
+  - Ajout d'un fichier `.env.example` pour guider les utilisateurs.
+- **Documentation** : Mise à jour complète du `README.md` pour refléter la nouvelle méthode d'installation et de configuration.
 
 ### 0.4.0
 - Gestion des dépendances centralisée via pyproject.toml

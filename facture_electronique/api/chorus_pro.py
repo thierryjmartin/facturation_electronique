@@ -1,30 +1,14 @@
 import requests
 import base64
+import os
 
 from ..utils.http_client import HttpClient
+from ..exceptions import ErreurConfiguration
 
-try:
-    from ..config import (
-        PISTE_CLIENT_ID,
-        PISTE_CLIENT_SECRET,
-        PISTE_OAUTH_URL,
-        PISTE_SANDBOX_OAUTH_URL,
-        CHORUS_PRO_LOGIN,
-        CHORUS_PRO_PASSWORD,
-        CHORUS_PRO_FACTURES_BASE_URL,
-        CHORUS_PRO_SANDBOX_FACTURES_BASE_URL,
-    )
-except ImportError:
-    from ..template_config import (
-        PISTE_CLIENT_ID,
-        PISTE_CLIENT_SECRET,
-        PISTE_OAUTH_URL,
-        PISTE_SANDBOX_OAUTH_URL,
-        CHORUS_PRO_LOGIN,
-        CHORUS_PRO_PASSWORD,
-        CHORUS_PRO_FACTURES_BASE_URL,
-        CHORUS_PRO_SANDBOX_FACTURES_BASE_URL,
-    )
+PISTE_SANDBOX_OAUTH_URL = "https://sandbox-oauth.piste.gouv.fr/api/oauth/token"
+PISTE_OAUTH_URL = "https://oauth.piste.gouv.fr/api/oauth/token"
+CHORUS_PRO_FACTURES_BASE_URL = "https://api.piste.gouv.fr/cpro"
+CHORUS_PRO_SANDBOX_FACTURES_BASE_URL = "https://sandbox-api.piste.gouv.fr/cpro"
 
 
 class ChorusProAPI:
@@ -37,10 +21,23 @@ class ChorusProAPI:
         cpro_password: str = "",
     ):
         self.sandbox = sandbox
-        self.piste_client_id = piste_client_id or PISTE_CLIENT_ID
-        self.piste_client_secret = piste_client_secret or PISTE_CLIENT_SECRET
-        self.cpro_login = cpro_login or CHORUS_PRO_LOGIN
-        self.cpro_password = cpro_password or CHORUS_PRO_PASSWORD
+        self.piste_client_id = piste_client_id or os.getenv("PISTE_CLIENT_ID")
+        if not self.piste_client_id:
+            raise ErreurConfiguration("PISTE_CLIENT_ID")
+
+        self.piste_client_secret = piste_client_secret or os.getenv(
+            "PISTE_CLIENT_SECRET"
+        )
+        if not self.piste_client_secret:
+            raise ErreurConfiguration("PISTE_CLIENT_SECRET")
+
+        self.cpro_login = cpro_login or os.getenv("CHORUS_PRO_LOGIN")
+        if not self.cpro_login:
+            raise ErreurConfiguration("CHORUS_PRO_LOGIN")
+
+        self.cpro_password = cpro_password or os.getenv("CHORUS_PRO_PASSWORD")
+        if not self.cpro_password:
+            raise ErreurConfiguration("CHORUS_PRO_PASSWORD")
 
         self.token = self.get_token()
         url = CHORUS_PRO_FACTURES_BASE_URL
