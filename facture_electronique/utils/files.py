@@ -2,7 +2,7 @@ import base64
 import mimetypes
 import os
 
-def file_to_base64(file_path):
+def file_to_base64(file_path) -> str:
 	with open(file_path, "rb") as file:
 		# Lire le contenu du fichier en mode binaire
 		file_content = file.read()

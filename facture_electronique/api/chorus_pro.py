@@ -3,9 +3,27 @@ import base64
 
 from ..utils.http_client import HttpClient
 try:
-	from ..config import *
+	from ..config import (
+		PISTE_CLIENT_ID,
+		PISTE_CLIENT_SECRET,
+		PISTE_OAUTH_URL,
+		PISTE_SANDBOX_OAUTH_URL,
+		CHORUS_PRO_LOGIN,
+		CHORUS_PRO_PASSWORD,
+		CHORUS_PRO_FACTURES_BASE_URL,
+		CHORUS_PRO_SANDBOX_FACTURES_BASE_URL,
+	)
 except ImportError:
-	from ..template_config import *
+	from ..template_config import (
+		PISTE_CLIENT_ID,
+		PISTE_CLIENT_SECRET,
+		PISTE_OAUTH_URL,
+		PISTE_SANDBOX_OAUTH_URL,
+		CHORUS_PRO_LOGIN,
+		CHORUS_PRO_PASSWORD,
+		CHORUS_PRO_FACTURES_BASE_URL,
+		CHORUS_PRO_SANDBOX_FACTURES_BASE_URL,
+	)
 
 
 class ChorusProAPI:
@@ -68,10 +86,10 @@ class ChorusProAPI:
 		:param facture_id: l'identifiant unique de la facture
 		:return: dict avec les informations de statut de la facture
 		"""
-		response = self.client.post(f'/factures/v1/consulter/fournisseur', json={'identifiantFactureCPP': facture_id})
+		response = self.client.post('/factures/v1/consulter/fournisseur', json={'identifiantFactureCPP': facture_id})
 		return response.json()
 
-	def ajouter_fichier_dans_systeme(self, fichier: base64 = '', nom: str = '', type_mime: str = '', extension: str = ''):
+	def ajouter_fichier_dans_systeme(self, fichier: str = '', nom: str = '', type_mime: str = '', extension: str = ''):
 		"""La méthode ajouterFichierDansSysteme permet d’ajouter une pièce-jointe au compte utilisateur courant
 		et d’en obtenir l’identifiant technique. La pièce jointe ne doit pas dépasser 10Mo.
 		Si le fichier dépasse cette taille, une erreur 20003 sera remontée.

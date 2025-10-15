@@ -1,10 +1,15 @@
+import facturx
+
 from decimal import Decimal
+from facture_electronique.utils.pdfs import convert_to_pdfa, sign_pdf
 from facture_electronique.api.chorus_pro import ChorusProAPI
+from facture_electronique.utils.files import get_absolute_path
 from facture_electronique.models import (
 	FactureFacturX, FactureChorus, ModeDepot, Destinataire, Fournisseur, CodeCadreFacturation, References,
 	TypeFacture, CadreDeFacturation, TypeTVA, ModePaiement, LigneDePoste, LigneDeTVA, MontantTotal, CategorieTVA,
 	AdressePostale
 )
+
 
 if __name__ == '__main__':
 	c = ChorusProAPI()
@@ -177,11 +182,10 @@ if __name__ == '__main__':
 	# c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
 	# print(exemple_facture.to_facturx_basic())
 
-	from facture_electronique.utils.files import *
 	file_path = get_absolute_path("facture_electronique/exemples/dummy.pdf")
 
 	file_path_pdfa = get_absolute_path("facture_electronique/exemples/dummy.pdfa.pdf")
-	from facture_electronique.utils.pdfs import convert_to_pdfa, sign_pdf
+
 	convert_to_pdfa(file_path, file_path_pdfa)
 
 	exemple_facture_mode_pdf = FactureFacturX(
@@ -319,7 +323,6 @@ if __name__ == '__main__':
 		],
 	)
 
-	import facturx
 	from facture_electronique.utils.facturx import (
 		gen_xml_depuis_facture,
 		valider_xml_xldt,

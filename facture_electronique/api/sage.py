@@ -1,8 +1,18 @@
 from ..utils.http_client import HttpClient
 try:
-	from ..config import *
+	from ..config import (
+		SAGE_CLIENT_ID,
+		SAGE_CLIENT_SECRET,
+		SAGE_BASE_URL,
+		SAGE_SANDBOX_BASE_URL,
+	)
 except ImportError:
-	from ..template_config import *
+	from ..template_config import (
+		SAGE_CLIENT_ID,
+		SAGE_CLIENT_SECRET,
+		SAGE_BASE_URL,
+		SAGE_SANDBOX_BASE_URL
+	)
 
 
 class SAGEAPI:
