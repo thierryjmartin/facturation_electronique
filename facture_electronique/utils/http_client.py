@@ -23,8 +23,6 @@ class HttpClient:
         Effectuer une requête POST
         """
         url = f"{self.base_url}{endpoint}"
-        response = requests.post(url, headers=self.headers, json=json, verify=False)
-        print(response.status_code)
-        print(response.text)
+        response = requests.post(url, headers=self.headers, json=json, verify=True)
         response.raise_for_status()
         return response

@@ -5,70 +5,82 @@ import os
 from ..utils.http_client import HttpClient
 from ..exceptions import ErreurConfiguration
 
-PISTE_SANDBOX_OAUTH_URL = "https://sandbox-oauth.piste.gouv.fr/api/oauth/token"
-PISTE_OAUTH_URL = "https://oauth.piste.gouv.fr/api/oauth/token"
-CHORUS_PRO_FACTURES_BASE_URL = "https://api.piste.gouv.fr/cpro"
-CHORUS_PRO_SANDBOX_FACTURES_BASE_URL = "https://sandbox-api.piste.gouv.fr/cpro"
-
 
 class ChorusProAPI:
+    URL_OAUTH_PROD = "https://oauth.piste.gouv.fr/api/oauth/token"
+    URL_OAUTH_SANDBOX = "https://sandbox-oauth.piste.gouv.fr/api/oauth/token"
+    URL_API_PROD = "https://api.piste.gouv.fr/cpro"
+    URL_API_SANDBOX = "https://sandbox-api.piste.gouv.fr/cpro"
+
     def __init__(
         self,
         sandbox: bool = True,
-        piste_client_id: str = "",
-        piste_client_secret: str = "",
-        cpro_login: str = "",
-        cpro_password: str = "",
+        identifiant_client_piste: str = None,
+        secret_client_piste: str = None,
+        identifiant_cpro: str = None,
+        mot_de_passe_cpro: str = None,
     ):
+        """
+        Le constructeur ne fait plus d'appels réseau. Il se contente de stocker la configuration.
+        """
         self.sandbox = sandbox
-        self.piste_client_id = piste_client_id or os.getenv("PISTE_CLIENT_ID")
-        if not self.piste_client_id:
+
+        # La logique de chargement de la configuration reste la même, elle est excellente
+        self.identifiant_client_piste = identifiant_client_piste or os.getenv(
+            "PISTE_CLIENT_ID"
+        )
+        if not self.identifiant_client_piste:
             raise ErreurConfiguration("PISTE_CLIENT_ID")
 
-        self.piste_client_secret = piste_client_secret or os.getenv(
+        self.secret_client_piste = secret_client_piste or os.getenv(
             "PISTE_CLIENT_SECRET"
         )
-        if not self.piste_client_secret:
+        if not self.secret_client_piste:
             raise ErreurConfiguration("PISTE_CLIENT_SECRET")
 
-        self.cpro_login = cpro_login or os.getenv("CHORUS_PRO_LOGIN")
-        if not self.cpro_login:
+        self.identifiant_cpro = identifiant_cpro or os.getenv("CHORUS_PRO_LOGIN")
+        if not self.identifiant_cpro:
             raise ErreurConfiguration("CHORUS_PRO_LOGIN")
 
-        self.cpro_password = cpro_password or os.getenv("CHORUS_PRO_PASSWORD")
-        if not self.cpro_password:
+        self.mot_de_passe_cpro = mot_de_passe_cpro or os.getenv("CHORUS_PRO_PASSWORD")
+        if not self.mot_de_passe_cpro:
             raise ErreurConfiguration("CHORUS_PRO_PASSWORD")
 
-        self.token = self.get_token()
-        url = CHORUS_PRO_FACTURES_BASE_URL
-        if self.sandbox:
-            url = CHORUS_PRO_SANDBOX_FACTURES_BASE_URL
-        self.client = HttpClient(base_url=url, api_key=self.token)
-        self.client.headers["cpro-account"] = self.cpro_account()
+        self._client = None
+        self._token = None
 
-    def get_token(self):
-        url = PISTE_OAUTH_URL
-        if self.sandbox:
-            url = PISTE_SANDBOX_OAUTH_URL
+    def _initialiser_session(self):
+        """
+        Méthode privée qui gère l'authentification et la création du _client HTTP.
+        N'est appelée qu'une seule fois, lors du premier besoin.
+        """
+        if self._client is None:
+            self._token = self._obtenir_jeton()
+
+            url_base = self.URL_API_PROD if not self.sandbox else self.URL_API_SANDBOX
+
+            self._client = HttpClient(base_url=url_base, api_key=self._token)
+            self._client.headers["cpro-account"] = self._creer_compte_cpro_base64()
+
+    def _obtenir_jeton(self):
+        url = self.URL_OAUTH_PROD if not self.sandbox else self.URL_OAUTH_SANDBOX
         headers = {"content-type": "application/x-www-form-urlencoded"}
-        data = {
+        donnees = {
             "grant_type": "client_credentials",
-            "client_id": self.piste_client_id,
-            "client_secret": self.piste_client_secret,
+            "client_id": self.identifiant_client_piste,
+            "client_secret": self.secret_client_piste,
             "scope": "openid",
         }
-        response = requests.post(url, headers=headers, data=data, verify=False)
-        response.raise_for_status()
-        return response.json()["access_token"]
+        reponse = requests.post(url, headers=headers, data=donnees, verify=True)
+        reponse.raise_for_status()
+        return reponse.json()["access_token"]
 
-    def cpro_account(self):
+    def _creer_compte_cpro_base64(self):
         """
         Identifiant compte CPRO sous la forme 'login:password' encodé en base 64.
-        Exemple : 'bG9naW46cGFzc3dvcmQ='
         """
-        return base64.b64encode(
-            bytes(f"{self.cpro_login}:{self.cpro_password}", "utf-8")
-        ).decode("utf-8")
+        identifiants_bruts = f"{self.identifiant_cpro}:{self.mot_de_passe_cpro}"
+        return base64.b64encode(bytes(identifiants_bruts, "utf-8")).decode("utf-8")
 
     def envoyer_facture(self, facture: dict) -> dict:
         """
@@ -76,7 +88,8 @@ class ChorusProAPI:
         :param facture: dict contenant les informations de la facture
         :return: dict avec la réponse de l'API
         """
-        response = self.client.post("/factures/v1/soumettre", json=facture)
+        self._initialiser_session()
+        response = self._client.post("/factures/v1/soumettre", json=facture)
         return response.json()
 
     def obtenir_statut_facture(self, facture_id: str) -> dict:
@@ -85,7 +98,8 @@ class ChorusProAPI:
         :param facture_id: l'identifiant unique de la facture
         :return: dict avec les informations de statut de la facture
         """
-        response = self.client.post(
+        self._initialiser_session()
+        response = self._client.post(
             "/factures/v1/consulter/fournisseur",
             json={"identifiantFactureCPP": facture_id},
         )
@@ -103,7 +117,8 @@ class ChorusProAPI:
         :param extension: Liste des extensions des pièces jointes autorisées par Chorus Pro : BMP;HTM;FAX;PNG;XHTML;BZ2;JPEG;PPS;XLC;CSV;JPG;PPT;PPTX ;XLM;DOC ;ODP;RTF;XLS;GIF;ODS;SVG;XML;GZ;ODT;TGZ;XSD;GZIP;P7S;TIF;XSL;HTML;PDF;TXT;ZIP ;TIFF,XLSX;DOC ;DOCX
         :return reponse de l'api
         """
-        response = self.client.post(
+        self._initialiser_session()
+        response = self._client.post(
             "/transverses/v1/ajouter/fichier",
             json={
                 "pieceJointeFichier": fichier,
@@ -116,7 +131,8 @@ class ChorusProAPI:
         return response.json()
 
     def consulter_structure(self, id_structure: int) -> dict:
-        reponse = self.client.post(
+        self._initialiser_session()
+        reponse = self._client.post(
             "/structures/v1/consulter",
             json={"codeLangue": "fr", "idStructureCPP": id_structure},
         )
@@ -137,7 +153,8 @@ class ChorusProAPI:
         Pour le tri par ordre décroissant, nous utiliserons le même tableau mais avec le nom '_desc'.
         Par exemple : '_desc': ['ville','pays']. L'attribut structure doit être spécifié pour la recherche.
         """
-        reponse = self.client.post("/organisations/v1/siren/recherche", json=payload)
+        self._initialiser_session()
+        reponse = self._client.post("/organisations/v1/siren/recherche", json=payload)
         return reponse.json()
 
     def rechercher_structure_via_organisation(self, payload) -> dict:
@@ -150,7 +167,8 @@ class ChorusProAPI:
         'DIRECTION GENERALE DE L'AVIATION CIVILE', 'typeOrganisation': 'PUBLIQUE', 'numeroEjDoitEtreRenseigne': true, }]
         Un attribut de la structure doit être renseigné pour la recherche.
         """
-        reponse = self.client.post(
+        self._initialiser_session()
+        reponse = self._client.post(
             "/organisations/v1/structures/recherche", json=payload
         )
         return reponse.json()
@@ -160,11 +178,13 @@ class ChorusProAPI:
         La méthode rechercherStructure permet à un gestionnaire de rechercher des structures.
         https://communaute.chorus-pro.gouv.fr/documentation/guide-dutilisation-de-lannuaire-des-structures-publiques-dans-chorus-pro/
         """
-        reponse = self.client.post("/structures/v1/rechercher", json=payload)
+        self._initialiser_session()
+        reponse = self._client.post("/structures/v1/rechercher", json=payload)
         return reponse.json()
 
     def rechercher_services_structure(self, id_structure: int) -> dict:
-        reponse = self.client.post(
+        self._initialiser_session()
+        reponse = self._client.post(
             "/structures/v1/rechercher/services", json={"idStructure": id_structure}
         )
         return reponse.json()
@@ -219,7 +239,8 @@ class ChorusProAPI:
                   "total": 0
                 }
         """
-        reponse = self.client.post(
+        self._initialiser_session()
+        reponse = self._client.post(
             "/structures/v1/consulter/service",
             json={"idStructure": id_structure, "idService": id_service},
         )
