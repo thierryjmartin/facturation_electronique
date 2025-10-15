@@ -142,6 +142,9 @@ Développé par Thierry Martin
 
 ## Changelog
 
+### 0.5.4
+- maj API et tests.
+
 ### 0.5.3
 - version plus robuste de validation des XML factur-X
 

@@ -1,4 +1,7 @@
-def to_camel_case(text):
+from typing import Dict, Union, List
+
+
+def to_camel_case(text: str) -> str:
     s = text.replace("-", " ").replace("_", " ")
     words = s.split()
     if len(words) == 0:
@@ -6,7 +9,7 @@ def to_camel_case(text):
     return words[0] + "".join(word[0].upper() + word[1:] for word in words[1:])
 
 
-def transform_dict_keys(d: dict, transform_func) -> dict:
+def transform_dict_keys(d: Dict, transform_func) -> Union[List[Dict], Dict]:
     """
     Applique une fonction de transformation à toutes les clés d'un dictionnaire, même s'il est imbriqué.
 

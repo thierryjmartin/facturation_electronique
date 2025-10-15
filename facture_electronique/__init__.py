@@ -48,6 +48,7 @@ from .utils.files import (
     get_file_extension,
     guess_mime_type,
 )
+from .utils.strings_and_dicts import to_camel_case, transform_dict_keys
 from .utils.pdfs import convert_to_pdfa, sign_pdf
 
 __all__ = [
@@ -93,4 +94,7 @@ __all__ = [
     # PDF utils
     "convert_to_pdfa",
     "sign_pdf",
+    # Strings and dicts utils
+    "to_camel_case",
+    "transform_dict_keys",
 ]
