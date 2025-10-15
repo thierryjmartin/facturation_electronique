@@ -92,6 +92,12 @@ facture_fx = FactureFacturX(
 # ... puis l'intégrer à un PDF pour obtenir la facture finale.
 ```
 
+## Petite note technique
+Le code dans generated est généré par cette commande qui convertit les xsd Factur-X en classes python :
+   ```bash
+ xsdata generate xsd/facturx-minimum/Factur-X_1.07.2_MINIMUM.xsd
+```
+
 ## Contribution
 Les contributions sont les bienvenues ! Veuillez cloner le dépôt, créer une branche et soumettre une Pull Request.
 
