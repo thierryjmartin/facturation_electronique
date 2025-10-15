@@ -15,6 +15,7 @@ from facture_electronique.models import (
     MontantTotal,
     AdressePostale,
     CategorieTVA,
+    ModeDepot,
 )
 from facture_electronique.utils.facturx import (
     get_facturx_type_code,
@@ -23,13 +24,19 @@ from facture_electronique.utils.facturx import (
     _parse_date_chorus_vers_facturx,
     gen_facturx_en16931,
     gen_xml_depuis_facture,
+    valider_xml_xldt,
+    chemin_xldt_minimum,
+    chemin_xldt_basic,
+    chemin_xldt_en16931,
 )
+from facture_electronique.exceptions import XSLTValidationError
+
 
 @pytest.fixture
 def sample_facture() -> FactureFacturX:
     """Provides a sample FactureFacturX object for testing."""
     return FactureFacturX(
-        mode_depot="DEPOT_PDF_API",
+        mode_depot=ModeDepot.DEPOT_PDF_API,
         numero_facture="FA-2024-001",
         date_facture="2024-10-26",
         date_echeance_paiement="2024-11-26",
@@ -53,6 +60,7 @@ def sample_facture() -> FactureFacturX:
             type_tva=TypeTVA.SUR_DEBIT,
             mode_paiement=ModePaiement.VIREMENT,
             numero_bon_commande="BC-456",
+            devise_facture="EUR",
         ),
         lignes_de_poste=[
             LigneDePoste(
@@ -60,24 +68,24 @@ def sample_facture() -> FactureFacturX:
                 denomination="Produit 1",
                 quantite=10,
                 unite="pce",
-                montant_unitaire_ht=100.0,
+                montant_unitaire_ht=Decimal("100.0"),
                 categorie_tva=CategorieTVA.STANDARD,
                 taux_tva_manuel=20.0,
             )
         ],
         lignes_de_tva=[
             LigneDeTVA(
-                montant_base_ht=1000.0,
-                montant_tva=200.0,
+                montant_base_ht=Decimal("1000.0"),
+                montant_tva=Decimal("200.0"),
                 categorie=CategorieTVA.STANDARD,
                 taux_manuel=20.0,
             )
         ],
         montant_total=MontantTotal(
-            montant_ht_total=1000.0,
-            montant_tva=200.0,
-            montant_ttc_total=1200.0,
-            montant_a_payer=1200.0,
+            montant_ht_total=Decimal("1000.0"),
+            montant_tva=Decimal("200.0"),
+            montant_ttc_total=Decimal("1200.0"),
+            montant_a_payer=Decimal("1200.0"),
         ),
     )
 
@@ -98,6 +106,7 @@ def test_float_vers_decimal_facturx():
     """Tests the float to Decimal conversion."""
     assert _float_vers_decimal_facturx(123.456) == Decimal("123.46")
     assert _float_vers_decimal_facturx(100.0) == Decimal("100.00")
+    assert _float_vers_decimal_facturx(Decimal("123.456")) == Decimal("123.46")
 
 def test_parse_date_chorus_vers_facturx():
     """Tests the date format conversion."""
@@ -137,3 +146,31 @@ def test_gen_xml_depuis_facture(sample_facture):
     assert "<rsm:CrossIndustryInvoice" in xml_output
     assert "<ram:GrandTotalAmount>1200.00</ram:GrandTotalAmount>" in xml_output
     assert "</rsm:CrossIndustryInvoice>" in xml_output
+
+
+def test_valider_xml_xldt(sample_facture):
+    """Tests the XSLT validation for all Factur-X profiles."""
+    # Test MINIMUM profile
+    facturx_min_obj = sample_facture.to_facturx_minimum()
+    xml_min_output = gen_xml_depuis_facture(facturx_min_obj)
+    assert valider_xml_xldt(xml_min_output, chemin_xldt_minimum) is False
+
+    # Test BASIC profile
+    facturx_basic_obj = sample_facture.to_facturx_basic()
+    xml_basic_output = gen_xml_depuis_facture(facturx_basic_obj)
+    assert valider_xml_xldt(xml_basic_output, chemin_xldt_basic) is False
+
+    # Test EN16931 profile
+    facturx_en16931_obj = sample_facture.to_facturx_en16931()
+    xml_en16931_output = gen_xml_depuis_facture(facturx_en16931_obj)
+    assert valider_xml_xldt(xml_en16931_output, chemin_xldt_en16931) is False
+
+    # Test for an invalid XML
+    # Let's break the XML by removing the invoice number, which is mandatory
+    invalid_facture = sample_facture.model_copy(deep=True)
+    invalid_facture.numero_facture = ""
+    facturx_invalid_obj = invalid_facture.to_facturx_en16931()
+    xml_invalid_output = gen_xml_depuis_facture(facturx_invalid_obj)
+    with pytest.raises(XSLTValidationError):
+        valider_xml_xldt(xml_invalid_output, chemin_xldt_en16931)
+

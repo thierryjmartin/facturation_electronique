@@ -1,5 +1,12 @@
+from decimal import Decimal
+from facture_electronique.api.chorus_pro import ChorusProAPI
+from facture_electronique.models import (
+	FactureFacturX, FactureChorus, ModeDepot, Destinataire, Fournisseur, CodeCadreFacturation, References,
+	TypeFacture, CadreDeFacturation, TypeTVA, ModePaiement, LigneDePoste, LigneDeTVA, MontantTotal, CategorieTVA,
+	AdressePostale
+)
+
 if __name__ == '__main__':
-	from facture_electronique.api.chorus_pro import ChorusProAPI
 	c = ChorusProAPI()
 	# print(c.token)
 
@@ -62,8 +69,6 @@ if __name__ == '__main__':
 	#service = c.consulter_service_structure(id_structure=26311042, id_service=10657669)
 	#print(service)
 
-	from facture_electronique.models import *
-
 	exemple_facture_mode_api = FactureChorus(
 		mode_depot=ModeDepot("SAISIE_API"),
 		# numero_facture_saisi="20240000000000000013", # ce champ n'est pas utilié en mode_depot saisie_api
@@ -78,7 +83,7 @@ if __name__ == '__main__':
 			# Les autres champs du fournisseur sont absents
 		),
 		cadre_de_facturation=CadreDeFacturation(
-			code_cadre_facturation="A1_FACTURE_FOURNISSEUR",
+			code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR,
 			code_structure_valideur=None
 		),
 		references=References(
@@ -98,8 +103,8 @@ if __name__ == '__main__':
 				denomination="D1",
 				quantite=10,
 				unite="lot",
-				montant_unitaire_ht=50.00,
-				montant_remise_ht=0,
+				montant_unitaire_ht=Decimal("50.00"),
+				montant_remise_ht=Decimal("0"),
 				taux_tva='',
 				taux_tva_manuel=20
 			),
@@ -109,8 +114,8 @@ if __name__ == '__main__':
 				denomination="D2",
 				quantite=12,
 				unite="Kg",
-				montant_unitaire_ht=36.00,
-				montant_remise_ht=0,
+				montant_unitaire_ht=Decimal("36.00"),
+				montant_remise_ht=Decimal("0"),
 				taux_tva='',
 				taux_tva_manuel=2.1
 			),
@@ -120,8 +125,8 @@ if __name__ == '__main__':
 				denomination="D3",
 				quantite=16,
 				unite="lot",
-				montant_unitaire_ht=24.00,
-				montant_remise_ht=0,
+				montant_unitaire_ht=Decimal("24.00"),
+				montant_remise_ht=Decimal("0"),
 				taux_tva='',
 				taux_tva_manuel=5
 			),
@@ -131,8 +136,8 @@ if __name__ == '__main__':
 				denomination="XX",
 				quantite=1,
 				unite="lot",
-				montant_unitaire_ht=10.00,
-				montant_remise_ht=0,
+				montant_unitaire_ht=Decimal("10.00"),
+				montant_remise_ht=Decimal("0"),
 				taux_tva='',
 				taux_tva_manuel=20
 			)
@@ -141,29 +146,29 @@ if __name__ == '__main__':
 			LigneDeTVA(
 				taux_manuel=20,
 				taux=None,
-				montant_base_ht=510.00,
-				montant_tva=102.00
+				montant_base_ht=Decimal("510.00"),
+				montant_tva=Decimal("102.00")
 			),
 			LigneDeTVA(
 				taux_manuel=2.1,
 				taux=None,
-				montant_base_ht=432.00,
-				montant_tva=9.072
+				montant_base_ht=Decimal("432.00"),
+				montant_tva=Decimal("9.072")
 			),
 			LigneDeTVA(
 				taux_manuel=5,
 				taux=None,
-				montant_base_ht=384.00,
-				montant_tva=19.20
+				montant_base_ht=Decimal("384.00"),
+				montant_tva=Decimal("19.20")
 			)
 		],
 		montant_total=MontantTotal(
-			montant_ht_total=1326.00,
-			montant_tva=130.272,
-			montant_ttc_total=1406.272,
-			montant_remise_globale_ttc=50.00,
+			montant_ht_total=Decimal("1326.00"),
+			montant_tva=Decimal("130.272"),
+			montant_ttc_total=Decimal("1406.272"),
+			montant_remise_globale_ttc=Decimal("50.00"),
 			motif_remise_globale_ttc="Geste commercial",
-			montant_a_payer=1400.00
+			montant_a_payer=Decimal("1400.00")
 		),
 		commentaire="Création_VABF_SoumettreFacture"
 	)
@@ -229,13 +234,13 @@ if __name__ == '__main__':
 			mode_paiement=ModePaiement("ESPECE")
 		),
 		montant_total=MontantTotal(
-			montant_ht_total=1326.00,
-			montant_tva=130.272,
-			montant_ttc_total=1456.272,
-			montant_remise_globale_ttc=0.00,
+			montant_ht_total=Decimal("1326.00"),
+			montant_tva=Decimal("130.272"),
+			montant_ttc_total=Decimal("1456.272"),
+			montant_remise_globale_ttc=Decimal("0.00"),
 			motif_remise_globale_ttc="",
-			acompte=56.272,
-			montant_a_payer=1400.00
+			acompte=Decimal("56.272"),
+			montant_a_payer=Decimal("1400.00")
 		),
 		commentaire = 'voici mon commentaire',
 		lignes_de_poste=[
@@ -245,8 +250,8 @@ if __name__ == '__main__':
 				denomination="D1",
 				quantite=10,
 				unite="lot",
-				montant_unitaire_ht=50.00,
-				montant_remise_ht=5,
+				montant_unitaire_ht=Decimal("50.00"),
+				montant_remise_ht=Decimal("5"),
 				taux_tva='',
 				taux_tva_manuel=20,
 				categorie_tva = CategorieTVA('S'),
@@ -258,8 +263,8 @@ if __name__ == '__main__':
 				denomination="D2",
 				quantite=12,
 				unite="Kg",
-				montant_unitaire_ht=36.00,
-				montant_remise_ht=0,
+				montant_unitaire_ht=Decimal("36.00"),
+				montant_remise_ht=Decimal("0"),
 				taux_tva='',
 				taux_tva_manuel=2.1,
 				categorie_tva = CategorieTVA('S')
@@ -270,8 +275,8 @@ if __name__ == '__main__':
 				denomination="D3",
 				quantite=16,
 				unite="lot",
-				montant_unitaire_ht=24.00,
-				montant_remise_ht=0,
+				montant_unitaire_ht=Decimal("24.00"),
+				montant_remise_ht=Decimal("0"),
 				taux_tva='',
 				taux_tva_manuel=5,
 				categorie_tva = CategorieTVA('S')
@@ -282,8 +287,8 @@ if __name__ == '__main__':
 				denomination="XX",
 				quantite=1,
 				unite="lot",
-				montant_unitaire_ht=10.00,
-				montant_remise_ht=0,
+				montant_unitaire_ht=Decimal("10.00"),
+				montant_remise_ht=Decimal("0"),
 				taux_tva='',
 				taux_tva_manuel=20,
 				categorie_tva = CategorieTVA('S')
@@ -293,22 +298,22 @@ if __name__ == '__main__':
 			LigneDeTVA(
 				taux_manuel=20,
 				taux=None,
-				montant_base_ht=510.00,
-				montant_tva=102.00,
+				montant_base_ht=Decimal("510.00"),
+				montant_tva=Decimal("102.00"),
 				categorie=CategorieTVA('S')
 			),
 			LigneDeTVA(
 				taux_manuel=2.1,
 				taux=None,
-				montant_base_ht=432.00,
-				montant_tva=9.072,
+				montant_base_ht=Decimal("432.00"),
+				montant_tva=Decimal("9.072"),
 				categorie=CategorieTVA('S')
 			),
 			LigneDeTVA(
 				taux_manuel=5,
 				taux=None,
-				montant_base_ht=384.00,
-				montant_tva=19.20,
+				montant_base_ht=Decimal("384.00"),
+				montant_tva=Decimal("19.20"),
 				categorie=CategorieTVA('S')
 			)
 		],

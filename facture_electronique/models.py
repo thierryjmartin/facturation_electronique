@@ -1,7 +1,7 @@
-from pydantic import BaseModel, PositiveFloat, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
-from typing import List, Optional
-from gettext import gettext as _
+from decimal import Decimal
+from typing import List, Optional, Annotated
 
 from .utils.strings_and_dicts import to_camel_case
 
@@ -83,8 +83,8 @@ class LigneDePoste(BaseModel):
 	denomination: str
 	quantite: float
 	unite: str
-	montant_unitaire_ht: PositiveFloat
-	montant_remise_ht: Optional[float] = None
+	montant_unitaire_ht: Annotated[Decimal, Field(gt=0, max_digits=12, decimal_places=4, description="Montant unitaire Hors Taxes de l'article.")]
+	montant_remise_ht: Optional[Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Montant de la remise HT.")]] = None
 	taux_tva: Optional[str] = None  # Ex: "TVA20"
 	taux_tva_manuel: Optional[float] = None
 	categorie_tva: Optional[CategorieTVA] = None
@@ -96,8 +96,8 @@ class LigneDePoste(BaseModel):
 
 class LigneDeTVA(BaseModel):
 	model_config = FRENCH_CAMEL_CASE_CONFIG
-	montant_base_ht: float
-	montant_tva: float
+	montant_base_ht: Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Montant de base HT pour cette ligne de TVA.")]
+	montant_tva: Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Montant de la TVA pour cette ligne.")]
 	taux: Optional[str] = None
 	taux_manuel: Optional[float] = None
 	categorie: Optional[CategorieTVA] = None
@@ -105,12 +105,12 @@ class LigneDeTVA(BaseModel):
 
 class MontantTotal(BaseModel):
 	model_config = FRENCH_CAMEL_CASE_CONFIG
-	montant_ht_total: float
-	montant_tva: float
-	montant_ttc_total: float
-	montant_a_payer: float
-	acompte: Optional[float] = None
-	montant_remise_globale_ttc: Optional[float] = None
+	montant_ht_total: Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Montant total HT.")]
+	montant_tva: Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Montant total de la TVA.")]
+	montant_ttc_total: Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Montant total TTC.")]
+	montant_a_payer: Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Montant à payer.")]
+	acompte: Optional[Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Acompte versé.")]] = None
+	montant_remise_globale_ttc: Optional[Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=4, description="Montant de la remise globale TTC.")]] = None
 	motif_remise_globale_ttc: Optional[str] = None
 
 

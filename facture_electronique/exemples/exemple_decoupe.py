@@ -1,6 +1,12 @@
+from decimal import Decimal
 from facture_electronique.api.chorus_pro import ChorusProAPI
-from facture_electronique.models import *
-from facture_electronique.utils.files import get_absolute_path, file_to_base64, guess_mime_type, get_file_extension
+from facture_electronique.models import (
+	FactureChorus, FactureFacturX, ModeDepot, Destinataire,
+	Fournisseur, CadreDeFacturation, CodeCadreFacturation, References,
+	TypeFacture, TypeTVA, ModePaiement, LigneDePoste, LigneDeTVA,
+	MontantTotal, AdressePostale, CategorieTVA
+)
+from facture_electronique.utils.files import get_absolute_path
 from facture_electronique.utils.pdfs import convert_to_pdfa
 from facture_electronique.utils.facturx import gen_xml_depuis_facture, valider_xml_xldt, chemin_xldt_en16931
 import facturx
@@ -35,22 +41,22 @@ if __name__ == '__main__':
 		lignes_de_poste=[
 			LigneDePoste(
 				numero=1, reference="R1", denomination="D1", quantite=10, unite="lot",
-				montant_unitaire_ht=50.00, taux_tva_manuel=20
+				montant_unitaire_ht=Decimal("50.00"), taux_tva_manuel=20
 			),
 			LigneDePoste(
 				numero=2, reference="R2", denomination="D2", quantite=12, unite="Kg",
-				montant_unitaire_ht=36.00, taux_tva_manuel=2.1
+				montant_unitaire_ht=Decimal("36.00"), taux_tva_manuel=2.1
 			),
 		],
 		lignes_de_tva=[
-			LigneDeTVA(montant_base_ht=500.00, montant_tva=100.00, taux_manuel=20),
-			LigneDeTVA(montant_base_ht=432.00, montant_tva=9.07, taux_manuel=2.1),
+			LigneDeTVA(montant_base_ht=Decimal("500.00"), montant_tva=Decimal("100.00"), taux_manuel=20),
+			LigneDeTVA(montant_base_ht=Decimal("432.00"), montant_tva=Decimal("9.07"), taux_manuel=2.1),
 		],
 		montant_total=MontantTotal(
-			montant_ht_total=932.00,
-			montant_tva=109.07,
-			montant_ttc_total=1041.07,
-			montant_a_payer=1041.07,
+			montant_ht_total=Decimal("932.00"),
+			montant_tva=Decimal("109.07"),
+			montant_ttc_total=Decimal("1041.07"),
+			montant_a_payer=Decimal("1041.07"),
 		),
 		commentaire="Facture envoyée via SAISIE_API"
 	)
@@ -90,17 +96,17 @@ if __name__ == '__main__':
 		lignes_de_poste=[
 			LigneDePoste(
 				numero=1, denomination="Prestation de conseil", quantite=10, unite="heure",
-				montant_unitaire_ht=100.00, categorie_tva=CategorieTVA.STANDARD, taux_tva_manuel=20
+				montant_unitaire_ht=Decimal("100.00"), categorie_tva=CategorieTVA.STANDARD, taux_tva_manuel=20
 			)
 		],
 		lignes_de_tva=[
-			LigneDeTVA(montant_base_ht=1000.00, montant_tva=200.00, categorie=CategorieTVA.STANDARD, taux_manuel=20)
+			LigneDeTVA(montant_base_ht=Decimal("1000.00"), montant_tva=Decimal("200.00"), categorie=CategorieTVA.STANDARD, taux_manuel=20)
 		],
 		montant_total=MontantTotal(
-			montant_ht_total=1000.00,
-			montant_tva=200.00,
-			montant_ttc_total=1200.00,
-			montant_a_payer=1200.00,
+			montant_ht_total=Decimal("1000.00"),
+			montant_tva=Decimal("200.00"),
+			montant_ttc_total=Decimal("1200.00"),
+			montant_a_payer=Decimal("1200.00"),
 		),
 	)
 

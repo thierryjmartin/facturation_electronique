@@ -1,4 +1,4 @@
-import pytest
+from decimal import Decimal
 from facture_electronique.models import (
 	FactureChorus,
 	FactureFacturX,
@@ -15,7 +15,6 @@ from facture_electronique.models import (
 	LigneDeTVA,
 	MontantTotal,
 	AdressePostale,
-	CategorieTVA,
 )
 
 def test_creation_facture_chorus_simple():
@@ -31,16 +30,16 @@ def test_creation_facture_chorus_simple():
 			mode_paiement=ModePaiement.VIREMENT,
 		),
 		montant_total=MontantTotal(
-			montant_ht_total=100.0,
-			montant_tva=20.0,
-			montant_ttc_total=120.0,
-			montant_a_payer=120.0,
+			montant_ht_total=Decimal("100.0"),
+			montant_tva=Decimal("20.0"),
+			montant_ttc_total=Decimal("120.0"),
+			montant_a_payer=Decimal("120.0"),
 		),
 		lignes_de_poste=[
-			LigneDePoste(numero=1, denomination="Test", quantite=1, unite="pce", montant_unitaire_ht=100.0)
+			LigneDePoste(numero=1, denomination="Test", quantite=1, unite="pce", montant_unitaire_ht=Decimal("100.0"))
 		],
 		lignes_de_tva=[
-			LigneDeTVA(montant_base_ht=100.0, montant_tva=20.0, taux_manuel=20.0)
+			LigneDeTVA(montant_base_ht=Decimal("100.0"), montant_tva=Decimal("20.0"), taux_manuel=20.0)
 		]
 	)
 	assert facture.mode_depot == ModeDepot.SAISIE_API
@@ -60,10 +59,10 @@ def test_facture_chorus_to_api_payload():
 			mode_paiement=ModePaiement.VIREMENT,
 		),
 		montant_total=MontantTotal(
-			montant_ht_total=100.0,
-			montant_tva=20.0,
-			montant_ttc_total=120.0,
-			montant_a_payer=120.0,
+			montant_ht_total=Decimal("100.0"),
+			montant_tva=Decimal("20.0"),
+			montant_ttc_total=Decimal("120.0"),
+			montant_a_payer=Decimal("120.0"),
 		),
 	)
 	payload = facture.to_api_payload()
@@ -103,10 +102,10 @@ def test_creation_facture_facturx():
 			mode_paiement=ModePaiement.VIREMENT,
 		),
 		montant_total=MontantTotal(
-			montant_ht_total=1000.0,
-			montant_tva=200.0,
-			montant_ttc_total=1200.0,
-			montant_a_payer=1200.0,
+			montant_ht_total=Decimal("1000.0"),
+			montant_tva=Decimal("200.0"),
+			montant_ttc_total=Decimal("1200.0"),
+			montant_a_payer=Decimal("1200.0"),
 		),
 	)
 	assert facture.numero_facture == "FX-2024-001"
@@ -124,7 +123,7 @@ def test_conversion_facturx_to_chorus():
 		fournisseur=Fournisseur(id_fournisseur=456),
 		cadre_de_facturation=CadreDeFacturation(code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR),
 		references=References(type_facture=TypeFacture.FACTURE, type_tva=TypeTVA.SUR_DEBIT, mode_paiement=ModePaiement.VIREMENT),
-		montant_total=MontantTotal(montant_ht_total=1, montant_tva=1, montant_ttc_total=1, montant_a_payer=1),
+		montant_total=MontantTotal(montant_ht_total=Decimal("1"), montant_tva=Decimal("1"), montant_ttc_total=Decimal("1"), montant_a_payer=Decimal("1")),
 	)
 
 	chorus_invoice = FactureChorus(

@@ -3,42 +3,42 @@ import re
 import copy
 from datetime import datetime
 from decimal import Decimal
-from typing import Literal, Union, Type
+from types import ModuleType
+from typing import Literal, Union, Final
 from saxonche import PySaxonProcessor
 
 from ..models import FactureFacturX, TypeFacture, LigneDePoste, ModePaiement, LigneDeTVA
 from ..generated import factur_x_minimum, factur_x_basic, factur_x_en16931
 from ..exceptions import InvalidDataFacturxError, XSLTValidationError
 
-FACTURX_MINIMUM = "factur-x-minimum"
-FACTURX_BASIC = "factur-x-basic"
-FACTURX_EN16931 = "factur-x-en16931"
+FACTURX_MINIMUM: Final = "factur-x-minimum"
+FACTURX_BASIC: Final = "factur-x-basic"
+FACTURX_EN16931: Final = "factur-x-en16931"
+ProfilFacturX = Literal[FACTURX_BASIC, FACTURX_EN16931]
 
-def get_factur_x_module(
-		factur_x_module_str: Literal[FACTURX_BASIC, FACTURX_EN16931]
-) -> Type:
-	"""
-	Returns the Factur-X module based on the input string.
+def get_factur_x_module(profil_facturx: ProfilFacturX) -> ModuleType:
+	"""Retourne le module Factur-X correspondant au profil demandé."""
 
-	Args:
-		factur_x_module_str (Literal): The name of the Factur-X module ('factur_x_basic' or 'factur_x_en16931').
-
-	Returns:
-		module: The selected Factur-X module.
-
-	Raises:
-		ValueError: If the module string is invalid.
-	"""
-	module_map = {
+	correspondance_modules = {
 		FACTURX_BASIC: factur_x_basic,
 		FACTURX_EN16931: factur_x_en16931,
 	}
-	if factur_x_module_str not in module_map:
-		raise ValueError(f"Invalid module: {factur_x_module_str}. Expected 'factur_x_basic' or 'factur_x_en16931'.")
-	return module_map[factur_x_module_str]
 
-def _float_vers_decimal_facturx(value: float) -> Decimal:
-	"""convertit un float en Decimal voulu par factur-x"""
+	module_selectionne = correspondance_modules.get(profil_facturx)
+
+	if not module_selectionne:
+		# Le message d'erreur est internationalisé et formaté de manière sûre.
+		message_erreur = "Profil Factur-X invalide : '{profil}'. Les profils attendus sont '{basic}' ou '{en16931}'.".format(
+			profil=profil_facturx,
+			basic=FACTURX_BASIC,
+			en16931=FACTURX_EN16931,
+		)
+		raise ValueError(message_erreur)
+
+	return module_selectionne
+
+def _float_vers_decimal_facturx(value: Union[float, Decimal]) -> Decimal:
+	"""convertit un float ou un Decimal en Decimal avec 2 décimales pour factur-x"""
 	format_decimal = "%.2f"
 	return Decimal(format_decimal % value)
 
@@ -129,7 +129,7 @@ def gen_facturx_minimum(facture: FactureFacturX) -> factur_x_minimum.CrossIndust
 	)
 	return f
 
-def _ligne_poste_facturx_basic_ou_en16931(ligne: LigneDePoste, facture: FactureFacturX, factur_x_module: Type) -> Union[factur_x_basic.SupplyChainTradeLineItemType, factur_x_en16931.SupplyChainTradeLineItemType]:
+def _ligne_poste_facturx_basic_ou_en16931(ligne: LigneDePoste, facture: FactureFacturX, factur_x_module: ModuleType) -> Union[factur_x_basic.SupplyChainTradeLineItemType, factur_x_en16931.SupplyChainTradeLineItemType]:
 	date_debut_retenue = ligne.date_debut_periode or facture.date_facture
 	date_fin_retenue = ligne.date_fin_periode or ligne.date_debut_periode or facture.date_facture
 
@@ -138,7 +138,7 @@ def _ligne_poste_facturx_basic_ou_en16931(ligne: LigneDePoste, facture: FactureF
 	if ligne.montant_remise_ht:
 		trade_allowance_charge = factur_x_module.TradeAllowanceChargeType(
 					charge_indicator=factur_x_module.IndicatorType(indicator=False),
-					actual_amount=factur_x_module.AmountType(value=_float_vers_decimal_facturx(ligne.montant_remise_ht * ligne.quantite)),
+					actual_amount=factur_x_module.AmountType(value=_float_vers_decimal_facturx(ligne.montant_remise_ht * Decimal(str(ligne.quantite)))),
 		)
 
 		rade_allowance_charge_trade_agreement = copy.deepcopy(trade_allowance_charge)
@@ -193,13 +193,13 @@ def _ligne_poste_facturx_basic_ou_en16931(ligne: LigneDePoste, facture: FactureF
 			),
 			specified_trade_allowance_charge=[trade_allowance_charge, ] if trade_allowance_charge else None,
 			specified_trade_settlement_line_monetary_summation=factur_x_module.TradeSettlementLineMonetarySummationType(
-				line_total_amount=factur_x_module.AmountType(value=_float_vers_decimal_facturx(ligne.montant_unitaire_ht * ligne.quantite)),
+				line_total_amount=factur_x_module.AmountType(value=_float_vers_decimal_facturx(ligne.montant_unitaire_ht * Decimal(str(ligne.quantite)))),
 			),
 		),
 	)
 	return suply_chain_trade_line
 
-def _ligne_tva_facturx_basic_ou_en_16931(ligne_tva: LigneDeTVA, factur_x_module: Type) -> Union[factur_x_basic.TradeTaxType, factur_x_en16931.TradeTaxType]:
+def _ligne_tva_facturx_basic_ou_en_16931(ligne_tva: LigneDeTVA, factur_x_module: ModuleType) -> Union[factur_x_basic.TradeTaxType, factur_x_en16931.TradeTaxType]:
 	return factur_x_module.TradeTaxType(
 		calculated_amount=factur_x_module.AmountType(value=_float_vers_decimal_facturx(ligne_tva.montant_tva)),
 		type_code=factur_x_module.TaxTypeCodeType(value='VAT'),
@@ -212,7 +212,7 @@ def est_valide_pour_facturx_basic(facture: FactureFacturX) -> None:
 	if facture.montant_total.montant_remise_globale_ttc:
 		raise InvalidDataFacturxError("On ne peut pas mettre une remise TTC dans Facturx basic, il faut dispatch la remise sur les différentes lignes.")
 
-def gen_facturx_basic_ou_en_16931(facture: FactureFacturX, factur_x_module_str: Literal[FACTURX_BASIC, FACTURX_EN16931]) -> Union[factur_x_basic.CrossIndustryInvoice, factur_x_en16931.CrossIndustryInvoice]:
+def gen_facturx_basic_ou_en_16931(facture: FactureFacturX, factur_x_module_str: ProfilFacturX) -> Union[factur_x_basic.CrossIndustryInvoice, factur_x_en16931.CrossIndustryInvoice]:
 	factur_x_module = get_factur_x_module(factur_x_module_str)
 
 	est_valide_pour_facturx_basic(facture)
@@ -313,14 +313,34 @@ chemin_xldt_minimum = os.path.join(current_file_dir, "xsd", "facturx-minimum", "
 chemin_xldt_basic = os.path.join(current_file_dir, "xsd", "facturx-basic", "_XSLT_BASIC", "Factur-X_1.07.2_BASIC.xslt")
 chemin_xldt_en16931 = os.path.join(current_file_dir, "xsd", "facturx-EN16931", "_XSLT_EN16931", "Factur-X_1.07.2_EN16931.xslt")
 
+REGEX_ASSERTION_ECHOUEE_SVRL = re.compile(
+	r"""
+	<svrl:failed-assert          # Balise d'ouverture
+	\s+
+	test="([^"]+)"               # Groupe 1: Capture la valeur de l'attribut 'test'
+	\s+
+	id="([^"]+)"                 # Groupe 2: Capture la valeur de l'attribut 'id'
+	\s+
+	location="([^"]+)"           # Groupe 3: Capture la valeur de l'attribut 'location'
+	>
+	\s*
+	<svrl:text>
+	\s*
+	([^<]+)                      # Groupe 4: Capture le contenu textuel de l'erreur
+	\s*
+	</svrl:text>                 # Balise de fermeture (sans échappement redondant)
+	""",
+	re.VERBOSE
+)
+
 def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
 	with PySaxonProcessor(license=False) as proc:
 		xsltproc = proc.new_xslt30_processor()
 		document = proc.parse_xml(xml_text=xml_data)
 		executable = xsltproc.compile_stylesheet(stylesheet_file=chemin_xldt)
 		output = executable.transform_to_string(xdm_node=document)
-		pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+id="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^<]+)<\/svrl:text>')
-		matches = pattern.findall(output)
+		# pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+id="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^<]+)<\/svrl:text>')
+		matches = REGEX_ASSERTION_ECHOUEE_SVRL.findall(output)
 		if not matches:
 			return False
 		res = ""
