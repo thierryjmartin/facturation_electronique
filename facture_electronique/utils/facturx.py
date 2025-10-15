@@ -334,17 +334,24 @@ REGEX_ASSERTION_ECHOUEE_SVRL = re.compile(
 )
 
 def valider_xml_xldt(xml_data: str, chemin_xldt: str) -> bool:
-	with PySaxonProcessor(license=False) as proc:
-		xsltproc = proc.new_xslt30_processor()
-		document = proc.parse_xml(xml_text=xml_data)
-		executable = xsltproc.compile_stylesheet(stylesheet_file=chemin_xldt)
-		output = executable.transform_to_string(xdm_node=document)
-		# pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+id="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^<]+)<\/svrl:text>')
-		matches = REGEX_ASSERTION_ECHOUEE_SVRL.findall(output)
-		if not matches:
-			return False
-		res = ""
-		for match in matches:
-			test_expr, id, location, message = match
-			res += f"Test: {test_expr}\nLocation: {location}\nMessage: {message.strip() if message else 'Pas de message'}\n\n"
-		raise XSLTValidationError(res)
+	original_cwd = os.getcwd()
+	xslt_dir = os.path.dirname(chemin_xldt)
+	xslt_filename = os.path.basename(chemin_xldt)
+	try:
+		os.chdir(xslt_dir)
+		with PySaxonProcessor(license=False) as proc:
+			xsltproc = proc.new_xslt30_processor()
+			document = proc.parse_xml(xml_text=xml_data)
+			executable = xsltproc.compile_stylesheet(stylesheet_file=xslt_filename)
+			output = executable.transform_to_string(xdm_node=document)
+			# pattern = re.compile(r'<svrl:failed-assert\s+test="([^"]+)"\s+id="([^"]+)"\s+location="([^"]+)">\s+<svrl:text>\s+([^<]+)<\/svrl:text>')
+			matches = REGEX_ASSERTION_ECHOUEE_SVRL.findall(output)
+			if not matches:
+				return False
+			res = ""
+			for match in matches:
+				test_expr, id, location, message = match
+				res += f"Test: {test_expr}\nLocation: {location}\nMessage: {message.strip() if message else 'Pas de message'}\n\n"
+			raise XSLTValidationError(res)
+	finally:
+		os.chdir(original_cwd)
