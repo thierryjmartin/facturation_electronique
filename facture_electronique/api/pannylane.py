@@ -3,12 +3,12 @@ import os
 from ..utils.http_client import HttpClient
 from ..exceptions import ErreurConfiguration
 
-PENNYLANE_API_VERSION = "/v1"
-PENNYLANE_BASE_URL = "https://app.pennylane.com/api/external"
-PENNYLANE_SANDBOX_BASE_URL = "<PENNYLANE_BASE_URL>"
-
 
 class PennylaneAPI:
+    API_VERSION = "/v1"
+    BASE_URL = "https://app.pennylane.com/api/external"
+    SANDBOX_BASE_URL = "<BASE_URL>"
+
     def __init__(
         self,
         sandbox: bool = True,
@@ -24,9 +24,9 @@ class PennylaneAPI:
         if not self.client_secret:
             raise ErreurConfiguration("PENNYLANE_CLIENT_SECRET")
 
-        self.base_url = PENNYLANE_BASE_URL
+        self.base_url = self.BASE_URL
         if self.sandbox:
-            self.base_url = PENNYLANE_SANDBOX_BASE_URL
+            self.base_url = self.SANDBOX_BASE_URL
         self.client = HttpClient(base_url=self.base_url, api_key="")
 
     def get_token(self):

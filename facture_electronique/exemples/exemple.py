@@ -28,8 +28,6 @@ load_dotenv()
 
 if __name__ == "__main__":
     c = ChorusProAPI(sandbox=True)
-    c._initialiser_session()
-    print("token piste : ", c._token)
 
     """
 	 A titre d'exemple, voici une cinématique nominale pour avoir des informations sur une structure et ses services:
@@ -70,7 +68,7 @@ if __name__ == "__main__":
         },
     }
 
-    recherche_structure = c.rechercher_structure(payload)
+    # recherche_structure = c.rechercher_structure(payload)
 
     # identifiant_cpro = 0
     # if recherche_structure["parametresRetour"]["total"] == 1:

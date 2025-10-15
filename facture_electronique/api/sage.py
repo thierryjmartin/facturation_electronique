@@ -3,11 +3,11 @@ import os
 from ..utils.http_client import HttpClient
 from ..exceptions import ErreurConfiguration
 
-SAGE_BASE_URL = ""
-SAGE_SANDBOX_BASE_URL = ""
-
 
 class SAGEAPI:
+    BASE_URL = ""
+    SANDBOX_BASE_URL = ""
+
     # SAGE n'a pas encore vraiment d'API...
     def __init__(
         self,
@@ -24,9 +24,9 @@ class SAGEAPI:
         if not self.client_secret:
             raise ErreurConfiguration("SAGE_CLIENT_SECRET")
 
-        self.base_url = SAGE_BASE_URL
+        self.base_url = self.BASE_URL
         if self.sandbox:
-            self.base_url = SAGE_SANDBOX_BASE_URL
+            self.base_url = self.SANDBOX_BASE_URL
         self.client = HttpClient(base_url=self.base_url, api_key="")
 
     def get_token(self):
