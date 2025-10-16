@@ -403,7 +403,10 @@ def gen_facturx_basic_ou_en_16931(
                         value=facture.references.mode_paiement.to_facturx_code()
                     ),
                     # payer_party_debtor_financial_account=factur_x_module.DebtorFinancialAccountType(ibanid=),
-                    # payee_party_creditor_financial_account=factur_x_module.CreditorFinancialAccountType(ibanid=,proprietary_id=,)
+                    payee_party_creditor_financial_account=factur_x_module.CreditorFinancialAccountType(
+                        ibanid=facture.fournisseur.iban,
+                        # proprietary_id=,
+                    ),
                 ),
             ],
             applicable_trade_tax=[
