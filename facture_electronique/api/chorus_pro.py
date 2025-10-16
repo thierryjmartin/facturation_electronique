@@ -7,6 +7,16 @@ from ..exceptions import ErreurConfiguration
 
 
 class ChorusProAPI:
+    """Client pour interagir avec l'API Chorus Pro.
+
+    Cette classe gère l'authentification auprès de PISTE (le portail d'API du gouvernement)
+    et fournit des méthodes pour les opérations courantes sur Chorus Pro, comme la soumission
+    et la consultation de factures.
+
+    L'authentification et la session HTTP sont initialisées de manière paresseuse,
+    c'est-à-dire uniquement lors du premier appel à une méthode de l'API.
+    """
+
     URL_OAUTH_PROD = "https://oauth.piste.gouv.fr/api/oauth/token"
     URL_OAUTH_SANDBOX = "https://sandbox-oauth.piste.gouv.fr/api/oauth/token"
     URL_API_PROD = "https://api.piste.gouv.fr/cpro"
@@ -20,6 +30,21 @@ class ChorusProAPI:
         identifiant_cpro: str = None,
         mot_de_passe_cpro: str = None,
     ):
+        """Initialise le client API.
+
+        Les paramètres peuvent être fournis directement ou lus depuis les variables d'environnement.
+
+        :param sandbox: Si True, utilise l'environnement de sandbox de Chorus Pro. Par défaut à True.
+        :param identifiant_client_piste: L'identifiant client pour l'API PISTE.
+                Peut être lu depuis la variable d'environnement `PISTE_CLIENT_ID`.
+        :param secret_client_piste: Le secret client pour l'API PISTE.
+                Peut être lu depuis la variable d'environnement `PISTE_CLIENT_SECRET`.
+        :param identifiant_cpro: Le login de l'utilisateur pour Chorus Pro.
+                Peut être lu depuis la variable d'environnement `CHORUS_PRO_LOGIN`.
+        :param mot_de_passe_cpro: Le mot de passe de l'utilisateur pour Chorus Pro.
+                Peut être lu depuis la variable d'environnement `CHORUS_PRO_PASSWORD`.
+        :raises ErreurConfiguration: Si une des informations requises est manquante.
+        """
         self.sandbox = sandbox
 
         # La logique de chargement de la configuration reste la même, elle est excellente
@@ -60,6 +85,7 @@ class ChorusProAPI:
             self._client.headers["cpro-account"] = self._creer_compte_cpro_base64()
 
     def _obtenir_jeton(self):
+        """Obtient un jeton d'accès OAuth2 auprès de l'API PISTE."""
         url = self.URL_OAUTH_PROD if not self.sandbox else self.URL_OAUTH_SANDBOX
         headers = {"content-type": "application/x-www-form-urlencoded"}
         donnees = {
@@ -74,26 +100,32 @@ class ChorusProAPI:
 
     def _creer_compte_cpro_base64(self):
         """
-        Identifiant compte CPRO sous la forme 'login:password' encodé en base 64.
+        Crée l'en-tête d'authentification Chorus Pro encodé en base64.
+
+        L'identifiant est sous la forme 'login:password'.
         """
         identifiants_bruts = f"{self.identifiant_cpro}:{self.mot_de_passe_cpro}"
         return base64.b64encode(bytes(identifiants_bruts, "utf-8")).decode("utf-8")
 
     def envoyer_facture(self, facture: dict) -> dict:
-        """
-        Envoyer une facture à Chorus Pro
-        :param facture: dict contenant les informations de la facture
-        :return: dict avec la réponse de l'API
+        """Soumet une facture à Chorus Pro.
+
+        Correspond à l'opération `/factures/v1/soumettre`.
+
+        :param facture: Un dictionnaire représentant la facture à soumettre.
+        :return: La réponse JSON de l'API.
         """
         self._initialiser_session()
         response = self._client.post("/factures/v1/soumettre", json=facture)
         return response.json()
 
     def obtenir_statut_facture(self, facture_id: str) -> dict:
-        """
-        Obtenir le statut d'une facture via son ID.
-        :param facture_id: l'identifiant unique de la facture
-        :return: dict avec les informations de statut de la facture
+        """Consulte le statut d'une facture sur Chorus Pro.
+
+        Correspond à l'opération `/factures/v1/consulter/fournisseur`.
+
+        :param facture_id: L'identifiant technique de la facture sur Chorus Pro.
+        :return: La réponse JSON de l'API contenant le statut.
         """
         self._initialiser_session()
         response = self._client.post(
@@ -105,14 +137,16 @@ class ChorusProAPI:
     def ajouter_fichier_dans_systeme(
         self, fichier: str = "", nom: str = "", type_mime: str = "", extension: str = ""
     ):
-        """La méthode ajouterFichierDansSysteme permet d’ajouter une pièce-jointe au compte utilisateur courant
-        et d’en obtenir l’identifiant technique. La pièce jointe ne doit pas dépasser 10Mo.
-        Si le fichier dépasse cette taille, une erreur 20003 sera remontée.
-        :param fichier: String : fichier contenant la piece jointe encodé en base64
-        :param nom: Nom du fichier taille max 50 cars
-        :param type_mime: format de données de la pièce taille max 255 cars
-        :param extension: Liste des extensions des pièces jointes autorisées par Chorus Pro : BMP;HTM;FAX;PNG;XHTML;BZ2;JPEG;PPS;XLC;CSV;JPG;PPT;PPTX ;XLM;DOC ;ODP;RTF;XLS;GIF;ODS;SVG;XML;GZ;ODT;TGZ;XSD;GZIP;P7S;TIF;XSL;HTML;PDF;TXT;ZIP ;TIFF,XLSX;DOC ;DOCX
-        :return reponse de l'api
+        """Ajoute une pièce jointe au compte utilisateur courant.
+
+        La pièce jointe ne doit pas dépasser 10Mo.
+        Correspond à l'opération `/transverses/v1/ajouter/fichier`.
+
+        :param fichier: Le contenu du fichier encodé en base64.
+        :param nom: Le nom du fichier (max 50 caractères).
+        :param type_mime: Le type MIME du fichier.
+        :param extension: L'extension du fichier (ex: "PDF", "JPG").
+        :return: La réponse JSON de l'API, contenant l'identifiant de la pièce jointe.
         """
         self._initialiser_session()
         response = self._client.post(
@@ -128,6 +162,11 @@ class ChorusProAPI:
         return response.json()
 
     def consulter_structure(self, id_structure: int) -> dict:
+        """Consulte les informations détaillées d'une structure.
+
+        :param id_structure: L'identifiant technique Chorus Pro de la structure.
+        :return: La réponse JSON de l'API.
+        """
         self._initialiser_session()
         reponse = self._client.post(
             "/structures/v1/consulter",
@@ -136,33 +175,25 @@ class ChorusProAPI:
         return reponse.json()
 
     def rechercher_organisation_siren(self, payload) -> dict:
-        """
-        FIXME n'a pas l'air de fonctionner... l'url n'est pas reconnue par le serveur
-        https://communaute.chorus-pro.gouv.fr/documentation/base-sirene-des-entreprises-et-de-leurs-etablissements/
-        Cette méthode peut rechercher les données d'une structure de type SIREN. Pour les recherches multicritères,
-        le champ '_fields' permet de préciser les champs retournés par l'API. Par exemple, si on met dans le corps
-        '_fields' : ['libelleOrganisation', 'raisonSociale', 'adresseElectronique'],
-        la demande de retour ne contiendra que ces champs.
-        Exemple [{ 'raisonSociale' : 'DIRECTION GENERALE DE L'AVIATION CIVILE ' , 'libelleOrganisation' :
-        'TEST', 'adresseElectronique' : 'test@gmail.com', }]. Pour le tri, nous mettrons un tableau '_sort'.
-        Les données de réponse seront triées par les champs de ce tableau.
-        Par exemple : '_sort': ['libelleOrganisation','adresse','identifiant'].
-        Pour le tri par ordre décroissant, nous utiliserons le même tableau mais avec le nom '_desc'.
-        Par exemple : '_desc': ['ville','pays']. L'attribut structure doit être spécifié pour la recherche.
+        """Recherche les données d'une organisation via son SIREN.
+
+        NOTE: L'endpoint semble inactif ou déprécié.
+        Voir: https://communaute.chorus-pro.gouv.fr/documentation/base-sirene-des-entreprises-et-de-leurs-etablissements/
+
+        :param payload: Le dictionnaire de critères de recherche.
+        :return: La réponse JSON de l'API.
         """
         self._initialiser_session()
         reponse = self._client.post("/organisations/v1/siren/recherche", json=payload)
         return reponse.json()
 
     def rechercher_structure_via_organisation(self, payload) -> dict:
-        """
-        https://communaute.chorus-pro.gouv.fr/documentation/base-sirene-des-entreprises-et-de-leurs-etablissements/
-        Cette méthode permet de rechercher les données sur les structures
-        Pour la recherche multicritères, le champ '_fields' permet de déterminer les champs retournés par l'API.
-        Par exemple si l'on met dans le body '_fields': ['typeOrganisation', 'raisonSociale', 'numeroEjDoitEtreRenseigne'],
-        les retours de la requête ne comprendront que ces champs exemple [{ 'raisonSociale':
-        'DIRECTION GENERALE DE L'AVIATION CIVILE', 'typeOrganisation': 'PUBLIQUE', 'numeroEjDoitEtreRenseigne': true, }]
-        Un attribut de la structure doit être renseigné pour la recherche.
+        """Recherche des données sur les structures via l'organisation.
+
+        Voir: https://communaute.chorus-pro.gouv.fr/documentation/base-sirene-des-entreprises-et-de-leurs-etablissements/
+
+        :param payload: Le dictionnaire de critères de recherche.
+        :return: La réponse JSON de l'API.
         """
         self._initialiser_session()
         reponse = self._client.post(
@@ -173,13 +204,21 @@ class ChorusProAPI:
     def rechercher_structure(self, payload) -> dict:
         """
         La méthode rechercherStructure permet à un gestionnaire de rechercher des structures.
-        https://communaute.chorus-pro.gouv.fr/documentation/guide-dutilisation-de-lannuaire-des-structures-publiques-dans-chorus-pro/
+        Voir: https://communaute.chorus-pro.gouv.fr/documentation/guide-dutilisation-de-lannuaire-des-structures-publiques-dans-chorus-pro/
+
+        :param payload: Le dictionnaire de critères de recherche.
+        :return: La réponse JSON de l'API.
         """
         self._initialiser_session()
         reponse = self._client.post("/structures/v1/rechercher", json=payload)
         return reponse.json()
 
     def rechercher_services_structure(self, id_structure: int) -> dict:
+        """Recherche les services associés à une structure.
+
+        :param id_structure: L'identifiant technique Chorus Pro de la structure.
+        :return: La réponse JSON de l'API listant les services.
+        """
         self._initialiser_session()
         reponse = self._client.post(
             "/structures/v1/rechercher/services", json={"idStructure": id_structure}
@@ -187,54 +226,11 @@ class ChorusProAPI:
         return reponse.json()
 
     def consulter_service_structure(self, id_structure: int, id_service: int) -> dict:
-        """
-        Consult a specific service associated with a given structure by their respective IDs.
+        """Consulte les informations détaillées d'un service.
 
-        Sends a POST request to the endpoint '/structures/v1/consulter/service' to retrieve
-        details of the service linked to a particular structure, based on the provided structure
-        and service IDs. Returns the response in JSON format.
-
-        Parameters:
-        id_structure: int
-            The Chorus Pro ID of the structure whose service details are to be consulted.
-        id_service: int
-            The Chorus Pro ID of the service to be consulted within the structure.
-
-        Returns:
-        dict
-            {
-                  "adressePostale": {
-                        "adresse": "string",
-                        "codePostal": "string",
-                        "complementAdresse1": "string",
-                        "complementAdresse2": "string",
-                        "fax": "string",
-                        "indicatifFax": "string",
-                        "indicatifTelephone": "string",
-                        "pays": "string",
-                        "telephone": "string",
-                        "ville": "string"
-                  },
-                  "codeRetour": 0,
-                  "informationsGenerales": {
-                        "codeService": "string",
-                        "descriptionService": "string",
-                        "nomService": "string"
-                  },
-                  "libelle": "TRA_MSG_00.000",
-                  "nbResultatsParPage": 0,
-                  "pageCourante": 0,
-                  "pages": 0,
-                  "parametres": {
-                        "dateCreation": "2024-12-09T13:18:46.376Z",
-                        "dateDebutValidite": "2024-12-09T13:18:46.376Z",
-                        "dateFinValidite": "2024-12-09T13:18:46.376Z",
-                        "dateModification": "2024-12-09T13:18:46.376Z",
-                        "miseEnPaiement": true,
-                        "numeroEngagement": true
-                  },
-                  "total": 0
-                }
+        :param id_structure: L'identifiant technique Chorus Pro de la structure.
+        :param id_service: L'identifiant technique Chorus Pro du service.
+        :return: La réponse JSON de l'API.
         """
         self._initialiser_session()
         reponse = self._client.post(
@@ -246,6 +242,15 @@ class ChorusProAPI:
     def obtenir_identifiant_cpro_depuis_siret(
         self, siret: str, type_identifiant: str = "SIRET"
     ) -> int:
+        """Recherche une structure par son SIRET et retourne son ID Chorus Pro.
+
+        Cette méthode est un raccourci pour `rechercher_structure` qui ne retourne
+        que l'ID si une seule structure correspond.
+
+        :param siret: Le numéro de SIRET de la structure.
+        :param type_identifiant: Le type d'identifiant (par défaut "SIRET").
+        :return: L'identifiant Chorus Pro (`idStructureCPP`) si une seule structure est trouvée, sinon 0.
+        """
         # "SIRET", "UE_HORS_FRANCE", "HORS_UE", "RIDET", "TAHITI", "AUTRE", "PARTICULIER"
         payload = {
             "restreindreStructuresPrivees": False,

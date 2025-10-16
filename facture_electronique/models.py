@@ -20,6 +20,8 @@ class CodeCadreFacturation(str, Enum):
 
 
 class CadreDeFacturation(BaseModel):
+    """Définit le cadre de facturation (ex: A1 pour une facture fournisseur)."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     code_cadre_facturation: CodeCadreFacturation
     code_service_valideur: Optional[str] = None
@@ -27,6 +29,8 @@ class CadreDeFacturation(BaseModel):
 
 
 class AdressePostale(BaseModel):
+    """Représente une adresse postale."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     code_postal: Optional[str] = None
     ligne_un: Optional[str] = None
@@ -36,6 +40,8 @@ class AdressePostale(BaseModel):
 
 
 class Destinataire(BaseModel):
+    """Informations sur le destinataire de la facture (le client)."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     code_destinataire: str  # SIRET
     code_service_executant: Optional[str] = None
@@ -44,6 +50,8 @@ class Destinataire(BaseModel):
 
 
 class Fournisseur(BaseModel):
+    """Informations sur le fournisseur qui émet la facture."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     id_fournisseur: int  # Identifiant Chorus Pro
     code_coordonnees_bancaires_fournisseur: Optional[int] = None
@@ -55,6 +63,8 @@ class Fournisseur(BaseModel):
 
 
 class CategorieTVA(str, Enum):
+    """Catégories de TVA standardisées pour Factur-X."""
+
     STANDARD = "S"
     ZERO = "Z"
     EXONEREE = "E"
@@ -67,6 +77,8 @@ class CategorieTVA(str, Enum):
 
 
 class CodeRaisonReduction(str, Enum):
+    """Codes standardisés pour justifier une réduction ou une charge."""
+
     REMISE_PUBLICITAIRE = "AA"
     SUPPLEMENT_EMBALLAGE = "ABL"
     AUTRES_SERVICES = "ADR"
@@ -77,6 +89,8 @@ class CodeRaisonReduction(str, Enum):
 
 
 class LigneDePoste(BaseModel):
+    """Représente une ligne de détail dans une facture."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     numero: int
     reference: Optional[str] = None
@@ -131,6 +145,8 @@ class LigneDePoste(BaseModel):
 
 
 class LigneDeTVA(BaseModel):
+    """Représente une ligne de totalisation par taux de TVA."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     montant_base_ht: Annotated[
         Decimal,
@@ -138,7 +154,7 @@ class LigneDeTVA(BaseModel):
             ge=0,
             max_digits=12,
             decimal_places=4,
-            description="Montant de base HT pour cette ligne de TVA.",
+            description="Montant de la base HT pour cette ligne de TVA.",
         ),
     ]
     montant_tva: Annotated[
@@ -164,6 +180,8 @@ class LigneDeTVA(BaseModel):
 
 
 class MontantTotal(BaseModel):
+    """Contient tous les montants totaux de la facture."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     montant_ht_total: Annotated[
         Decimal,
@@ -207,6 +225,8 @@ class MontantTotal(BaseModel):
 
 
 class PieceJointeComplementaire(BaseModel):
+    """Représente une pièce jointe complémentaire."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     designation: str
     id: int
@@ -216,12 +236,16 @@ class PieceJointeComplementaire(BaseModel):
 
 
 class PieceJointePrincipale(BaseModel):
+    """Représente la pièce jointe principale (la facture PDF elle-même)."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     designation: str
     id: Optional[int] = None
 
 
 class ModePaiement(str, Enum):
+    """Modes de paiement acceptés."""
+
     CHEQUE = "CHEQUE"
     PRELEVEMENT = "PRELEVEMENT"
     VIREMENT = "VIREMENT"
@@ -231,11 +255,15 @@ class ModePaiement(str, Enum):
 
 
 class TypeFacture(str, Enum):
+    """Type de document (facture ou avoir)."""
+
     FACTURE = "FACTURE"
     AVOIR = "AVOIR"
 
 
 class TypeTVA(str, Enum):
+    """Régime de TVA."""
+
     SUR_DEBIT = "TVA_SUR_DEBIT"
     SUR_ENCAISSEMENT = "TVA_SUR_ENCAISSEMENT"
     EXONERATION = "EXONERATION"
@@ -243,6 +271,8 @@ class TypeTVA(str, Enum):
 
 
 class References(BaseModel):
+    """Contient les références diverses de la facture (devise, type, etc.)."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     devise_facture: str = "EUR"
     mode_paiement: ModePaiement
@@ -255,6 +285,8 @@ class References(BaseModel):
 
 
 class ModeDepot(str, Enum):
+    """Mode de dépôt de la facture sur Chorus Pro."""
+
     SAISIE_API = "SAISIE_API"
     DEPOT_PDF_API = "DEPOT_PDF_API"
     DEPOT_PDF_SIGNE_API = "DEPOT_PDF_SIGNE_API"
@@ -264,6 +296,8 @@ class ModeDepot(str, Enum):
 
 
 class FactureBase(BaseModel):
+    """Modèle de base contenant les champs communs à toutes les factures."""
+
     model_config = FRENCH_CAMEL_CASE_CONFIG
     mode_depot: ModeDepot
     destinataire: Destinataire
@@ -282,12 +316,19 @@ class FactureBase(BaseModel):
 
 
 class FactureChorus(FactureBase):
+    """Modèle spécifique pour une soumission à l'API Chorus Pro."""
+
     numero_facture_saisi: Optional[str] = None
     date_facture: Optional[str] = None
     pieces_jointes_principales: Optional[List[PieceJointePrincipale]] = None
 
     def to_api_payload(self) -> dict:
-        """Génère le payload JSON pour l'API Chorus Pro."""
+        """Génère le dictionnaire JSON pour l'API Chorus Pro.
+
+        La sérialisation respecte le format camelCase attendu par l'API.
+
+        :return: Un dictionnaire prêt à être sérialisé en JSON.
+        """
         # Pydantic s'occupe de la conversion en camelCase grâce à la config
         return self.model_dump(by_alias=True, exclude_unset=True)
 
@@ -296,21 +337,26 @@ class FactureChorus(FactureBase):
 
 
 class FactureFacturX(FactureBase):
+    """Modèle de données pour une facture destinée à être convertie en Factur-X."""
+
     numero_facture: str
     date_facture: str
     date_echeance_paiement: str
 
     def to_facturx_minimum(self):
+        """Convertit le modèle en objet XML Factur-X au profil MINIMUM."""
         from .utils.facturx import gen_facturx_minimum
 
         return gen_facturx_minimum(self)
 
     def to_facturx_basic(self):
+        """Convertit le modèle en objet XML Factur-X au profil BASIC."""
         from .utils.facturx import gen_facturx_basic
 
         return gen_facturx_basic(self)
 
     def to_facturx_en16931(self):
+        """Convertit le modèle en objet XML Factur-X au profil EN16931."""
         from .utils.facturx import gen_facturx_en16931
 
         return gen_facturx_en16931(self)

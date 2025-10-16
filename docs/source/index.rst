@@ -6,6 +6,7 @@ Bienvenue dans la documentation de Facturation Électronique
    :caption: Contenu:
 
    guide/index
+   api/index
 
 Indices and tables
 ==================

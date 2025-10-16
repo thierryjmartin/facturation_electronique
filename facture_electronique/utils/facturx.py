@@ -51,6 +51,7 @@ def _parse_date_chorus_vers_facturx(date_str: str) -> str:
 
 
 def get_facturx_type_code(facture: FactureFacturX) -> str:
+    """Détermine le code de type de document Factur-X (380 pour facture, 381 for avoir)."""
     if facture.references.type_facture == TypeFacture.AVOIR:
         return "381"
     else:
@@ -58,6 +59,7 @@ def get_facturx_type_code(facture: FactureFacturX) -> str:
 
 
 def get_facturx_mode_paiement(facture: FactureFacturX) -> str:
+    """Traduit le mode de paiement interne en code Factur-X standard."""
     equiv = {
         ModePaiement.CHEQUE: "20",
         ModePaiement.PRELEVEMENT: "49",
@@ -70,24 +72,24 @@ def get_facturx_mode_paiement(facture: FactureFacturX) -> str:
 
 
 def get_facturx_quantity_units(unite: str) -> str:
-    """sont les suivantes:
-    LTR = Litre (1 dm3)
-    MTQ = Mètre cube
-    KGM = Kilogramme
-    MTR = Mètre
-    C62 = Unité
-    TNE = Tonne"""
+    """Traduit une unité de quantité en code UN/ECE standard pour Factur-X."""
+    # Unités de mesure recommandées par la norme Factur-X
     equiv = {
-        "lot": "C62",
-        "Kg": "KGM",
+        "lot": "C62",  # Unité
+        "Kg": "KGM",  # Kilogramme
+        "L": "LTR",  # Litre
+        "m": "MTR",  # Mètre
+        "m3": "MTQ",  # Mètre cube
+        "t": "TNE",  # Tonne
     }
     try:
         return equiv[unite]
     except KeyError:
-        return "C62"
+        return "C62"  # Retourne "Unité" par défaut si non trouvé
 
 
 def _gen_applicable_header_trade_agreement(facturx, facture):
+    """Génère la section `ApplicableHeaderTradeAgreement` du XML Factur-X."""
     return facturx.HeaderTradeAgreementType(
         buyer_reference=facturx.TextType(
             value=facture.destinataire.code_service_executant
@@ -136,6 +138,7 @@ def _gen_applicable_header_trade_agreement(facturx, facture):
 def gen_facturx_minimum(
     facture: FactureFacturX,
 ) -> factur_x_minimum.CrossIndustryInvoice:
+    """Génère un objet XML Factur-X conforme au profil MINIMUM."""
     exchanged_document_context = factur_x_minimum.ExchangedDocumentContextType(
         guideline_specified_document_context_parameter=factur_x_minimum.DocumentContextParameterType(
             id=factur_x_minimum.Idtype(value="urn:factur-x.eu:1p0:minimum")
@@ -203,6 +206,7 @@ def _ligne_poste_facturx_basic_ou_en16931(
     factur_x_basic.SupplyChainTradeLineItemType,
     factur_x_en16931.SupplyChainTradeLineItemType,
 ]:
+    """Génère une ligne de facture (`SupplyChainTradeLineItem`) pour les profils BASIC ou EN16931."""
     date_debut_retenue = ligne.date_debut_periode or facture.date_facture
     date_fin_retenue = (
         ligne.date_fin_periode or ligne.date_debut_periode or facture.date_facture
@@ -330,6 +334,7 @@ def _ligne_poste_facturx_basic_ou_en16931(
 def _ligne_tva_facturx_basic_ou_en_16931(
     ligne_tva: LigneDeTVA, factur_x_module: ModuleType
 ) -> Union[factur_x_basic.TradeTaxType, factur_x_en16931.TradeTaxType]:
+    """Génère une ligne de TVA (`TradeTax`) pour les profils BASIC ou EN16931."""
     return factur_x_module.TradeTaxType(
         calculated_amount=factur_x_module.AmountType(
             value=_float_vers_decimal_facturx(ligne_tva.montant_tva)
@@ -346,6 +351,10 @@ def _ligne_tva_facturx_basic_ou_en_16931(
 
 
 def est_valide_pour_facturx_basic(facture: FactureFacturX) -> None:
+    """Vérifie si les données de la facture sont compatibles avec le profil BASIC.
+
+    :raises InvalidDataFacturxError: Si une remise globale TTC est présente.
+    """
     if facture.montant_total.montant_remise_globale_ttc:
         raise InvalidDataFacturxError(
             "On ne peut pas mettre une remise TTC dans Facturx basic, il faut dispatch la remise sur les différentes lignes."
@@ -355,6 +364,7 @@ def est_valide_pour_facturx_basic(facture: FactureFacturX) -> None:
 def gen_facturx_basic_ou_en_16931(
     facture: FactureFacturX, factur_x_module_str: ProfilFacturX
 ) -> Union[factur_x_basic.CrossIndustryInvoice, factur_x_en16931.CrossIndustryInvoice]:
+    """Génère un objet XML Factur-X pour les profils BASIC ou EN16931."""
     factur_x_module = get_factur_x_module(factur_x_module_str)
 
     est_valide_pour_facturx_basic(facture)
@@ -486,23 +496,30 @@ def gen_facturx_basic_ou_en_16931(
 
 
 def gen_facturx_basic(facture: FactureFacturX) -> factur_x_basic.CrossIndustryInvoice:
+    """Génère un objet XML Factur-X conforme au profil BASIC."""
     est_valide_pour_facturx_basic(facture)
     return gen_facturx_basic_ou_en_16931(facture, factur_x_module_str=FACTURX_BASIC)
 
 
 def est_valide_facturx_en16931(facture: FactureFacturX) -> None:
+    """Vérifie si les données de la facture sont compatibles avec le profil EN16931."""
     est_valide_pour_facturx_basic(facture)
 
 
 def gen_facturx_en16931(
     facture: FactureFacturX,
 ) -> factur_x_en16931.CrossIndustryInvoice:
+    """Génère un objet XML Factur-X conforme au profil EN16931."""
     est_valide_facturx_en16931(facture)
     return gen_facturx_basic_ou_en_16931(facture, factur_x_module_str=FACTURX_EN16931)
 
 
 def gen_xml_depuis_facture(facture) -> str:
-    """gènère un xml depuis les données sous forme de classes xsdata"""
+    """Sérialise un objet de facture (généré par xsdata) en une chaîne XML.
+
+    :param facture: L'objet de facture à sérialiser.
+    :return: Une chaîne de caractères contenant le XML formaté.
+    """
     from xsdata.formats.dataclass.serializers import XmlSerializer
     from xsdata.formats.dataclass.context import XmlContext
     from xsdata.formats.dataclass.serializers.config import SerializerConfig

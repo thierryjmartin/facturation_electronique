@@ -1,4 +1,12 @@
 def convert_to_pdfa(input_pdf_path: str, output_pdfa_path: str):
+    """Convertit un fichier PDF en format PDF/A-3B.
+
+    Cette fonction utilise Ghostscript en sous-main. Assurez-vous que Ghostscript
+    est installé et accessible dans le PATH de votre système.
+
+    :param input_pdf_path: Chemin vers le fichier PDF d'entrée.
+    :param output_pdfa_path: Chemin où sauvegarder le fichier PDF/A résultant.
+    """
     import ghostscript
 
     args = [
@@ -29,6 +37,17 @@ def sign_pdf(
     ca_chain_files: tuple = tuple(),
     key_passphrase: bytes = None,
 ):
+    """Appose une signature électronique (cachet) sur un fichier PDF.
+
+    Cette fonction utilise la bibliothèque PyHanko pour la signature.
+
+    :param input_pdf_path: Chemin vers le PDF à signer.
+    :param output_pdf_signed_path: Chemin où sauvegarder le PDF signé.
+    :param key_path: Chemin vers le fichier de la clé privée (format PEM).
+    :param cert_path: Chemin vers le fichier du certificat (format PEM).
+    :param ca_chain_files: Un tuple de chemins vers les certificats de l'autorité de certification.
+    :param key_passphrase: Le mot de passe de la clé privée, si elle est protégée.
+    """
     from pyhanko import stamp
     from pyhanko.sign import signers, fields
     from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter

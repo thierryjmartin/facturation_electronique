@@ -119,3 +119,4 @@ venv.bak/
 
 # VSCode settings
 .vscode/
+/docs/build/

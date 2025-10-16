@@ -1,5 +1,5 @@
 class ErreurConfiguration(Exception):
-    """Exception levée lorsque la configuration de la bibliothèque est manquante ou invalide."""
+    """Levée lorsqu'une variable de configuration requise est manquante."""
 
     def __init__(self, nom_variable):
         self.nom_variable = nom_variable
@@ -11,24 +11,24 @@ class ErreurConfiguration(Exception):
 
 
 class FacturationAPIError(Exception):
-    """Erreur générique pour les erreurs liées à l'API de facturation électronique."""
+    """Classe de base pour les erreurs retournées par une API externe."""
 
     pass
 
 
 class FactureNonTrouveeError(FacturationAPIError):
-    """Exception lorsque la facture n'est pas trouvée."""
+    """Levée spécifiquement lorsqu'une facture n'est pas trouvée via l'API."""
 
     pass
 
 
 class InvalidDataFacturxError(Exception):
-    """Exception lorsqu'on l'objet Facture comprend des données qui sont incompatibles avec Facturx"""
+    """Levée lorsque les données d'une facture sont incompatibles avec un profil Factur-X."""
 
     pass
 
 
 class XSLTValidationError(Exception):
-    """Erreur lorsque qu'on essaie de valider un facturx selon xslt et que ça ne passe pas"""
+    """Levée lorsque la validation d'un XML Factur-X contre son fichier XSLT échoue."""
 
     pass
