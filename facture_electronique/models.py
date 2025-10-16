@@ -59,6 +59,7 @@ class Fournisseur(BaseModel):
     nom: Optional[str] = None
     siret: Optional[str] = None
     numero_tva_intra: Optional[str] = None
+    iban: Optional[str] = None
     adresse_postale: Optional[AdressePostale] = None
 
 

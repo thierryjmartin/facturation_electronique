@@ -49,6 +49,7 @@ def sample_facture() -> FactureFacturX:
             nom="Vendeur SAS",
             siret="11122233300011",
             numero_tva_intra="FR12111222333",
+            iban="FR7630006000011234567890189",
             adresse_postale=AdressePostale(pays_code_iso="FR"),
         ),
         cadre_de_facturation=CadreDeFacturation(
@@ -65,11 +66,11 @@ def sample_facture() -> FactureFacturX:
             LigneDePoste(
                 numero=1,
                 denomination="Produit 1",
-                quantite=10,
+                quantite=Decimal(10),
                 unite="pce",
                 montant_unitaire_ht=Decimal("100.0"),
                 categorie_tva=CategorieTVA.STANDARD,
-                taux_tva_manuel=20.0,
+                taux_tva_manuel=Decimal(20.0),
             )
         ],
         lignes_de_tva=[
@@ -77,7 +78,7 @@ def sample_facture() -> FactureFacturX:
                 montant_base_ht=Decimal("1000.0"),
                 montant_tva=Decimal("200.0"),
                 categorie=CategorieTVA.STANDARD,
-                taux_manuel=20.0,
+                taux_manuel=Decimal(20.0),
             )
         ],
         montant_total=MontantTotal(

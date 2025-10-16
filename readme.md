@@ -142,6 +142,9 @@ Développé par Thierry Martin
 
 ## Changelog
 
+### 0.5.9
+- Mise à jour pour le support de Factur-X 1.0.7.3.
+
 ### 0.5.8
 - **Fix** : Correction d'un bug qui empêchait l'exception `XSLTValidationError` d'être interceptée (`catch`). L'exception a été refactorisée pour accepter une liste d'erreurs, la rendant robuste et testable.
 

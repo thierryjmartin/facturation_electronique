@@ -8,7 +8,11 @@ from importlib import resources
 from saxonche import PySaxonProcessor
 
 from ..models import FactureFacturX, TypeFacture, LigneDePoste, LigneDeTVA
-from ..generated import factur_x_minimum, factur_x_basic, factur_x_en16931
+from ..generated.factur_x_1_07_03 import (
+    factur_x_minimum,
+    factur_x_basic,
+    factur_x_en16931,
+)
 from ..exceptions import InvalidDataFacturxError, XSLTValidationError
 
 FACTURX_MINIMUM: Final = "factur-x-minimum"
@@ -565,15 +569,15 @@ def valider_xml_xldt(xml_data: str, profil: str) -> bool:
         if profil == FACTURX_MINIMUM:
             ref_xslt = resources.files(
                 "facture_electronique.xsd.facturx-minimum._XSLT_MINIMUM"
-            ).joinpath("Factur-X_1.07.2_MINIMUM.xslt")
+            ).joinpath("FACTUR-X_MINIMUM.xslt")
         elif profil == FACTURX_BASIC:
             ref_xslt = resources.files(
                 "facture_electronique.xsd.facturx-basic._XSLT_BASIC"
-            ).joinpath("Factur-X_1.07.2_BASIC.xslt")
+            ).joinpath("FACTUR-X_BASIC.xslt")
         elif profil == FACTURX_EN16931:
             ref_xslt = resources.files(
                 "facture_electronique.xsd.facturx-EN16931._XSLT_EN16931"
-            ).joinpath("Factur-X_1.07.2_EN16931.xslt")
+            ).joinpath("FACTUR-X_EN16931.xslt")
         else:
             raise ValueError(f"Profil de validation inconnu : '{profil}'")
     except (ModuleNotFoundError, FileNotFoundError):
