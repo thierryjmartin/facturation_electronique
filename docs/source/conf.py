@@ -52,7 +52,7 @@ from facture_electronique.utils.files import get_absolute_path, file_to_base64, 
 from facture_electronique.utils.pdfs import convert_to_pdfa, sign_pdf
 from facture_electronique.utils.facturx import (
     gen_xml_depuis_facture,
-    valider_xml_xldt,
+    valider_xml_facturx_schematron,
     FACTURX_EN16931,
 )
 import facturx

@@ -553,13 +553,12 @@ REGEX_ASSERTION_ECHOUEE_SVRL = re.compile(
 )
 
 
-def valider_xml_xldt(xml_data: str, profil: str) -> bool:
+def valider_xml_facturx_schematron(xml_data: str, profil: str) -> bool:
     """
     Valide un contenu XML en utilisant le fichier XSLT de validation approprié.
 
-    Cette fonction utilise importlib.resources pour accéder de manière robuste
-    aux fichiers XSLT empaquetés avec la bibliothèque, sans jamais manipuler
-    le répertoire de travail actuel (os.chdir).
+    Cette fonction utilise importlib.resources pour accéder
+    aux fichiers XSLT empaquetés avec la bibliothèque.
 
     :param xml_data: La chaîne de caractères contenant le XML de la facture.
     :param profil: Le profil de validation.

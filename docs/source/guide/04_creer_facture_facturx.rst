@@ -99,7 +99,7 @@ La norme Factur-X exige que le PDF porteur soit au format PDF/A-3. La fonction `
     
     # La validation lève une exception en cas de non-conformité
     try:
-        valider_xml_xldt(xml_content, FACTURX_EN16931)
+        valider_xml_facturx_schematron(xml_content, FACTURX_EN16931)
         validation_ok = True
     except Exception:
         validation_ok = False

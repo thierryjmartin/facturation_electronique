@@ -41,7 +41,7 @@ from .utils.facturx import (
     gen_facturx_en16931,
     gen_facturx_minimum,
     gen_xml_depuis_facture,
-    valider_xml_xldt,
+    valider_xml_facturx_schematron,
 )
 from .utils.files import (
     file_to_base64,
@@ -83,7 +83,7 @@ __all__ = [
     "gen_facturx_basic",
     "gen_facturx_en16931",
     "gen_xml_depuis_facture",
-    "valider_xml_xldt",
+    "valider_xml_facturx_schematron",
     "FACTURX_MINIMUM",
     "FACTURX_BASIC",
     "FACTURX_EN16931",

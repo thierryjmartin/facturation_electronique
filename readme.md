@@ -7,13 +7,25 @@
 [![GitHub license](https://img.shields.io/github/license/thierryjmartin/facturation_electronique)](https://github.com/thierryjmartin/facturation_electronique/blob/main/LICENSE)
 
 ## Description
-`Facturation Electronique` est une bibliothèque Python qui simplifie l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro**, et d'autres partenaires privés. Elle supporte également le format **Factur-X** pour la création et l'envoi de factures électroniques.
+`Facturation Electronique` est une bibliothèque Python complète conçue pour simplifier l'interaction avec les principales API de facturation électronique en France, notamment **Chorus Pro** et d'autres Plateformes de Dématérialisation Partenaires (PDP). Elle offre une approche robuste pour la création, la validation et l'envoi de factures électroniques conformes au standard **Factur-X**.
 
-Le concept repose sur l'instanciation de classes Pydantic dédiées (`FactureChorus` et `FactureFacturX`), qui fournissent ensuite les outils nécessaires pour interagir avec diverses API publiques (Chorus Pro) et générer des factures conformes.
+Contrairement à la bibliothèque `factur-x` qui fournit les structures de données XML brutes, ce SDK se positionne comme une surcouche intelligente. Il vous permet de manipuler vos données de facture via des **modèles Pydantic intuitifs et validés**, puis d'orchestrer leur conversion en XML Factur-X et leur soumission aux plateformes requises.
 
 ## Fonctionnalités
-- **Chorus Pro** : Création, envoi et suivi des factures destinées aux entités publiques.
-- **Factur-X** : Génération de factures au format PDF/A-3 avec XML embarqué (profils MINIMUM, BASIC, EN16931), avec des fonctions de validation avancées (XSD et Schematron).
+- **Modélisation et Validation des Données (Pydantic)** :
+  - Définissez vos factures avec des modèles Pydantic riches, typés et auto-validés.
+  - Bénéficiez d'une validation automatique des types, formats et contraintes métier (ex: montants positifs) dès la saisie de vos données, bien avant la génération du XML.
+- **Génération Factur-X Complète** :
+  - Créez des factures au format PDF/A-3 avec XML embarqué, supportant les profils MINIMUM, BASIC, EN16931.
+  - **Conformité PDF/A-3** : Le module assure la génération de documents PDF/A-3, un format d'archivage à long terme qui permet l'intégration du fichier XML Factur-X directement dans le PDF. Cette conformité est essentielle pour l'interopérabilité et la validité légale des factures électroniques.
+  - **Signature Électronique** : Intégrez des signatures électroniques qualifiées (e-Seal) à vos documents PDF/A-3, garantissant l'authenticité et l'intégrité de vos factures.
+  - **Validation Multi-couches** :
+    - **Validation Pydantic** : Assure l'intégrité de vos données d'entrée.
+    - **Validation de Règles Métier** : Des contrôles spécifiques aux profils Factur-X (ex: interdiction de remises globales TTC pour le profil BASIC) sont appliqués.
+    - **Validation Schematron (`valider_xml_facturx_schematron`)** : Une validation approfondie du XML généré contre les règles métier officielles de Factur-X, utilisant XSLT et `saxonche`. Cette étape cruciale garantit la conformité de votre facture aux exigences les plus strictes, allant au-delà de la simple validation de schéma XML (XSD).
+- **Intégrations API Robustes** :
+  - **Chorus Pro** : Gérez le cycle de vie complet de vos factures (création, envoi, suivi de statut, ajout de pièces jointes) via un client API dédié, avec gestion de l'authentification OAuth2.
+  - **Autres PDP** : Des clients API pour d'autres plateformes (ex: Pennylane, Sage) sont également inclus pour une interopérabilité étendue.
 
 ## Ressources
 
@@ -197,7 +209,7 @@ Développé par Thierry Martin
 - Maj validation XML via Schematron
 
 ### 0.1.19
-- Ajout des XSD de factur-x au package, en particulier pour pouvoir utiliser utils.facturx.valider_xml_xldt plus facilement.
+- Ajout des XSD de factur-x au package, en particulier pour pouvoir utiliser utils.facturx.valider_xml_facturx_schematron plus facilement.
 
 ### 0.1.16
 - Ajout d'exemple de code pour signer les PDFs avec PyHanko, car cela devrait être nécessaire pour faire des Factur-X (Qualified eSeal). Pour le moment la signature casse la validité PDF/A...

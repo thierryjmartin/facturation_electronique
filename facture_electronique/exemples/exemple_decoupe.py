@@ -21,9 +21,9 @@ from facture_electronique.models import (
 from facture_electronique.utils.files import get_absolute_path
 from facture_electronique.utils.pdfs import convert_to_pdfa
 from facture_electronique.utils.facturx import (
-    gen_xml_depuis_facture,
-    valider_xml_xldt,
     FACTURX_EN16931,
+    gen_xml_depuis_facture,
+    valider_xml_facturx_schematron,
 )
 import facturx
 from dotenv import load_dotenv
@@ -173,7 +173,7 @@ if __name__ == "__main__":
 
     # 2. Générer le XML Factur-X
     xml_content = gen_xml_depuis_facture(facturx_invoice.to_facturx_en16931())
-    valider_xml_xldt(xml_content, FACTURX_EN16931)
+    valider_xml_facturx_schematron(xml_content, FACTURX_EN16931)
 
     # 3. Intégrer le XML dans le PDF/A pour créer la facture Factur-X
     facturx.generate_from_file(

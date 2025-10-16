@@ -23,6 +23,13 @@ from facture_electronique.models import (
     CategorieTVA,
     AdressePostale,
 )
+from facture_electronique.utils.facturx import (
+    FACTURX_BASIC,
+    FACTURX_EN16931,
+    FACTURX_MINIMUM,
+    gen_xml_depuis_facture,
+    valider_xml_facturx_schematron,
+)
 
 load_dotenv()
 
@@ -336,21 +343,13 @@ if __name__ == "__main__":
         ],
     )
 
-    from facture_electronique.utils.facturx import (
-        gen_xml_depuis_facture,
-        valider_xml_xldt,
-        FACTURX_MINIMUM,
-        FACTURX_BASIC,
-        FACTURX_EN16931,
-    )
-
     file_path_facturx_mini = file_path + ".facturx.minmum.pdf"
     file_path_facturx_basic = file_path + ".facturx.basic.pdf"
     file_path_facturx_en16931 = file_path + ".facturx.en16931.pdf"
 
     # test generation factur-x minimum
     xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_minimum())
-    valider_xml_xldt(xml, FACTURX_MINIMUM)
+    valider_xml_facturx_schematron(xml, FACTURX_MINIMUM)
     facturx.generate_from_file(
         file_path_pdfa,
         xml,
@@ -370,7 +369,7 @@ if __name__ == "__main__":
 
     # test generation factur-x basic
     xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_basic())
-    valider_xml_xldt(xml, FACTURX_BASIC)
+    valider_xml_facturx_schematron(xml, FACTURX_BASIC)
     facturx.generate_from_file(
         file_path_pdfa,
         xml,
@@ -390,7 +389,7 @@ if __name__ == "__main__":
 
     # test generation factur-x EN16931
     xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_en16931())
-    valider_xml_xldt(xml, FACTURX_EN16931)
+    valider_xml_facturx_schematron(xml, FACTURX_EN16931)
     facturx.generate_from_file(
         file_path_pdfa,
         xml,

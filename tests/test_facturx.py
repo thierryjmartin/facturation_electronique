@@ -23,7 +23,7 @@ from facture_electronique.utils.facturx import (
     _parse_date_chorus_vers_facturx,
     gen_facturx_en16931,
     gen_xml_depuis_facture,
-    valider_xml_xldt,
+    valider_xml_facturx_schematron,
     FACTURX_MINIMUM,
     FACTURX_BASIC,
     FACTURX_EN16931,
@@ -161,22 +161,22 @@ def test_gen_xml_depuis_facture(sample_facture):
     assert "</rsm:CrossIndustryInvoice>" in xml_output
 
 
-def test_valider_xml_xldt(sample_facture):
+def test_valider_xml_facturx_schematron(sample_facture):
     """Tests the XSLT validation for all Factur-X profiles."""
     # Test MINIMUM profile
     facturx_min_obj = sample_facture.to_facturx_minimum()
     xml_min_output = gen_xml_depuis_facture(facturx_min_obj)
-    assert valider_xml_xldt(xml_min_output, FACTURX_MINIMUM) is True
+    assert valider_xml_facturx_schematron(xml_min_output, FACTURX_MINIMUM) is True
 
     # Test BASIC profile
     facturx_basic_obj = sample_facture.to_facturx_basic()
     xml_basic_output = gen_xml_depuis_facture(facturx_basic_obj)
-    assert valider_xml_xldt(xml_basic_output, FACTURX_BASIC) is True
+    assert valider_xml_facturx_schematron(xml_basic_output, FACTURX_BASIC) is True
 
     # Test EN16931 profile
     facturx_en16931_obj = sample_facture.to_facturx_en16931()
     xml_en16931_output = gen_xml_depuis_facture(facturx_en16931_obj)
-    assert valider_xml_xldt(xml_en16931_output, FACTURX_EN16931) is True
+    assert valider_xml_facturx_schematron(xml_en16931_output, FACTURX_EN16931) is True
 
     # Test for an invalid XML
     # Let's break the XML by removing the invoice number, which is mandatory
@@ -185,7 +185,7 @@ def test_valider_xml_xldt(sample_facture):
     facturx_invalid_obj = invalid_facture.to_facturx_en16931()
     xml_invalid_output = gen_xml_depuis_facture(facturx_invalid_obj)
     with pytest.raises(XSLTValidationError):
-        valider_xml_xldt(xml_invalid_output, FACTURX_EN16931)
+        valider_xml_facturx_schematron(xml_invalid_output, FACTURX_EN16931)
 
 
 def test_intercepter_xslt_validation_error(sample_facture):
@@ -201,4 +201,4 @@ def test_intercepter_xslt_validation_error(sample_facture):
     with pytest.raises(XSLTValidationError):
         # Cette ligne lève bien une XSLTValidationError, et le contexte
         # pytest.raises doit l'attraper.
-        valider_xml_xldt(xml_invalide, FACTURX_EN16931)
+        valider_xml_facturx_schematron(xml_invalide, FACTURX_EN16931)
