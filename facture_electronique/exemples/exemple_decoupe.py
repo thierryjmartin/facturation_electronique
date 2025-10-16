@@ -26,8 +26,10 @@ from facture_electronique.utils.facturx import (
     FACTURX_EN16931,
 )
 import facturx
+from dotenv import load_dotenv
 
 if __name__ == "__main__":
+    load_dotenv()
     # --- Initialisation de l'API ---
     c = ChorusProAPI()
     # identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140") or 12345
