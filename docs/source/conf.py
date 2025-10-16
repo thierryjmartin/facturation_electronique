@@ -36,3 +36,31 @@ language = "fr"
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+
+# -- Options for doctest -----------------------------------------------------
+doctest_global_setup = """
+import os
+from decimal import Decimal
+from facture_electronique.api.chorus_pro import ChorusProAPI
+from facture_electronique.models import (
+    FactureChorus, FactureFacturX, ModeDepot, Destinataire, Fournisseur,
+    CadreDeFacturation, CodeCadreFacturation, References, TypeFacture,
+    TypeTVA, ModePaiement, LigneDePoste, LigneDeTVA, MontantTotal,
+    AdressePostale, CategorieTVA, PieceJointePrincipale
+)
+from facture_electronique.utils.files import get_absolute_path, file_to_base64, guess_mime_type, get_file_extension
+from facture_electronique.utils.pdfs import convert_to_pdfa, sign_pdf
+from facture_electronique.utils.facturx import (
+    gen_xml_depuis_facture,
+    valider_xml_xldt,
+    FACTURX_EN16931,
+)
+import facturx
+
+os.environ['PISTE_CLIENT_ID'] = 'dummy'
+os.environ['PISTE_CLIENT_SECRET'] = 'dummy'
+os.environ['PISTE_SANDBOX_CLIENT_ID'] = 'dummy'
+os.environ['PISTE_SANDBOX_CLIENT_SECRET'] = 'dummy'
+os.environ['CHORUS_PRO_LOGIN'] = 'dummy'
+os.environ['CHORUS_PRO_PASSWORD'] = 'dummy'
+"""

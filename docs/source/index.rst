@@ -5,7 +5,7 @@ Bienvenue dans la documentation de Facturation Électronique
    :maxdepth: 2
    :caption: Contenu:
 
-   exemples
+   guide/index
 
 Indices and tables
 ==================
