@@ -49,3 +49,4 @@ def get_absolute_path(relative_path):
     :param relative_path: Le chemin relatif.
     :return: Le chemin absolu correspondant.
     """
+    return os.path.abspath(relative_path)
