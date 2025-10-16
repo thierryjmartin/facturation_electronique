@@ -15,6 +15,15 @@ Le concept repose sur l'instanciation de classes Pydantic dédiées (`FactureCho
 - **Chorus Pro** : Création, envoi et suivi des factures destinées aux entités publiques.
 - **Factur-X** : Génération de factures au format PDF/A-3 avec XML embarqué (profils MINIMUM, BASIC, EN16931), avec des fonctions de validation avancées (XSD et Schematron).
 
+## Ressources
+
+Pour vous aider à démarrer et à utiliser ce projet, voici les ressources essentielles :
+
+- 📖 **Documentation Complète** : Explorez le guide complet, les tutoriels et la référence de l'API.
+  - **https://thierryjmartin.github.io/facturation_electronique/**
+- 📦 **Paquet PyPI** : Installez la dernière version stable directement depuis le Python Package Index.
+  - **https://pypi.org/project/facture-electronique/**
+
 ## Installation
 
 Le paquet est disponible sur PyPI :
