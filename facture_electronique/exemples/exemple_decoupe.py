@@ -118,6 +118,7 @@ if __name__ == "__main__":
             siret="26073617692140",
             numero_tva_intra="FR61529571234",
             nom="Mon Entreprise SAS",
+            iban="FR7630006000011234567890189",
             adresse_postale=AdressePostale(
                 ligne_un="456 Avenue du Code", code_postal="69001", nom_ville="Lyon"
             ),
