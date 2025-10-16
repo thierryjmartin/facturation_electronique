@@ -7,7 +7,7 @@ from typing import Literal, Union, Final
 from importlib import resources
 from saxonche import PySaxonProcessor
 
-from ..models import FactureFacturX, TypeFacture, LigneDePoste, ModePaiement, LigneDeTVA
+from ..models import FactureFacturX, TypeFacture, LigneDePoste, LigneDeTVA
 from ..generated import factur_x_minimum, factur_x_basic, factur_x_en16931
 from ..exceptions import InvalidDataFacturxError, XSLTValidationError
 
@@ -56,19 +56,6 @@ def get_facturx_type_code(facture: FactureFacturX) -> str:
         return "381"
     else:
         return "380"
-
-
-def get_facturx_mode_paiement(facture: FactureFacturX) -> str:
-    """Traduit le mode de paiement interne en code Factur-X standard."""
-    equiv = {
-        ModePaiement.CHEQUE: "20",
-        ModePaiement.PRELEVEMENT: "49",
-        ModePaiement.VIREMENT: "30",
-        ModePaiement.ESPECE: "10",
-        ModePaiement.AUTRE: "57",
-        ModePaiement.REPORT: "97",
-    }
-    return equiv[facture.references.mode_paiement]
 
 
 def get_facturx_quantity_units(unite: str) -> str:
@@ -409,7 +396,7 @@ def gen_facturx_basic_ou_en_16931(
             specified_trade_settlement_payment_means=[
                 factur_x_module.TradeSettlementPaymentMeansType(
                     type_code=factur_x_module.PaymentMeansCodeType(
-                        value=get_facturx_mode_paiement(facture)
+                        value=facture.references.mode_paiement.to_facturx_code()
                     ),
                     # payer_party_debtor_financial_account=factur_x_module.DebtorFinancialAccountType(ibanid=),
                     # payee_party_creditor_financial_account=factur_x_module.CreditorFinancialAccountType(ibanid=,proprietary_id=,)

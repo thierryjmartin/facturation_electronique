@@ -68,21 +68,25 @@ class ChorusProAPI:
         if not self.mot_de_passe_cpro:
             raise ErreurConfiguration("CHORUS_PRO_PASSWORD")
 
-        self._client = None
+        self._client_instance = None
         self._token = None
 
-    def _initialiser_session(self):
+    @property
+    def client(self):
         """
-        Méthode privée qui gère l'authentification et la création du _client HTTP.
-        N'est appelée qu'une seule fois, lors du premier besoin.
+        Propriété qui gère l'initialisation paresseuse du client HTTP.
+        Le client est créé et authentifié à la première utilisation.
         """
-        if self._client is None:
+        if self._client_instance is None:
             self._token = self._obtenir_jeton()
 
             url_base = self.URL_API_PROD if not self.sandbox else self.URL_API_SANDBOX
 
-            self._client = HttpClient(base_url=url_base, api_key=self._token)
-            self._client.headers["cpro-account"] = self._creer_compte_cpro_base64()
+            self._client_instance = HttpClient(base_url=url_base, api_key=self._token)
+            self._client_instance.headers["cpro-account"] = (
+                self._creer_compte_cpro_base64()
+            )
+        return self._client_instance
 
     def _obtenir_jeton(self):
         """Obtient un jeton d'accès OAuth2 auprès de l'API PISTE."""
@@ -115,8 +119,7 @@ class ChorusProAPI:
         :param facture: Un dictionnaire représentant la facture à soumettre.
         :return: La réponse JSON de l'API.
         """
-        self._initialiser_session()
-        response = self._client.post("/factures/v1/soumettre", json=facture)
+        response = self.client.post("/factures/v1/soumettre", json=facture)
         return response.json()
 
     def obtenir_statut_facture(self, facture_id: str) -> dict:
@@ -127,8 +130,7 @@ class ChorusProAPI:
         :param facture_id: L'identifiant technique de la facture sur Chorus Pro.
         :return: La réponse JSON de l'API contenant le statut.
         """
-        self._initialiser_session()
-        response = self._client.post(
+        response = self.client.post(
             "/factures/v1/consulter/fournisseur",
             json={"identifiantFactureCPP": facture_id},
         )
@@ -148,8 +150,7 @@ class ChorusProAPI:
         :param extension: L'extension du fichier (ex: "PDF", "JPG").
         :return: La réponse JSON de l'API, contenant l'identifiant de la pièce jointe.
         """
-        self._initialiser_session()
-        response = self._client.post(
+        response = self.client.post(
             "/transverses/v1/ajouter/fichier",
             json={
                 "pieceJointeFichier": fichier,
@@ -167,8 +168,7 @@ class ChorusProAPI:
         :param id_structure: L'identifiant technique Chorus Pro de la structure.
         :return: La réponse JSON de l'API.
         """
-        self._initialiser_session()
-        reponse = self._client.post(
+        reponse = self.client.post(
             "/structures/v1/consulter",
             json={"codeLangue": "fr", "idStructureCPP": id_structure},
         )
@@ -183,8 +183,7 @@ class ChorusProAPI:
         :param payload: Le dictionnaire de critères de recherche.
         :return: La réponse JSON de l'API.
         """
-        self._initialiser_session()
-        reponse = self._client.post("/organisations/v1/siren/recherche", json=payload)
+        reponse = self.client.post("/organisations/v1/siren/recherche", json=payload)
         return reponse.json()
 
     def rechercher_structure_via_organisation(self, payload) -> dict:
@@ -195,8 +194,7 @@ class ChorusProAPI:
         :param payload: Le dictionnaire de critères de recherche.
         :return: La réponse JSON de l'API.
         """
-        self._initialiser_session()
-        reponse = self._client.post(
+        reponse = self.client.post(
             "/organisations/v1/structures/recherche", json=payload
         )
         return reponse.json()
@@ -209,8 +207,7 @@ class ChorusProAPI:
         :param payload: Le dictionnaire de critères de recherche.
         :return: La réponse JSON de l'API.
         """
-        self._initialiser_session()
-        reponse = self._client.post("/structures/v1/rechercher", json=payload)
+        reponse = self.client.post("/structures/v1/rechercher", json=payload)
         return reponse.json()
 
     def rechercher_services_structure(self, id_structure: int) -> dict:
@@ -219,8 +216,7 @@ class ChorusProAPI:
         :param id_structure: L'identifiant technique Chorus Pro de la structure.
         :return: La réponse JSON de l'API listant les services.
         """
-        self._initialiser_session()
-        reponse = self._client.post(
+        reponse = self.client.post(
             "/structures/v1/rechercher/services", json={"idStructure": id_structure}
         )
         return reponse.json()
@@ -232,8 +228,7 @@ class ChorusProAPI:
         :param id_service: L'identifiant technique Chorus Pro du service.
         :return: La réponse JSON de l'API.
         """
-        self._initialiser_session()
-        reponse = self._client.post(
+        reponse = self.client.post(
             "/structures/v1/consulter/service",
             json={"idStructure": id_structure, "idService": id_service},
         )

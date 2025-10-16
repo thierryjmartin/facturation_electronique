@@ -19,7 +19,6 @@ from facture_electronique.models import (
 )
 from facture_electronique.utils.facturx import (
     get_facturx_type_code,
-    get_facturx_mode_paiement,
     _float_vers_decimal_facturx,
     _parse_date_chorus_vers_facturx,
     gen_facturx_en16931,
@@ -97,12 +96,14 @@ def test_get_facturx_type_code(sample_facture):
     assert get_facturx_type_code(sample_facture) == "381"
 
 
-def test_get_facturx_mode_paiement(sample_facture):
-    """Tests the payment mode code generation."""
-    sample_facture.references.mode_paiement = ModePaiement.VIREMENT
-    assert get_facturx_mode_paiement(sample_facture) == "30"
-    sample_facture.references.mode_paiement = ModePaiement.CHEQUE
-    assert get_facturx_mode_paiement(sample_facture) == "20"
+def test_mode_paiement_to_facturx_code():
+    """Tests the payment mode code generation from the Enum."""
+    assert ModePaiement.VIREMENT.to_facturx_code() == "30"
+    assert ModePaiement.CHEQUE.to_facturx_code() == "20"
+    assert ModePaiement.PRELEVEMENT.to_facturx_code() == "49"
+    assert ModePaiement.ESPECE.to_facturx_code() == "10"
+    assert ModePaiement.AUTRE.to_facturx_code() == "57"
+    assert ModePaiement.REPORT.to_facturx_code() == "97"
 
 
 def test_float_vers_decimal_facturx():

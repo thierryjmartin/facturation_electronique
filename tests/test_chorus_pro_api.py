@@ -1,6 +1,6 @@
 import pytest
 import base64
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, PropertyMock
 
 from facture_electronique.api.chorus_pro import ChorusProAPI
 from facture_electronique.exceptions import ErreurConfiguration
@@ -41,7 +41,7 @@ class TestConfigurationChorusProAPI:
         )
         assert api.identifiant_client_piste == ID_CLIENT_PISTE_FICTIF
         assert api.identifiant_cpro == LOGIN_CPRO_FICTIF
-        assert api._client is None  # Vérifie l'initialisation paresseuse
+        assert api._client_instance is None  # Vérifie l'initialisation paresseuse
 
     def test_initialisation_reussie_avec_variables_env(self, mock_variables_env):
         """Vérifie que la classe s'initialise correctement depuis les variables d'environnement."""
@@ -159,13 +159,13 @@ class TestAppelsAPIChorusPro:
         )
 
         # b) Vérifier que le client HttpClient a été correctement configuré
-        assert api._client.base_url == api.URL_API_SANDBOX
+        assert api.client.base_url == api.URL_API_SANDBOX
 
         # Le comportement important n'est pas de stocker la clé, mais de l'utiliser
         # pour configurer le header d'autorisation. C'est ce que nous vérifions.
         en_tete_auth_attendu = f"Bearer {JETON_ACCES_FICTIF}"
-        assert api._client.headers["Authorization"] == en_tete_auth_attendu
-        assert api._client.headers["cpro-account"] == CPRO_ACCOUNT_FICTIF_ENCODE
+        assert api.client.headers["Authorization"] == en_tete_auth_attendu
+        assert api.client.headers["cpro-account"] == CPRO_ACCOUNT_FICTIF_ENCODE
 
         # c) Vérifier l'appel à l'API Chorus Pro
         mock_client_post.assert_called_once_with(
@@ -175,22 +175,20 @@ class TestAppelsAPIChorusPro:
         # d) Vérifier que le résultat est correct
         assert resultat == reponse_api_attendue
 
-    @patch("facture_electronique.api.chorus_pro.ChorusProAPI._initialiser_session")
+    @patch.object(ChorusProAPI, "client", new_callable=PropertyMock)
     def test_obtenir_statut_facture_appelle_correctement_le_client(
-        self, mock_init, mock_variables_env
+        self, mock_client_property, mock_variables_env
     ):
         """Vérifie que obtenir_statut_facture appelle le bon endpoint avec le bon payload."""
         api = ChorusProAPI()
-        api._client = MagicMock()  # On assigne un mock pour le client
+        # Le client est maintenant une propriété mockée
+        mock_client = mock_client_property.return_value
 
         id_facture = "CPP-FACT-987"
         api.obtenir_statut_facture(id_facture)
 
-        # Vérifier que l'initialisation a été appelée
-        mock_init.assert_called_once()
-
         # Vérifier que la méthode post du client a été appelée avec les bons arguments
-        api._client.post.assert_called_once_with(
+        mock_client.post.assert_called_once_with(
             "/factures/v1/consulter/fournisseur",
             json={"identifiantFactureCPP": id_facture},
         )

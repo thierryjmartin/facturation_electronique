@@ -253,6 +253,27 @@ class ModePaiement(str, Enum):
     AUTRE = "AUTRE"
     REPORT = "REPORT"
 
+    def to_facturx_code(self) -> str:
+        """Traduit le mode de paiement en code Factur-X standard."""
+        match self:
+            case ModePaiement.CHEQUE:
+                return "20"
+            case ModePaiement.PRELEVEMENT:
+                return "49"
+            case ModePaiement.VIREMENT:
+                return "30"
+            case ModePaiement.ESPECE:
+                return "10"
+            case ModePaiement.AUTRE:
+                return "57"
+            case ModePaiement.REPORT:
+                return "97"
+            case _:
+                # Cette branche ne devrait jamais être atteinte avec un Enum, mais c'est une bonne pratique.
+                raise NotImplementedError(
+                    f"Le mode de paiement '{self.value}' n'a pas de code Factur-X défini."
+                )
+
 
 class TypeFacture(str, Enum):
     """Type de document (facture ou avoir)."""
