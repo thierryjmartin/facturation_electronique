@@ -57,6 +57,7 @@ dev = [
 [project.urls]
 "Homepage" = "https://github.com/thierryjmartin/facturation_electronique"
 "Source Code" = "https://github.com/thierryjmartin/facturation_electronique"
+"Documentation" = "https://thierryjmartin.github.io/facturation_electronique/"
 
 [tool.setuptools]
 package-data = { "facture_electronique" = ["xsd/**/*.xslt", "xsd/**/*.xsd"] }
