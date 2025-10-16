@@ -142,6 +142,9 @@ Développé par Thierry Martin
 
 ## Changelog
 
+### 0.5.8
+- **Fix** : Correction d'un bug qui empêchait l'exception `XSLTValidationError` d'être interceptée (`catch`). L'exception a été refactorisée pour accepter une liste d'erreurs, la rendant robuste et testable.
+
 ### 0.5.4
 - maj API et tests.
 

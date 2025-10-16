@@ -184,3 +184,19 @@ def test_valider_xml_xldt(sample_facture):
     xml_invalid_output = gen_xml_depuis_facture(facturx_invalid_obj)
     with pytest.raises(XSLTValidationError):
         valider_xml_xldt(xml_invalid_output, FACTURX_EN16931)
+
+
+def test_intercepter_xslt_validation_error(sample_facture):
+    """
+    Ce test démontre la capacité à intercepter XSLTValidationError.
+    Il devrait passer, confirmant que le bug est corrigé.
+    """
+    # Un XML invalide qui déclenche la validation XSLT
+    invalid_facture = sample_facture.model_copy(deep=True)
+    invalid_facture.numero_facture = ""
+    xml_invalide = gen_xml_depuis_facture(invalid_facture.to_facturx_en16931())
+
+    with pytest.raises(XSLTValidationError):
+        # Cette ligne lève bien une XSLTValidationError, et le contexte
+        # pytest.raises doit l'attraper.
+        valider_xml_xldt(xml_invalide, FACTURX_EN16931)

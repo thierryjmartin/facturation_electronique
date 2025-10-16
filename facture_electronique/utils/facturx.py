@@ -618,7 +618,7 @@ def valider_xml_xldt(xml_data: str, profil: str) -> bool:
                     messages_erreur.append(
                         f"Test: {test_expr}\nLocation: {location}\nMessage: {message_propre}"
                     )
-                raise XSLTValidationError("\n\n".join(messages_erreur))
+                raise XSLTValidationError(messages_erreur)
 
             # Si aucune erreur n'est trouvée (la logique originale retournait False, ce qui semble incorrect)
             # S'il n'y a pas de "failed-assert", la validation est réussie.
