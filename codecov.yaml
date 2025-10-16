@@ -9,3 +9,4 @@ coverage:
 
 ignore:
   - "facture_electronique/generated/factur_x_1_07_02/**"
+  - "facture_electronique/exemples/**"
