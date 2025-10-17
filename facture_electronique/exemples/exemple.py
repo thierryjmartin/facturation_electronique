@@ -166,16 +166,16 @@ if __name__ == "__main__":
 
     payload = {
         "numeroFactureSaisi": "FACT-2025-001",  # AJOUT OBLIGATOIRE
-        "dateFacture": "2025-10-17T00:00:00",  # FORMAT DATE-TIME
+        # "dateFacture": "2025-10-17T00:00:00",  # FORMAT DATE-TIME
         "modeDepot": "SAISIE_API",
         "destinataire": {
             "codeDestinataire": "99986401570264",
             "codeServiceExecutant": "",  # À REMPLIR
         },
         "fournisseur": {
-            "idFournisseur": 12345,
-            "idServiceFournisseur": 67890,  # AJOUT OBLIGATOIRE
-            "codeCoordonneesBancairesFournisseur": 123,  # Si nécessaire
+            "idFournisseur": 26073617692140,
+            "idServiceFournisseur": 10652252,  # AJOUT OBLIGATOIRE
+            # "codeCoordonneesBancairesFournisseur": 123,  # Si nécessaire
         },
         "cadreDeFacturation": {"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR"},
         "references": {
@@ -186,7 +186,7 @@ if __name__ == "__main__":
             "numeroMarche": "VABFM001",
         },
         "commentaire": "Création_VABF_SoumettreFacture",
-        "idUtilisateurCourant": 123456,  # ID UTILISATEUR RÉEL
+        "idUtilisateurCourant": 0,  # ID UTILISATEUR RÉEL
         "lignePoste": [
             {
                 "lignePosteNumero": 1,
@@ -221,7 +221,9 @@ if __name__ == "__main__":
     }
     # print(exemple_facture_mode_api.to_api_payload())
     # c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
-    c.envoyer_facture(payload)
+    print(payload)
+    res = c.envoyer_facture(payload)
+    print(res)
 
     exemple_facture_mode_pdf = FactureFacturX(
         mode_depot=ModeDepot("DEPOT_PDF_API"),
