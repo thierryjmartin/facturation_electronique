@@ -203,7 +203,7 @@ La norme Factur-X exige que le PDF porteur soit au format PDF/A-3. La fonction `
     except XSLTValidationError:
         validation_ok_extended = False
 
-    assert validation_ok_extended is False
+    assert validation_ok_extended is True
 
     assert validation_ok_extended is True
     assert "<rsm:ExchangedDocumentContext>" in xml_content_extended
