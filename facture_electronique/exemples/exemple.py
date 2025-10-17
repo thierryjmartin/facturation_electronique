@@ -57,11 +57,11 @@ if __name__ == "__main__":
             "typeIdentifiantStructure": "SIRET",
         },
     }
-    # recherche_structure = c.rechercher_structure(payload)
-    # identifiant_cpro = 0
-    # if recherche_structure["parametresRetour"]["total"] == 1:
-    # identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
-    # print(identifiant_cpro)
+    recherche_structure = c.rechercher_structure(payload)
+    identifiant_cpro = 0
+    if recherche_structure["parametresRetour"]["total"] == 1:
+        identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
+        print(identifiant_cpro)
     # identifiant_cpro = 12345
     # identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
     # c.consulter_structure(26300989)
@@ -173,7 +173,7 @@ if __name__ == "__main__":
             "codeServiceExecutant": "",  # À REMPLIR
         },
         "fournisseur": {
-            "idFournisseur": 26073617692140,
+            "idFournisseur": 26300989,  # TOUJOURS TROUVE PAR RECHERCHE DE STRUCTURE !!!
             "idServiceFournisseur": 10652252,  # AJOUT OBLIGATOIRE
             # "codeCoordonneesBancairesFournisseur": 123,  # Si nécessaire
         },
