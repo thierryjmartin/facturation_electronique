@@ -606,10 +606,10 @@ def valider_xml_facturx_schematron(xml_data: str, profil: str) -> bool:
             ).joinpath("FACTUR-X_EXTENDED.xslt")
         else:
             raise ValueError(f"Profil de validation inconnu : '{profil}'")
-    except (ModuleNotFoundError, FileNotFoundError):
+    except (ModuleNotFoundError, FileNotFoundError) as e:
         raise FileNotFoundError(
             f"La ressource XSLT pour le profil '{profil}' n'a pas pu être trouvée. "
-            "Vérifiez que les fichiers sont bien inclus dans le paquet via pyproject.toml."
+            f"Vérifiez que les fichiers sont bien inclus dans le paquet via pyproject.toml. Erreur: {e}"
         )
 
     # 2. Utiliser la ressource dans un contexte sécurisé

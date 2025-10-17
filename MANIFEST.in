@@ -1,6 +1,8 @@
 include readme.md
 include LICENSE
 include facture_electronique/xsd/*
+include facture_electronique/xsd/facturx-extended/*
+include facture_electronique/xsd/facturx-extended/_XSLT_EXTENDED/*
 include facture_electronique/xsd/facturx-basic/*
 include facture_electronique/xsd/facturx-basic/_XSLT_BASIC/*
 include facture_electronique/xsd/facturx-EN16931/*

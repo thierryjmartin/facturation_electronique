@@ -143,7 +143,7 @@ Cet objet contient toutes les données nécessaires à la fois pour le fichier X
             ),
         ],
     )
-    assert facturx_invoice.numero_facture == "FX-2024-001"
+    assert facturx_invoice.numero_facture == "20240000000000000110"
 
 
 2. Convertir le PDF en PDF/A-3
