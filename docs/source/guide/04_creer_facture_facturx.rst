@@ -146,80 +146,41 @@ Cet objet contient toutes les données nécessaires à la fois pour le fichier X
     assert facturx_invoice.numero_facture == "20240000000000000110"
 
 
-2. Convertir le PDF en PDF/A-3
---------------------------------
+2. Génération de TOUS les profils Factur-X via une boucle
+----------------------------------------------------------
 
-La norme Factur-X exige que le PDF porteur soit au format PDF/A-3. La fonction `convert_to_pdfa` utilise Ghostscript pour effectuer cette conversion.
+La nouvelle API fluide permet de générer tous les profils Factur-X de manière concise.
 
 .. testcode::
 
     import os
-    from facture_electronique.utils.facturx import FACTURX_EXTENDED
-    from facture_electronique.exceptions import XSLTValidationError
+    from facture_electronique.utils.facturx import ProfilFacturX
+    from facture_electronique.utils.files import get_absolute_path
+    from facture_electronique.utils.pdfs import convert_to_pdfa
+
     output_dir = "test_outputs"
     os.makedirs(output_dir, exist_ok=True)
 
-    pdf_original = "../facture_electronique/exemples/dummy.pdf"
-    pdfa_output = os.path.join(output_dir, "dummy.pdfa.pdf")
+    chemin_pdf_source = get_absolute_path("facture_electronique/exemples/dummy.pdf")
+    chemin_cle_signature = get_absolute_path("facture_electronique/exemples/key.key")
+    chemin_cert_signature = get_absolute_path("facture_electronique/exemples/cert.cert")
 
-    # La conversion peut prendre quelques secondes
-    convert_to_pdfa(pdf_original, pdfa_output)
+    chemins_factures_generees = {}
+    for profil in ProfilFacturX:
+        nom_fichier = os.path.join(output_dir, f"facture_generee_{profil.name.lower()}.pdf")
+        try:
+            with facturx_invoice.generer_facturx(profil=profil) as constructeur:
+                resultat = (
+                    constructeur.valider_conformite()
+                    .integrer_dans_pdfa(chemin_pdf_source)
+                    .enregistrer_sous(nom_fichier)
+                )
+            chemins_factures_generees[profil] = resultat['chemin_fichier']
+        except Exception as e:
+            print(f"  -> ERREUR lors de la génération du profil {profil.name}: {e}")
 
-    assert os.path.exists(pdfa_output)
-
-    # On choisit ici le profil EN16931 (ou EXTENDED pour plus de détails)
-    xml_content = gen_xml_depuis_facture(facturx_invoice.to_facturx_en16931())
-    
-    # La validation lève une exception en cas de non-conformité
-    try:
-        valider_xml_facturx_schematron(xml_content, FACTURX_EN16931)
-        validation_ok = True
-    except Exception:
-        validation_ok = False
-
-    assert validation_ok is True
-    assert "<rsm:ExchangedDocumentContext>" in xml_content
-
-    facturx_output = os.path.join(output_dir, "facture_en16931.pdf")
-
-    facturx.generate_from_file(
-        pdfa_output, # Le PDF/A généré à l'étape 2
-        xml_content, # Le XML généré à l'étape 3
-        output_pdf_file=facturx_output,
-        flavor="factur-x",
-        level="en16931",
-        check_xsd=True, # Active la validation XSD interne
-    )
-
-    assert os.path.exists(facturx_output)
+    assert os.path.exists(chemins_factures_generees[ProfilFacturX.EN16931])
+    assert os.path.exists(chemins_factures_generees[ProfilFacturX.EXTENDED])
 
 
-    # On choisit ici le profil EXTENDED
-    xml_content_extended = gen_xml_depuis_facture(facturx_invoice.to_facturx_extended())
-
-    try:
-        valider_xml_facturx_schematron(xml_content_extended, FACTURX_EXTENDED)
-        validation_ok_extended = True
-    except XSLTValidationError:
-        validation_ok_extended = False
-
-    assert validation_ok_extended is True
-
-    assert validation_ok_extended is True
-    assert "<rsm:ExchangedDocumentContext>" in xml_content_extended
-
-    facturx_output_extended = os.path.join(output_dir, "facture_extended.pdf")
-
-    facturx.generate_from_file(
-        pdfa_output, # Le PDF/A généré à l'étape 2
-        xml_content_extended, # Le XML généré
-        output_pdf_file=facturx_output_extended,
-        flavor="factur-x",
-        level="extended",
-        check_xsd=True, # Active la validation XSD interne
-    )
-
-    assert os.path.exists(facturx_output_extended)
-
-
-Le fichier `facture_en16931.pdf` est maintenant une facture Factur-X valide, prête à être envoyée.
+Le fichier `facture_generee_en16931.pdf` est maintenant une facture Factur-X valide, prête à être envoyée.
