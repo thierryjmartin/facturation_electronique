@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from typing import List, Optional, Annotated, Dict, Any
 
 from .utils.strings_and_dicts import to_camel_case, nettoyer_dict
@@ -328,117 +328,94 @@ class FactureChorus(FactureBase):
 
     def to_api_payload(self) -> Dict[str, Any]:
         """
-        Génère le dictionnaire JSON final pour l'API Chorus Pro.
-        Cette méthode garantit la conformité des types, formats, arrondis
-        et la cohérence des règles métier comme la liaison des taux de TVA.
+        Convertit le modèle interne Pydantic en payload JSON conforme à l'API Chorus Pro.
+        Corrige la casse, les noms de champs, et supprime les données interdites.
         """
-        precision_monetaire = Decimal("0.01")
 
-        # --- Étape 1: Exclure les champs à reconstruire ---
-        payload_base = self.model_dump(
-            by_alias=True,
-            exclude={
-                "lignes_de_poste",
-                "lignes_de_tva",
-                "montant_total",
-                "pieces_jointes_principales",
-                "pieces_jointes_complementaires",
+        # Base minimale du payload
+        payload = {
+            "numeroFactureSaisi": self.numero_facture_saisi,
+            "modeDepot": self.mode_depot,
+            "destinataire": {
+                "codeDestinataire": self.destinataire.code_destinataire,
+                "codeServiceExecutant": self.destinataire.code_service_executant or "",
             },
-        )
-
-        # --- Étape 2: Construction des listes avec la logique métier correcte ---
-        lignes_poste_payload = []
-        if self.lignes_de_poste:
-            for ligne in self.lignes_de_poste:
-                taux_tva_code = ligne.taux_tva
-                if not taux_tva_code and ligne.taux_tva_manuel is not None:
-                    # CORRECTION: Utiliser normalize() pour un formatage correct et robuste
-                    taux_normalise = ligne.taux_tva_manuel.normalize()
-                    taux_tva_code = f"TVA{taux_normalise}"
-
-                lignes_poste_payload.append(
-                    {
-                        "lignePosteNumero": ligne.numero,
-                        "lignePosteReference": ligne.reference,
-                        "lignePosteDenomination": ligne.denomination,
-                        "lignePosteQuantite": ligne.quantite,
-                        "lignePosteUnite": ligne.unite,
-                        "lignePosteMontantUnitaireHT": ligne.montant_unitaire_ht.quantize(
-                            precision_monetaire, rounding=ROUND_HALF_UP
-                        ),
-                        "lignePosteMontantRemiseHT": (
-                            ligne.montant_remise_ht or Decimal(0)
-                        ).quantize(precision_monetaire, rounding=ROUND_HALF_UP),
-                        "lignePosteTauxTva": taux_tva_code,
-                        "lignePosteTauxTvaManuel": ligne.taux_tva_manuel,
-                    }
-                )
-        payload_base["lignePoste"] = lignes_poste_payload
-
-        lignes_tva_payload = []
-        if self.lignes_de_tva:
-            for ligne in self.lignes_de_tva:
-                taux_tva_code = ligne.taux
-                if not taux_tva_code and ligne.taux_manuel is not None:
-                    taux_normalise = ligne.taux_manuel.normalize()
-                    taux_tva_code = f"TVA{taux_normalise}"
-
-                lignes_tva_payload.append(
-                    {
-                        "ligneTvaMontantBaseHtParTaux": ligne.montant_base_ht.quantize(
-                            precision_monetaire, rounding=ROUND_HALF_UP
-                        ),
-                        "ligneTvaMontantTvaParTaux": ligne.montant_tva.quantize(
-                            precision_monetaire, rounding=ROUND_HALF_UP
-                        ),
-                        "ligneTvaTaux": taux_tva_code,
-                        "ligneTvaTauxManuel": ligne.taux_manuel,
-                    }
-                )
-        payload_base["ligneTva"] = lignes_tva_payload
-
-        # --- Étape 3: Calcul et arrondi des totaux ---
-        montant_ht_calcule = sum(
-            (d["lignePosteQuantite"] * d["lignePosteMontantUnitaireHT"])
-            - d["lignePosteMontantRemiseHT"]
-            for d in payload_base.get("lignePoste", [])
-        ).quantize(precision_monetaire, rounding=ROUND_HALF_UP)
-
-        montant_tva_calcule = sum(
-            d["ligneTvaMontantTvaParTaux"] for d in payload_base.get("ligneTva", [])
-        ).quantize(precision_monetaire, rounding=ROUND_HALF_UP)
-
-        montant_ttc_calcule = (montant_ht_calcule + montant_tva_calcule).quantize(
-            precision_monetaire, rounding=ROUND_HALF_UP
-        )
-        montant_remise_globale = (
-            self.montant_total.montant_remise_globale_ttc or Decimal(0)
-        ).quantize(precision_monetaire, rounding=ROUND_HALF_UP)
-        montant_a_payer_calcule = (
-            montant_ttc_calcule - montant_remise_globale
-        ).quantize(precision_monetaire, rounding=ROUND_HALF_UP)
-
-        payload_base["montantTotal"] = {
-            "montantHtTotal": montant_ht_calcule,
-            "montantTva": montant_tva_calcule,
-            "montantTtcTotal": montant_ttc_calcule,
-            "montantAPayer": montant_a_payer_calcule,
-            "montantRemiseGlobaleTTC": montant_remise_globale or None,
-            "motifRemiseGlobaleTTC": self.montant_total.motif_remise_globale_ttc,
+            "fournisseur": {
+                "idFournisseur": self.fournisseur.id_fournisseur,
+            },
+            "cadreDeFacturation": {
+                "codeCadreFacturation": self.cadre_de_facturation.code_cadre_facturation,
+            },
+            "references": {
+                "deviseFacture": self.references.devise_facture,
+                "modePaiement": self.references.mode_paiement,
+                "typeFacture": self.references.type_facture,
+                "typeTva": self.references.type_tva,
+                "numeroMarche": self.references.numero_marche,
+            },
+            "commentaire": self.commentaire,
+            "idUtilisateurCourant": self.id_utilisateur_courant or 0,
         }
 
-        # Le traitement des pièces jointes suit la même logique.
-        if self.pieces_jointes_principales:
-            payload_base["pieceJointePrincipale"] = [
-                {
-                    "pieceJointePrincipaleDesignation": pj.designation,
-                    "pieceJointePrincipaleId": pj.id,
-                }
-                for pj in self.pieces_jointes_principales
-            ]
+        # --- Fournisseur : champs optionnels
+        if self.fournisseur.id_service_fournisseur:
+            payload["fournisseur"]["idServiceFournisseur"] = (
+                self.fournisseur.id_service_fournisseur
+            )
+        if self.fournisseur.code_coordonnees_bancaires_fournisseur:
+            payload["fournisseur"]["codeCoordonneesBancairesFournisseur"] = (
+                self.fournisseur.code_coordonnees_bancaires_fournisseur
+            )
 
-        # 4. Retourner le payload final en retirant toutes les clés dont la valeur est None.
-        return nettoyer_dict(payload_base)
+        # --- Lignes de poste
+        payload["lignePoste"] = []
+        for lp in self.lignes_de_poste:
+            payload["lignePoste"].append(
+                {
+                    "lignePosteNumero": lp.numero,
+                    "lignePosteReference": lp.reference,
+                    "lignePosteDenomination": lp.denomination,
+                    "lignePosteQuantite": float(lp.quantite),
+                    "lignePosteUnite": lp.unite,
+                    "lignePosteMontantUnitaireHT": float(lp.montant_unitaire_ht),
+                    "lignePosteMontantRemiseHT": float(lp.montant_remise_ht or 0),
+                    "lignePosteTauxTvaManuel": float(lp.taux_tva_manuel or 0),
+                }
+            )
+
+        # --- Lignes de TVA
+        payload["ligneTva"] = []
+        for lt in self.lignes_de_tva:
+            payload["ligneTva"].append(
+                {
+                    "ligneTvaMontantBaseHtParTaux": float(lt.montant_base_ht),
+                    "ligneTvaMontantTvaParTaux": float(lt.montant_tva),
+                    "ligneTvaTauxManuel": float(lt.taux_manuel or 0),
+                }
+            )
+
+        # --- Montants totaux
+        payload["montantTotal"] = {
+            "montantHtTotal": float(self.montant_total.montant_ht_total),
+            "montantTVA": float(self.montant_total.montant_tva),
+            "montantTtcTotal": float(self.montant_total.montant_ttc_total),
+            "montantAPayer": float(self.montant_total.montant_a_payer),
+        }
+
+        if self.montant_total.montant_remise_globale_ttc is not None:
+            payload["montantTotal"]["montantRemiseGlobaleTTC"] = float(
+                self.montant_total.montant_remise_globale_ttc
+            )
+        if self.montant_total.motif_remise_globale_ttc:
+            payload["montantTotal"]["motifRemiseGlobaleTTC"] = (
+                self.montant_total.motif_remise_globale_ttc
+            )
+
+        # --- Ne surtout pas inclure la date_facture (provoque une 500)
+        # (aucun champ "dateFacture" ajouté)
+
+        # --- Nettoyage final : suppression des None
+        return nettoyer_dict(payload)
 
 
 # --- Modèle pour la génération Factur-X ---

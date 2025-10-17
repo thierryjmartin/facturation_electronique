@@ -72,11 +72,15 @@ if __name__ == "__main__":
     # --- 2. Préparation des données de facture (conservée à l'identique) ---
     exemple_facture_mode_api = FactureChorus(
         mode_depot=ModeDepot("SAISIE_API"),
+        numero_facture_saisi="2025-002",
         id_utilisateur_courant=0,
         destinataire=Destinataire(
             code_destinataire="99986401570264", code_service_executant=""
         ),
-        fournisseur=Fournisseur(id_fournisseur=12345),
+        fournisseur=Fournisseur(
+            id_fournisseur=26300989,
+            id_service_fournisseur=10652252,
+        ),
         cadre_de_facturation=CadreDeFacturation(
             code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR
         ),
@@ -164,9 +168,9 @@ if __name__ == "__main__":
         commentaire="Création_VABF_SoumettreFacture",
     )
 
-    payload = {
+    payload_c_pro_ok = {  # NE PAS SUPPRIMER, conserver pour exemple !!!
         "numeroFactureSaisi": "FACT-2025-001",  # AJOUT OBLIGATOIRE
-        # "dateFacture": "2025-10-17T00:00:00",  # FORMAT DATE-TIME
+        # "dateFacture": "2025-10-17T00:00:00",  # ERREUR 500 SI FOURNI, NE PAS METTRE
         "modeDepot": "SAISIE_API",
         "destinataire": {
             "codeDestinataire": "99986401570264",
@@ -196,33 +200,33 @@ if __name__ == "__main__":
                 "lignePosteUnite": "lot",
                 "lignePosteMontantUnitaireHT": 50.00,  # FLOAT
                 "lignePosteMontantRemiseHT": 0.00,  # FLOAT
-                "lignePosteTauxTva": "TVA2",
+                # "lignePosteTauxTva": "TVA20",
                 "lignePosteTauxTvaManuel": 20.0,  # FLOAT
             },
             # ... autres lignes
         ],
         "ligneTva": [
             {
-                "ligneTvaMontantBaseHtParTaux": 510.00,  # FLOAT
-                "ligneTvaMontantTvaParTaux": 102.00,  # FLOAT
-                "ligneTvaTaux": "TVA2",
+                "ligneTvaMontantBaseHtParTaux": 500.00,  # FLOAT
+                "ligneTvaMontantTvaParTaux": 100.00,  # FLOAT
+                # "ligneTvaTaux": "TVA20",
                 "ligneTvaTauxManuel": 20.0,  # FLOAT
             },
             # ... autres lignes
         ],
         "montantTotal": {
-            "montantHtTotal": 1326.00,  # FLOAT
-            "montantTVA": 130.27,  # FLOAT (notez 'montantTVA' pas 'montantTva')
-            "montantTtcTotal": 1456.27,  # FLOAT
-            "montantAPayer": 1406.27,  # FLOAT
+            "montantHtTotal": 500.00,  # FLOAT
+            "montantTVA": 100.00,  # FLOAT (notez 'montantTVA' pas 'montantTva')
+            "montantTtcTotal": 600.00,  # FLOAT
+            "montantAPayer": 550.00,  # FLOAT
             "montantRemiseGlobaleTTC": 50.00,  # FLOAT
             "motifRemiseGlobaleTTC": "Geste commercial",
         },
     }
-    # print(exemple_facture_mode_api.to_api_payload())
-    # c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
-    print(payload)
-    res = c.envoyer_facture(payload)
+    print(exemple_facture_mode_api.to_api_payload())
+    res = c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
+    # print(payload)
+    # res = c.envoyer_facture(payload)
     print(res)
 
     exemple_facture_mode_pdf = FactureFacturX(
