@@ -1,4 +1,4 @@
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Any
 
 
 def to_camel_case(text: str) -> str:
@@ -26,3 +26,12 @@ def transform_dict_keys(d: Dict, transform_func) -> Union[List[Dict], Dict]:
         return [transform_dict_keys(item, transform_func) for item in d]
     else:
         return d
+
+
+def nettoyer_dict(d: Any) -> Any:
+    """Fonction utilitaire récursive pour retirer les clés avec valeur None."""
+    if not isinstance(d, dict):
+        return d
+    return {
+        cle: nettoyer_dict(valeur) for cle, valeur in d.items() if valeur is not None
+    }

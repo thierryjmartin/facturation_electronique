@@ -163,7 +163,65 @@ if __name__ == "__main__":
         ),
         commentaire="Création_VABF_SoumettreFacture",
     )
+
+    payload = {
+        "numeroFactureSaisi": "FACT-2025-001",  # AJOUT OBLIGATOIRE
+        "dateFacture": "2025-10-17T00:00:00",  # FORMAT DATE-TIME
+        "modeDepot": "SAISIE_API",
+        "destinataire": {
+            "codeDestinataire": "99986401570264",
+            "codeServiceExecutant": "",  # À REMPLIR
+        },
+        "fournisseur": {
+            "idFournisseur": 12345,
+            "idServiceFournisseur": 67890,  # AJOUT OBLIGATOIRE
+            "codeCoordonneesBancairesFournisseur": 123,  # Si nécessaire
+        },
+        "cadreDeFacturation": {"codeCadreFacturation": "A1_FACTURE_FOURNISSEUR"},
+        "references": {
+            "deviseFacture": "EUR",
+            "modePaiement": "ESPECE",
+            "typeFacture": "FACTURE",
+            "typeTva": "TVA_SUR_DEBIT",
+            "numeroMarche": "VABFM001",
+        },
+        "commentaire": "Création_VABF_SoumettreFacture",
+        "idUtilisateurCourant": 123456,  # ID UTILISATEUR RÉEL
+        "lignePoste": [
+            {
+                "lignePosteNumero": 1,
+                "lignePosteReference": "R1",
+                "lignePosteDenomination": "D1",
+                "lignePosteQuantite": 10.0,  # FLOAT
+                "lignePosteUnite": "lot",
+                "lignePosteMontantUnitaireHT": 50.00,  # FLOAT
+                "lignePosteMontantRemiseHT": 0.00,  # FLOAT
+                "lignePosteTauxTva": "TVA2",
+                "lignePosteTauxTvaManuel": 20.0,  # FLOAT
+            },
+            # ... autres lignes
+        ],
+        "ligneTva": [
+            {
+                "ligneTvaMontantBaseHtParTaux": 510.00,  # FLOAT
+                "ligneTvaMontantTvaParTaux": 102.00,  # FLOAT
+                "ligneTvaTaux": "TVA2",
+                "ligneTvaTauxManuel": 20.0,  # FLOAT
+            },
+            # ... autres lignes
+        ],
+        "montantTotal": {
+            "montantHtTotal": 1326.00,  # FLOAT
+            "montantTVA": 130.27,  # FLOAT (notez 'montantTVA' pas 'montantTva')
+            "montantTtcTotal": 1456.27,  # FLOAT
+            "montantAPayer": 1406.27,  # FLOAT
+            "montantRemiseGlobaleTTC": 50.00,  # FLOAT
+            "motifRemiseGlobaleTTC": "Geste commercial",
+        },
+    }
+    # print(exemple_facture_mode_api.to_api_payload())
     # c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
+    c.envoyer_facture(payload)
 
     exemple_facture_mode_pdf = FactureFacturX(
         mode_depot=ModeDepot("DEPOT_PDF_API"),
