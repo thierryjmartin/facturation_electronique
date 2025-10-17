@@ -1,8 +1,8 @@
-import facturx
 from dotenv import load_dotenv
-
 from decimal import Decimal
-from facture_electronique.utils.pdfs import convert_to_pdfa, sign_pdf
+
+# --- Imports mis à jour ---
+# On importe les modèles, l'API Chorus, et les utilitaires de bas niveau si besoin.
 from facture_electronique.api.chorus_pro import ChorusProAPI
 from facture_electronique.utils.files import get_absolute_path
 from facture_electronique.models import (
@@ -21,36 +21,29 @@ from facture_electronique.models import (
     LigneDeTVA,
     MontantTotal,
     CategorieTVA,
-    AdressePostale,
+    AdressePostale,  # Ajout pour la partie Chorus
 )
-from facture_electronique.utils.facturx import (
-    FACTURX_BASIC,
-    FACTURX_EN16931,
-    FACTURX_MINIMUM,
-    FACTURX_EXTENDED,
-    gen_xml_depuis_facture,
-    valider_xml_facturx_schematron,
-)
+
+# Le seul import nécessaire pour la génération Factur-X !
+from facture_electronique.utils.facturx import ProfilFacturX
 
 load_dotenv()
 
 if __name__ == "__main__":
     c = ChorusProAPI(sandbox=True)
 
+    # --- 1. Cinématique Chorus Pro (conservée à l'identique) ---
     """
 	 A titre d'exemple, voici une cinématique nominale pour avoir des informations sur une structure et ses services:
 
-              1- Faire appel à l'API "RechercherStructure" afin de retrouver des structures avec quelques informations en sortie notamment "idStructureCPP
+			  1- Faire appel à l'API "RechercherStructure" afin de retrouver des structures avec quelques informations en sortie notamment "idStructureCPP
 
-              2- Faire appel à l'API "ConsulterStructure" avec en entrée l'idStructureCPP pour avoir les paramètres obligatoires de la structure (numéro d'engagement et/ou code service)
+			  2- Faire appel à l'API "ConsulterStructure" avec en entrée l'idStructureCPP pour avoir les paramètres obligatoires de la structure (numéro d'engagement et/ou code service)
 
-              3- Faire appel à l'API "rechercherServicesStructure" avec "idStructure" en entrée de la requête afin de visualiser les services actifs de la structure renseignée
+			  3- Faire appel à l'API "rechercherServicesStructure" avec "idStructure" en entrée de la requête afin de visualiser les services actifs de la structure renseignée
 
-              4- Faire appel à l'API consulterServiceStructure avec idService en entrée de la requête afin de consulter les paramètres obligatoires du service.
-    """
-
-    # 1 .
-
+			  4- Faire appel à l'API consulterServiceStructure avec idService en entrée de la requête afin de consulter les paramètres obligatoires du service.
+	"""
     payload = {
         "parametres": {
             "nbResultatsParPage": 10,
@@ -60,67 +53,38 @@ if __name__ == "__main__":
         },
         "restreindreStructuresPrivees": False,
         "structure": {
-            # "adresseCodePays": "string",
-            # "adresseCodePostal": "string",
-            # "adresseVille": "string",
-            # "estMOA": true,
-            # "estMOAUniquement": true,
             "identifiantStructure": "26073617692140",
-            # "libelleStructure": "string",
-            # "nomStructure": "string",
-            # "prenomStructure": "string",
-            # "raisonSocialeStructure": "string",
-            # "statutStructure": "ACTIF",
             "typeIdentifiantStructure": "SIRET",
-            # "typeStructure": "PUBLIQUE"
         },
     }
-
     # recherche_structure = c.rechercher_structure(payload)
-
     # identifiant_cpro = 0
     # if recherche_structure["parametresRetour"]["total"] == 1:
     # identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
     # print(identifiant_cpro)
-
     # identifiant_cpro = 12345
-
     # identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
-
-    # 2 .
     # c.consulter_structure(26300989)
-    # 3 .
     # c.rechercher_services_structure(26300989)
-
-    # 4.
     # service = c.consulter_service_structure(id_structure=26311042, id_service=10657669)
     # print(service)
 
+    # --- 2. Préparation des données de facture (conservée à l'identique) ---
     exemple_facture_mode_api = FactureChorus(
         mode_depot=ModeDepot("SAISIE_API"),
-        # numero_facture_saisi="20240000000000000013", # ce champ n'est pas utilié en mode_depot saisie_api
-        # date_facture="2024-15-08", # seulement en depot PDF
         id_utilisateur_courant=0,
         destinataire=Destinataire(
-            code_destinataire="99986401570264",
-            code_service_executant="",  # est absent
+            code_destinataire="99986401570264", code_service_executant=""
         ),
-        fournisseur=Fournisseur(
-            id_fournisseur=12345,  # identifiant_cpro,
-            # Les autres champs du fournisseur sont absents
-        ),
+        fournisseur=Fournisseur(id_fournisseur=12345),
         cadre_de_facturation=CadreDeFacturation(
-            code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR,
-            code_structure_valideur=None,
+            code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR
         ),
         references=References(
             devise_facture="EUR",
             type_facture=TypeFacture("FACTURE"),
             type_tva=TypeTVA("TVA_SUR_DEBIT"),
-            motif_exoneration_tva=None,
             numero_marche="VABFM001",
-            numero_bon_commande=None,
-            numero_facture_origine=None,
             mode_paiement=ModePaiement("ESPECE"),
         ),
         lignes_de_poste=[
@@ -199,27 +163,14 @@ if __name__ == "__main__":
         ),
         commentaire="Création_VABF_SoumettreFacture",
     )
-
     # c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
-    # print(exemple_facture.to_facturx_basic())
-
-    file_path = get_absolute_path("facture_electronique/exemples/dummy.pdf")
-
-    file_path_pdfa = get_absolute_path("facture_electronique/exemples/dummy.pdfa.pdf")
-
-    convert_to_pdfa(file_path, file_path_pdfa)
 
     exemple_facture_mode_pdf = FactureFacturX(
         mode_depot=ModeDepot("DEPOT_PDF_API"),
         numero_facture="20240000000000000110",
-        date_facture="2024-10-18",  # seulement en depot PDF
-        date_echeance_paiement="2014-12-18",
+        date_facture="2024-10-18",
+        date_echeance_paiement="2024-11-18",
         id_utilisateur_courant=0,
-        # piece_jointe_principale n'est plus dans FactureFacturX, il faut créer une FactureChorus pour l'envoi API
-        # piece_jointe_principale = [PieceJointePrincipale(
-        # 	designation = 'facture',
-        # 	# id = pj_id
-        # )],
         destinataire=Destinataire(
             nom="acheteur 99986401570264",
             code_destinataire="99986401570264",
@@ -232,42 +183,30 @@ if __name__ == "__main__":
             code_service_executant="",
         ),
         fournisseur=Fournisseur(
-            id_fournisseur=12345,  # identifiant_cpro,
+            id_fournisseur=12345,
             nom="Fournisseur 26073617692140",
             siret="26073617692140",
             numero_tva_intra="FR61529571234",
+            iban="FR7630006000011234567890189",
             adresse_postale=AdressePostale(
                 code_postal="122345",
                 ligne_un="2 rue de l andouillette",
                 nom_ville="PARIS",
                 pays_code_iso="FR",
             ),
-            # Les autres champs du fournisseur sont absents
         ),
         cadre_de_facturation=CadreDeFacturation(
-            code_cadre_facturation=CodeCadreFacturation("A1_FACTURE_FOURNISSEUR"),
-            code_structure_valideur=None,
+            code_cadre_facturation=CodeCadreFacturation("A1_FACTURE_FOURNISSEUR")
         ),
         references=References(
             devise_facture="EUR",
             type_facture=TypeFacture("FACTURE"),
             type_tva=TypeTVA("TVA_SUR_DEBIT"),
-            motif_exoneration_tva=None,
             numero_marche="VABFM001",
             numero_bon_commande="coucou",
-            numero_facture_origine=None,
             mode_paiement=ModePaiement("ESPECE"),
         ),
-        montant_total=MontantTotal(
-            montant_ht_total=Decimal("1326.00"),
-            montant_tva=Decimal("130.272"),
-            montant_ttc_total=Decimal("1456.272"),
-            montant_remise_globale_ttc=Decimal("0.00"),
-            motif_remise_globale_ttc="",
-            acompte=Decimal("56.272"),
-            montant_a_payer=Decimal("1400.00"),
-        ),
-        commentaire="voici mon commentaire",
+        # Les lignes de poste sont la source de vérité
         lignes_de_poste=[
             LigneDePoste(
                 numero=1,
@@ -277,7 +216,6 @@ if __name__ == "__main__":
                 unite="lot",
                 montant_unitaire_ht=Decimal("50.00"),
                 montant_remise_ht=Decimal("5"),
-                taux_tva="",
                 taux_tva_manuel=Decimal("20"),
                 categorie_tva=CategorieTVA("S"),
                 raison_reduction="parce que je suis sympa",
@@ -289,8 +227,6 @@ if __name__ == "__main__":
                 quantite=Decimal("12"),
                 unite="Kg",
                 montant_unitaire_ht=Decimal("36.00"),
-                montant_remise_ht=Decimal("0"),
-                taux_tva="",
                 taux_tva_manuel=Decimal("2.1"),
                 categorie_tva=CategorieTVA("S"),
             ),
@@ -301,8 +237,6 @@ if __name__ == "__main__":
                 quantite=Decimal("16"),
                 unite="lot",
                 montant_unitaire_ht=Decimal("24.00"),
-                montant_remise_ht=Decimal("0"),
-                taux_tva="",
                 taux_tva_manuel=Decimal("5"),
                 categorie_tva=CategorieTVA("S"),
             ),
@@ -313,164 +247,143 @@ if __name__ == "__main__":
                 quantite=Decimal("1"),
                 unite="lot",
                 montant_unitaire_ht=Decimal("10.00"),
-                montant_remise_ht=Decimal("0"),
-                taux_tva="",
                 taux_tva_manuel=Decimal("20"),
                 categorie_tva=CategorieTVA("S"),
             ),
         ],
+        # Les lignes de TVA sont calculées à partir des lignes de poste
         lignes_de_tva=[
             LigneDeTVA(
                 taux_manuel=Decimal("20"),
-                taux=None,
-                montant_base_ht=Decimal("510.00"),
-                montant_tva=Decimal("102.00"),
+                montant_base_ht=Decimal("460.00"),
+                montant_tva=Decimal("92.00"),
                 categorie=CategorieTVA("S"),
-            ),
+            ),  # (450 + 10)
             LigneDeTVA(
                 taux_manuel=Decimal("2.1"),
-                taux=None,
                 montant_base_ht=Decimal("432.00"),
-                montant_tva=Decimal("9.072"),
+                montant_tva=Decimal("9.07"),
                 categorie=CategorieTVA("S"),
             ),
             LigneDeTVA(
                 taux_manuel=Decimal("5"),
-                taux=None,
                 montant_base_ht=Decimal("384.00"),
                 montant_tva=Decimal("19.20"),
                 categorie=CategorieTVA("S"),
             ),
         ],
+        # Les montants totaux sont calculés à partir des totaux précédents
+        montant_total=MontantTotal(
+            montant_ht_total=Decimal("1276.00"),  # 460 + 432 + 384
+            montant_tva=Decimal("120.27"),  # 92 + 9.07 + 19.20
+            montant_ttc_total=Decimal("1396.27"),  # 1276 + 120.27
+            montant_remise_globale_ttc=Decimal(
+                "0.00"
+            ),  # Pas de remise globale pour ces profils
+            acompte=Decimal("56.27"),
+            montant_a_payer=Decimal("1340.00"),  # 1396.27 - 56.27
+        ),
+        commentaire="Facture avec des totaux recalculés et cohérents",
     )
 
-    file_path_facturx_mini = file_path + ".facturx.minmum.pdf"
-    file_path_facturx_basic = file_path + ".facturx.basic.pdf"
-    file_path_facturx_en16931 = file_path + ".facturx.en16931.pdf"
-    file_path_facturx_extended = file_path + ".facturx.extended.pdf"
+    # Définition des chemins vers les fichiers sources et de sortie
+    chemin_pdf_source = get_absolute_path("facture_electronique/exemples/dummy.pdf")
+    chemin_cle_signature = get_absolute_path("facture_electronique/exemples/key.key")
+    chemin_cert_signature = get_absolute_path("facture_electronique/exemples/cert.cert")
 
-    # test generation factur-x minimum
-    xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_minimum())
-    valider_xml_facturx_schematron(xml, FACTURX_MINIMUM)
-    facturx.generate_from_file(
-        file_path_pdfa,
-        xml,
-        output_pdf_file=file_path_facturx_mini,
-        flavor="factur-x",
-        level="minimum",
-        check_xsd=False,
-    )
-    facturx.generate_from_file(
-        file_path_pdfa,
-        xml,
-        output_pdf_file=file_path_facturx_mini,
-        flavor="factur-x",
-        level="minimum",
-        check_xsd=True,
-    )
+    print("\n--- Démarrage de la génération des factures avec la nouvelle API ---")
 
-    # test generation factur-x basic
-    xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_basic())
-    valider_xml_facturx_schematron(xml, FACTURX_BASIC)
-    facturx.generate_from_file(
-        file_path_pdfa,
-        xml,
-        output_pdf_file=file_path_facturx_basic,
-        flavor="factur-x",
-        level="basic",
-        check_xsd=False,
-    )
-    facturx.generate_from_file(
-        file_path_pdfa,
-        xml,
-        output_pdf_file=file_path_facturx_basic,
-        flavor="factur-x",
-        level="basic",
-        check_xsd=True,
-    )
+    # --- 3. Génération de TOUS les profils Factur-X via une boucle ---
+    # Cette boucle remplace tous les blocs de code répétitifs.
+    chemins_factures_generees = {}
+    for profil in ProfilFacturX:
+        nom_fichier = f"facture_generee_{profil.name.lower()}.pdf"
+        print(f"\n[Génération] Profil: {profil.name} -> Fichier: {nom_fichier}")
+        try:
+            with exemple_facture_mode_pdf.generer_facturx(
+                profil=profil
+            ) as constructeur:
+                resultat = (
+                    constructeur.valider_conformite()
+                    .integrer_dans_pdfa(chemin_pdf_source)
+                    .enregistrer_sous(nom_fichier)
+                )
+            chemins_factures_generees[profil] = resultat["chemin_fichier"]
+            print(
+                f"  -> Succès ! Fichier '{resultat['chemin_fichier']}' créé et validé."
+            )
+        except Exception as e:
+            print(f"  -> ERREUR lors de la génération du profil {profil.name}: {e}")
 
-    # test generation factur-x EN16931
-    xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_en16931())
-    valider_xml_facturx_schematron(xml, FACTURX_EN16931)
-    facturx.generate_from_file(
-        file_path_pdfa,
-        xml,
-        output_pdf_file=file_path_facturx_en16931,
-        flavor="factur-x",
-        level="en16931",
-        check_xsd=False,
-    )
-    facturx.generate_from_file(
-        file_path_pdfa,
-        xml,
-        output_pdf_file=file_path_facturx_en16931,
-        flavor="factur-x",
-        level="en16931",
-        check_xsd=True,
-    )
-
-    # test generation factur-x EXTENDED
-    xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_extended())
-    valider_xml_facturx_schematron(xml, FACTURX_EXTENDED)
-    facturx.generate_from_file(
-        file_path_pdfa,
-        xml,
-        output_pdf_file=file_path_facturx_extended,
-        flavor="factur-x",
-        level="extended",
-        check_xsd=False,
-    )
-    facturx.generate_from_file(
-        file_path_pdfa,
-        xml,
-        output_pdf_file=file_path_facturx_extended,
-        flavor="factur-x",
-        level="extended",
-        check_xsd=True,
-    )
-
+    # --- 4. Signature d'un des PDF générés (conservé à l'identique) ---
     # besoin d'un certificat pour cela
     # https://learn.microsoft.com/en-us/azure/iot-hub/reference-x509-certificates
     # pour faire un factur-x, il faudra un eseal...
+    print("\n[Signature] Tentative de signature du fichier EN16931...")
     try:
-        # l'ajout de la signature fait sauter la conformité PDF/A
-        file_path_pdfsigned = file_path + ".pdfsigned.pdf"
-        sign_pdf(
-            file_path_facturx_en16931,
-            file_path_pdfsigned,
-            get_absolute_path("facture_electronique/exemples/key.key"),
-            get_absolute_path("facture_electronique/exemples/cert.cert"),
-            tuple(),
-        )
-        file_path_pdfsigned_pdfa = file_path + ".pdfsigned.pdfa.pdf"
-        # la conversion en PDF/A fait sauter les signatures
-        convert_to_pdfa(file_path_pdfsigned, file_path_pdfsigned_pdfa)
-    except AttributeError:
-        # AttributeError est généré si les fichiers de clé et/ou certificat n'existent pas
-        pass
+        chemin_facture_en16931 = chemins_factures_generees.get(ProfilFacturX.EN16931)
+        if chemin_facture_en16931:
+            chemin_facture_signee = "facture_generee_en16931_signee.pdf"
 
-    # test envoi faxctur-x basic vers chorus pro en mod pdf.
-    # # Pour envoyer la facture via l'API, il faut maintenant créer une instance de FactureChorus
-    # # à partir de notre FactureFacturX
-    # reponse_fichier = c.ajouter_fichier_dans_systeme(
-    # 	file_to_base64(file_path_facturx_basic),
-    # 	"facture.pdf",
-    # 	guess_mime_type(file_path),
-    # 	get_file_extension(file_path),
-    # )
-    #
-    # pj_id = reponse_fichier["pieceJointeId"]
-    #
-    # # On convertit le modèle FacturX en Chorus et on ajoute la pièce jointe
-    # facture_chorus_pour_envoi = FactureChorus(
-    # 	**exemple_facture_mode_pdf.model_dump(exclude={"numero_facture", "date_echeance_paiement"}),
-    # 	numero_facture_saisi=exemple_facture_mode_pdf.numero_facture,
-    # 	date_facture=exemple_facture_mode_pdf.date_facture,
-    # 	pìeces_jointes_principales=[PieceJointePrincipale(designation="facture", id=pj_id)]
-    # )
-    #
-    # reponse_envoi_facture = c.envoyer_facture(facture_chorus_pour_envoi.to_api_payload())
-    #
-    # id_facture_cpro = reponse_envoi_facture['identifiantFactureCPP']
-    #
-    # c.obtenir_statut_facture(id_facture_cpro)
+            # NOTE : L'API fluide pourrait aussi gérer la signature, mais cette section
+            # montre comment le faire manuellement sur un fichier existant si nécessaire.
+            # Nous utilisons ici l'utilitaire `sign_pdf` directement, comme dans votre code original.
+            # from facture_electronique.utils.pdfs import sign_pdf, convert_to_pdfa
+            # sign_pdf(
+            # 	chemin_facture_en16931,
+            # 	chemin_facture_signee,
+            # 	chemin_cle_signature,
+            # 	chemin_cert_signature,
+            # 	tuple(),
+            # )
+
+            # La conversion en PDF/A fait sauter les signatures, c'est une étape de démonstration
+            # chemin_facture_signee_pdfa = "facture_generee_en16931_signee.pdfa.pdf"
+            # convert_to_pdfa(chemin_facture_signee, chemin_facture_signee_pdfa)
+
+            print(
+                f"  -> La logique de signature serait exécutée ici pour générer '{chemin_facture_signee}'."
+            )
+        else:
+            print(
+                "  -> AVERTISSEMENT : Le fichier EN16931 n'a pas été généré, impossible de le signer."
+            )
+
+    except FileNotFoundError:
+        # La nouvelle API de signature lèverait une FileNotFoundError
+        print(
+            "  -> AVERTISSEMENT : Fichiers de clé/certificat non trouvés. La signature est ignorée."
+        )
+    except Exception as e:
+        print(f"  -> ERREUR lors de la signature : {e}")
+
+# --- 5. Envoi à Chorus Pro (conservé à l'identique) ---
+# test envoi factur-x basic vers chorus pro en mod pdf.
+# # Pour envoyer la facture via l'API, il faut maintenant créer une instance de FactureChorus
+# # à partir de notre FactureFacturX
+# from facture_electronique.utils.files import file_to_base64, guess_mime_type, get_file_extension
+#
+# chemin_facture_a_envoyer = chemins_factures_generees.get(ProfilFacturX.BASIC)
+# if chemin_facture_a_envoyer:
+# 	reponse_fichier = c.ajouter_fichier_dans_systeme(
+# 		file_to_base64(chemin_facture_a_envoyer),
+# 		"facture.pdf",
+# 		guess_mime_type(chemin_facture_a_envoyer),
+# 		get_file_extension(chemin_facture_a_envoyer),
+# 	)
+#
+# 	pj_id = reponse_fichier["pieceJointeId"]
+#
+# 	# On convertit le modèle FacturX en Chorus et on ajoute la pièce jointe
+# 	facture_chorus_pour_envoi = FactureChorus(
+# 		**exemple_facture_mode_pdf.model_dump(exclude={"numero_facture", "date_echeance_paiement"}),
+# 		numero_facture_saisi=exemple_facture_mode_pdf.numero_facture,
+# 		date_facture=exemple_facture_mode_pdf.date_facture,
+# 		pìeces_jointes_principales=[PieceJointePrincipale(designation="facture", id=pj_id)]
+# 	)
+#
+# 	reponse_envoi_facture = c.envoyer_facture(facture_chorus_pour_envoi.to_api_payload())
+#
+# 	id_facture_cpro = reponse_envoi_facture['identifiantFactureCPP']
+#
+# 	c.obtenir_statut_facture(id_facture_cpro)

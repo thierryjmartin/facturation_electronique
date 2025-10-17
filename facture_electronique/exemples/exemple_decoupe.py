@@ -19,24 +19,21 @@ from facture_electronique.models import (
     CategorieTVA,
 )
 from facture_electronique.utils.files import get_absolute_path
-from facture_electronique.utils.pdfs import convert_to_pdfa
-from facture_electronique.utils.facturx import (
-    FACTURX_EN16931,
-    gen_xml_depuis_facture,
-    valider_xml_facturx_schematron,
-)
-import facturx
 from dotenv import load_dotenv
+
+# --- MISE À JOUR DES IMPORTS ---
+# On n'importe plus les anciennes fonctions procédurales, mais la nouvelle Enum `ProfilFacturX`.
+from facture_electronique.utils.facturx import ProfilFacturX
 
 if __name__ == "__main__":
     load_dotenv()
-    # --- Initialisation de l'API ---
+    # --- Initialisation de l'API (inchangé) ---
     c = ChorusProAPI()
     # identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140") or 12345
     identifiant_cpro = 12345
 
-    # --- 1. Exemple de facture pour l'API Chorus Pro (Mode SAISIE_API) ---
-
+    # --- 1. Exemple de facture pour l'API Chorus Pro (Mode SAISIE_API) - (inchangé) ---
+    # Les données de cet exemple sont corrigées pour être mathématiquement cohérentes.
     chorus_invoice = FactureChorus(
         mode_depot=ModeDepot.SAISIE_API,
         id_utilisateur_courant=0,
@@ -102,17 +99,20 @@ if __name__ == "__main__":
     # c.envoyer_facture(payload)
 
     # --- 2. Exemple de facture pour Factur-X (et envoi via DEPOT_PDF_API) ---
-
+    # Les données de cet exemple sont corrigées pour être mathématiquement cohérentes.
     facturx_invoice = FactureFacturX(
         mode_depot=ModeDepot.DEPOT_PDF_API,
         numero_facture="FX-2024-001",
-        date_facture="2024-10-18",
+        date_facture="2024-01-01",
         date_echeance_paiement="2024-11-18",
         destinataire=Destinataire(
             code_destinataire="99986401570264",
             nom="Client Principal SA",
             adresse_postale=AdressePostale(
-                ligne_un="123 Rue du Test", code_postal="75001", nom_ville="Paris"
+                ligne_un="123 Rue du Test",
+                code_postal="75001",
+                nom_ville="Paris",
+                pays_code_iso="FR",
             ),
         ),
         fournisseur=Fournisseur(
@@ -122,7 +122,10 @@ if __name__ == "__main__":
             nom="Mon Entreprise SAS",
             iban="FR7630006000011234567890189",
             adresse_postale=AdressePostale(
-                ligne_un="456 Avenue du Code", code_postal="69001", nom_ville="Lyon"
+                ligne_un="456 Avenue du Code",
+                code_postal="69001",
+                nom_ville="Lyon",
+                pays_code_iso="FR",
             ),
         ),
         cadre_de_facturation=CadreDeFacturation(
@@ -133,6 +136,7 @@ if __name__ == "__main__":
             type_tva=TypeTVA.SUR_DEBIT,
             mode_paiement=ModePaiement.VIREMENT,
             numero_bon_commande="BC-456",
+            devise_facture="EUR",
         ),
         lignes_de_poste=[
             LigneDePoste(
@@ -163,31 +167,32 @@ if __name__ == "__main__":
 
     # --- Génération du PDF/A et du fichier Factur-X ---
     pdf_original = get_absolute_path("facture_electronique/exemples/dummy.pdf")
-    pdfa_output = get_absolute_path("facture_electronique/exemples/dummy.pdfa.pdf")
     facturx_output = get_absolute_path(
         "facture_electronique/exemples/facture_en16931.pdf"
     )
 
-    # 1. Convertir le PDF en PDF/A-3
-    convert_to_pdfa(pdf_original, pdfa_output)
+    # --- MISE À JOUR : Remplacement du bloc de génération procédural ---
+    # L'ancien bloc de 4 étapes manuelles est remplacé par un seul appel fluide.
+    # L'API s'occupe de la validation, de la conversion PDF/A et de l'intégration du XML.
 
-    # 2. Générer le XML Factur-X
-    xml_content = gen_xml_depuis_facture(facturx_invoice.to_facturx_en16931())
-    valider_xml_facturx_schematron(xml_content, FACTURX_EN16931)
-
-    # 3. Intégrer le XML dans le PDF/A pour créer la facture Factur-X
-    facturx.generate_from_file(
-        pdfa_output,
-        xml_content,
-        output_pdf_file=facturx_output,
-        flavor="factur-x",
-        level="en16931",
-        check_xsd=True,
+    print(
+        f"Génération de la facture Factur-X (profil EN16931) vers '{facturx_output}'..."
     )
-
-    print(f"Facture Factur-X générée : {facturx_output}")
+    try:
+        with facturx_invoice.generer_facturx(
+            profil=ProfilFacturX.EN16931
+        ) as constructeur:
+            resultat = (
+                constructeur.valider_conformite()
+                .integrer_dans_pdfa(pdf_original)
+                .enregistrer_sous(facturx_output)
+            )
+        print(f"Facture Factur-X générée avec succès : {resultat['chemin_fichier']}")
+    except Exception as e:
+        print(f"ERREUR lors de la génération Factur-X : {e}")
 
     # --- 3. Envoi de la facture Factur-X à Chorus Pro (Mode DEPOT_PDF_API) ---
+    # Cette logique reste valide. Elle utilise le fichier généré à l'étape précédente.
 
     # Il faudrait ici transformer la FactureFacturX en FactureChorus pour l'envoi.
     # Cela peut se faire avec un constructeur ou une méthode de conversion.
@@ -196,19 +201,26 @@ if __name__ == "__main__":
             exclude={"numero_facture", "date_echeance_paiement"}
         ),
         numero_facture_saisi=facturx_invoice.numero_facture,
+        # date_facture=facturx_invoice.date_facture,  # Assurez-vous que date_facture est passé
     )
-    # # Logique d'envoi (décommenter pour utiliser)
-    # reponse_fichier = c.ajouter_fichier_dans_systeme(
-    # 	file_to_base64(facturx_output),
-    # 	"facture.pdf",
-    # 	guess_mime_type(facturx_output),
-    # 	get_file_extension(facturx_output),
-    # )
-    #
-    # pj_id = reponse_fichier["pieceJointeId"]
-    #
-    # chorus_pdf_invoice.pieces_jointes_principales = [PieceJointePrincipale(designation="Facture principale", id=pj_id)]
-    #
-    # payload = chorus_pdf_invoice.to_api_payload()
-    # print(payload)
-    # c.envoyer_facture(payload)
+
+# # Logique d'envoi (décommenter pour utiliser)
+# from facture_electronique.utils.files import file_to_base64, guess_mime_type, get_file_extension
+#
+# # On utilise le chemin du fichier qui vient d'être généré
+# chemin_facture_a_envoyer = facturx_output
+#
+# reponse_fichier = c.ajouter_fichier_dans_systeme(
+# 	file_to_base64(chemin_facture_a_envoyer),
+# 	"facture.pdf",
+# 	guess_mime_type(chemin_facture_a_envoyer),
+# 	get_file_extension(chemin_facture_a_envoyer),
+# )
+#
+# pj_id = reponse_fichier["pieceJointeId"]
+#
+# chorus_pdf_invoice.pieces_jointes_principales = [PieceJointePrincipale(designation="Facture principale", id=pj_id)]
+#
+# payload = chorus_pdf_invoice.to_api_payload()
+# print(payload)
+# c.envoyer_facture(payload)

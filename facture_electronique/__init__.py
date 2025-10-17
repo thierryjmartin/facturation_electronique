@@ -4,12 +4,16 @@
 Module principal pour la bibliothèque de facturation électronique.
 
 Ce module expose les classes et fonctions les plus importantes de la bibliothèque
-pour une utilisation simplifiée.
+pour une utilisation simplifiée, en se concentrant sur l'API moderne et intuitive.
+
+L'usage recommandé est d'instancier un modèle `FactureFacturX` puis d'utiliser
+la méthode `.generer_facturx(profil)` pour démarrer le processus de construction.
 """
 
 from .api.chorus_pro import ChorusProAPI
 from .api.pannylane import PennylaneAPI
 from .api.sage import SAGEAPI
+
 from .models import (
     AdressePostale,
     CadreDeFacturation,
@@ -19,7 +23,7 @@ from .models import (
     Destinataire,
     FactureBase,
     FactureChorus,
-    FactureFacturX,
+    FactureFacturX,  # Point d'entrée principal pour la nouvelle API !
     Fournisseur,
     LigneDePoste,
     LigneDeTVA,
@@ -32,72 +36,46 @@ from .models import (
     TypeFacture,
     TypeTVA,
 )
-from .exceptions import XSLTValidationError
-from .utils.facturx import (
-    FACTURX_BASIC,
-    FACTURX_EN16931,
-    FACTURX_MINIMUM,
-    gen_facturx_basic,
-    gen_facturx_en16931,
-    gen_facturx_minimum,
-    gen_xml_depuis_facture,
-    valider_xml_facturx_schematron,
+
+from .exceptions import (
+    XSLTValidationError,
+    ErreurConfiguration,
+    InvalidDataFacturxError,
 )
-from .utils.files import (
-    file_to_base64,
-    get_absolute_path,
-    get_file_extension,
-    guess_mime_type,
-)
-from .utils.strings_and_dicts import to_camel_case, transform_dict_keys
-from .utils.pdfs import convert_to_pdfa, sign_pdf
+
+from .utils.facturx import ProfilFacturX
+
 
 __all__ = [
-    # API Clients
+    # Clients API
     "ChorusProAPI",
     "PennylaneAPI",
     "SAGEAPI",
-    # Models
-    "CodeCadreFacturation",
-    "CadreDeFacturation",
+    # Modèles de Données
     "AdressePostale",
-    "Destinataire",
-    "Fournisseur",
+    "CadreDeFacturation",
     "CategorieTVA",
+    "CodeCadreFacturation",
     "CodeRaisonReduction",
-    "LigneDePoste",
-    "LigneDeTVA",
-    "MontantTotal",
-    "PieceJointeComplementaire",
-    "PieceJointePrincipale",
-    "ModePaiement",
-    "TypeFacture",
-    "TypeTVA",
-    "References",
-    "ModeDepot",
+    "Destinataire",
     "FactureBase",
     "FactureChorus",
     "FactureFacturX",
-    # Factur-X utils
-    "gen_facturx_minimum",
-    "gen_facturx_basic",
-    "gen_facturx_en16931",
-    "gen_xml_depuis_facture",
-    "valider_xml_facturx_schematron",
-    "FACTURX_MINIMUM",
-    "FACTURX_BASIC",
-    "FACTURX_EN16931",
-    # File utils
-    "file_to_base64",
-    "guess_mime_type",
-    "get_file_extension",
-    "get_absolute_path",
-    # PDF utils
-    "convert_to_pdfa",
-    "sign_pdf",
-    # Strings and dicts utils
-    "to_camel_case",
-    "transform_dict_keys",
+    "Fournisseur",
+    "LigneDePoste",
+    "LigneDeTVA",
+    "ModeDepot",
+    "ModePaiement",
+    "MontantTotal",
+    "PieceJointeComplementaire",
+    "PieceJointePrincipale",
+    "References",
+    "TypeFacture",
+    "TypeTVA",
     # Exceptions
     "XSLTValidationError",
+    "ErreurConfiguration",
+    "InvalidDataFacturxError",
+    # Nouvelle API Factur-X
+    "ProfilFacturX",
 ]

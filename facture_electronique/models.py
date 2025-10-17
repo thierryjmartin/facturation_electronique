@@ -4,7 +4,8 @@ from decimal import Decimal
 from typing import List, Optional, Annotated
 
 from .utils.strings_and_dicts import to_camel_case
-
+from .utils.facturx import ProfilFacturX
+from .constructeur import ConstructeurFacturX
 
 FRENCH_CAMEL_CASE_CONFIG = ConfigDict(
     alias_generator=to_camel_case,
@@ -365,26 +366,13 @@ class FactureFacturX(FactureBase):
     date_facture: str
     date_echeance_paiement: str
 
-    def to_facturx_minimum(self):
-        """Convertit le modèle en objet XML Factur-X au profil MINIMUM."""
-        from .utils.facturx import gen_facturx_minimum
+    def get_facturx_type_code(self) -> str:
+        """Détermine le code de type de document Factur-X (380 pour facture, 381 pour avoir)."""
+        return "381" if self.references.type_facture == TypeFacture.AVOIR else "380"
 
-        return gen_facturx_minimum(self)
-
-    def to_facturx_basic(self):
-        """Convertit le modèle en objet XML Factur-X au profil BASIC."""
-        from .utils.facturx import gen_facturx_basic
-
-        return gen_facturx_basic(self)
-
-    def to_facturx_en16931(self):
-        """Convertit le modèle en objet XML Factur-X au profil EN16931."""
-        from .utils.facturx import gen_facturx_en16931
-
-        return gen_facturx_en16931(self)
-
-    def to_facturx_extended(self):
-        """Convertit le modèle en objet XML Factur-X au profil EXTENDED."""
-        from .utils.facturx import gen_facturx_extended
-
-        return gen_facturx_extended(self)
+    def generer_facturx(self, profil: ProfilFacturX) -> ConstructeurFacturX:
+        """
+        Point d'entrée pour le processus de construction d'un fichier Factur-X.
+        Retourne un objet constructeur permettant de chaîner les opérations.
+        """
+        return ConstructeurFacturX(self, profil)
