@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # --- 2. Préparation des données de facture (conservée à l'identique) ---
     exemple_facture_mode_api = FactureChorus(
         mode_depot=ModeDepot("SAISIE_API"),
-        numero_facture_saisi="2025-002",
+        numero_facture="2025-002",
         id_utilisateur_courant=0,
         destinataire=Destinataire(
             code_destinataire="99986401570264", code_service_executant=""
@@ -441,7 +441,7 @@ if __name__ == "__main__":
 # 	# On convertit le modèle FacturX en Chorus et on ajoute la pièce jointe
 # 	facture_chorus_pour_envoi = FactureChorus(
 # 		**exemple_facture_mode_pdf.model_dump(exclude={"numero_facture", "date_echeance_paiement"}),
-# 		numero_facture_saisi=exemple_facture_mode_pdf.numero_facture,
+# 		numero_facture=exemple_facture_mode_pdf.numero_facture,
 # 		date_facture=exemple_facture_mode_pdf.date_facture,
 # 		pìeces_jointes_principales=[PieceJointePrincipale(designation="facture", id=pj_id)]
 # 	)

@@ -302,6 +302,8 @@ class ModeDepot(str, Enum):
 class FactureBase(BaseModel):
     """Modèle de base contenant les champs communs à toutes les factures."""
 
+    numero_facture: str
+    date_echeance_paiement: str
     model_config = FRENCH_CAMEL_CASE_CONFIG
     date_facture: str = Field(default_factory=obtenir_date_iso_maintenant)
     mode_depot: ModeDepot
@@ -323,7 +325,8 @@ class FactureBase(BaseModel):
 class FactureChorus(FactureBase):
     """Modèle spécifique pour une soumission à l'API Chorus Pro."""
 
-    numero_facture_saisi: Optional[str] = None
+    numero_facture: Optional[str] = None
+    date_echeance_paiement: Optional[str] = None
     pieces_jointes_principales: Optional[List[PieceJointePrincipale]] = None
 
     def to_api_payload(self) -> Dict[str, Any]:
@@ -339,8 +342,8 @@ class FactureChorus(FactureBase):
         def to_float(value: Optional[Decimal]) -> Optional[float]:
             return float(value) if value is not None else None
 
-        payload = {
-            "numeroFactureSaisi": self.numero_facture_saisi,
+        payload: Dict[str, Any] = {
+            "numeroFactureSaisi": self.numero_facture,
             "modeDepot": self.mode_depot,
             "destinataire": {
                 "codeDestinataire": self.destinataire.code_destinataire,
@@ -494,9 +497,6 @@ class FactureChorus(FactureBase):
 
 class FactureFacturX(FactureBase):
     """Modèle de données pour une facture destinée à être convertie en Factur-X."""
-
-    numero_facture: str
-    date_echeance_paiement: str
 
     def get_facturx_type_code(self) -> str:
         """Détermine le code de type de document Factur-X (380 pour facture, 381 pour avoir)."""

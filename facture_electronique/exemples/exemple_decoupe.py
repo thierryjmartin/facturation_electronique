@@ -197,11 +197,7 @@ if __name__ == "__main__":
     # Il faudrait ici transformer la FactureFacturX en FactureChorus pour l'envoi.
     # Cela peut se faire avec un constructeur ou une méthode de conversion.
     chorus_pdf_invoice = FactureChorus(
-        **facturx_invoice.model_dump(
-            exclude={"numero_facture", "date_echeance_paiement"}
-        ),
-        numero_facture_saisi=facturx_invoice.numero_facture,
-        # date_facture=facturx_invoice.date_facture,  # Assurez-vous que date_facture est passé
+        **facturx_invoice.model_dump(),
     )
 
 # # Logique d'envoi (décommenter pour utiliser)

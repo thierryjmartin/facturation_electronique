@@ -63,7 +63,7 @@ def test_facture_chorus_to_api_payload():
     """Teste la méthode to_api_payload pour la conversion en camelCase."""
     facture = FactureChorus(
         mode_depot=ModeDepot.DEPOT_PDF_API,
-        numero_facture_saisi="FAC-2024-01",
+        numero_facture="FAC-2024-01",
         destinataire=Destinataire(
             code_destinataire="123456789", code_service_executant="RH"
         ),
@@ -162,13 +162,10 @@ def test_conversion_facturx_to_chorus():
     )
 
     chorus_invoice = FactureChorus(
-        **facturx_invoice.model_dump(
-            exclude={"numero_facture", "date_echeance_paiement"}
-        ),
-        numero_facture_saisi=facturx_invoice.numero_facture,
+        **facturx_invoice.model_dump(exclude={"date_echeance_paiement"}),
     )
 
-    assert chorus_invoice.numero_facture_saisi == "FX-2024-001"
+    assert chorus_invoice.numero_facture == "FX-2024-001"
     assert chorus_invoice.date_facture == "2024-10-18"
     assert chorus_invoice.destinataire.code_destinataire == "123"
-    assert not hasattr(chorus_invoice, "date_echeance_paiement")
+    assert hasattr(chorus_invoice, "date_echeance_paiement")
