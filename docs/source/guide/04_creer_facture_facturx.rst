@@ -154,6 +154,8 @@ La norme Factur-X exige que le PDF porteur soit au format PDF/A-3. La fonction `
 .. testcode::
 
     import os
+    from facture_electronique.utils.facturx import FACTURX_EXTENDED
+    from facture_electronique.exceptions import XSLTValidationError
     output_dir = "test_outputs"
     os.makedirs(output_dir, exist_ok=True)
 
