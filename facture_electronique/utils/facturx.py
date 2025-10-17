@@ -12,13 +12,15 @@ from ..generated.factur_x_1_07_03 import (
     factur_x_minimum,
     factur_x_basic,
     factur_x_en16931,
+    factur_x_extended,
 )
 from ..exceptions import InvalidDataFacturxError, XSLTValidationError
 
 FACTURX_MINIMUM: Final = "factur-x-minimum"
 FACTURX_BASIC: Final = "factur-x-basic"
 FACTURX_EN16931: Final = "factur-x-en16931"
-ProfilFacturX = Literal[FACTURX_BASIC, FACTURX_EN16931]
+FACTURX_EXTENDED: Final = "factur-x-extended"
+ProfilFacturX = Literal[FACTURX_BASIC, FACTURX_EN16931, FACTURX_EXTENDED]
 
 
 def get_factur_x_module(profil_facturx: ProfilFacturX) -> ModuleType:
@@ -27,16 +29,18 @@ def get_factur_x_module(profil_facturx: ProfilFacturX) -> ModuleType:
     correspondance_modules = {
         FACTURX_BASIC: factur_x_basic,
         FACTURX_EN16931: factur_x_en16931,
+        FACTURX_EXTENDED: factur_x_extended,
     }
 
     module_selectionne = correspondance_modules.get(profil_facturx)
 
     if not module_selectionne:
         # Le message d'erreur est internationalisé et formaté de manière sûre.
-        message_erreur = "Profil Factur-X invalide : '{profil}'. Les profils attendus sont '{basic}' ou '{en16931}'.".format(
+        message_erreur = "Profil Factur-X invalide : '{profil}'. Les profils attendus sont '{basic}', '{en16931} ou '{extended}'.".format(
             profil=profil_facturx,
             basic=FACTURX_BASIC,
             en16931=FACTURX_EN16931,
+            extended=FACTURX_EXTENDED,
         )
         raise ValueError(message_erreur)
 
@@ -354,15 +358,18 @@ def est_valide_pour_facturx_basic(facture: FactureFacturX) -> None:
 
 def gen_facturx_basic_ou_en_16931(
     facture: FactureFacturX, factur_x_module_str: ProfilFacturX
-) -> Union[factur_x_basic.CrossIndustryInvoice, factur_x_en16931.CrossIndustryInvoice]:
-    """Génère un objet XML Factur-X pour les profils BASIC ou EN16931."""
+) -> Union[
+    factur_x_basic.CrossIndustryInvoice,
+    factur_x_en16931.CrossIndustryInvoice,
+    factur_x_extended.CrossIndustryInvoice,
+]:
+    """Génère un objet XML Factur-X pour les profils BASIC ou EN16931 ou EXTENDED."""
     factur_x_module = get_factur_x_module(factur_x_module_str)
-
-    est_valide_pour_facturx_basic(facture)
 
     document_context_type_parameter = {
         FACTURX_BASIC: "urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic",
         FACTURX_EN16931: "urn:cen.eu:en16931:2017",
+        FACTURX_EXTENDED: "urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended",
     }
     exchanged_document_context = factur_x_module.ExchangedDocumentContextType(
         guideline_specified_document_context_parameter=factur_x_module.DocumentContextParameterType(
@@ -497,7 +504,7 @@ def gen_facturx_basic(facture: FactureFacturX) -> factur_x_basic.CrossIndustryIn
 
 def est_valide_facturx_en16931(facture: FactureFacturX) -> None:
     """Vérifie si les données de la facture sont compatibles avec le profil EN16931."""
-    est_valide_pour_facturx_basic(facture)
+    return est_valide_pour_facturx_basic(facture)
 
 
 def gen_facturx_en16931(
@@ -506,6 +513,19 @@ def gen_facturx_en16931(
     """Génère un objet XML Factur-X conforme au profil EN16931."""
     est_valide_facturx_en16931(facture)
     return gen_facturx_basic_ou_en_16931(facture, factur_x_module_str=FACTURX_EN16931)
+
+
+def est_valide_facturx_extended(facture: FactureFacturX) -> None:
+    """Vérifie si les données de la facture sont compatibles avec le profil EN16931."""
+    return est_valide_pour_facturx_basic(facture)
+
+
+def gen_facturx_extended(
+    facture: FactureFacturX,
+) -> factur_x_extended.CrossIndustryInvoice:
+    """Génère un objet XML Factur-X conforme au profil EN16931."""
+    est_valide_facturx_extended(facture)
+    return gen_facturx_basic_ou_en_16931(facture, factur_x_module_str=FACTURX_EXTENDED)
 
 
 def gen_xml_depuis_facture(facture) -> str:
@@ -580,6 +600,10 @@ def valider_xml_facturx_schematron(xml_data: str, profil: str) -> bool:
             ref_xslt = resources.files(
                 "facture_electronique.xsd.facturx-EN16931._XSLT_EN16931"
             ).joinpath("FACTUR-X_EN16931.xslt")
+        elif profil == FACTURX_EXTENDED:
+            ref_xslt = resources.files(
+                "facture_electronique.xsd.facturx-extended._XSLT_EXTENDED"
+            ).joinpath("FACTUR-X_EXTENDED.xslt")
         else:
             raise ValueError(f"Profil de validation inconnu : '{profil}'")
     except (ModuleNotFoundError, FileNotFoundError):

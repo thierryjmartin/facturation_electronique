@@ -272,7 +272,7 @@ class ModePaiement(str, Enum):
             case _:
                 # Cette branche ne devrait jamais être atteinte avec un Enum, mais c'est une bonne pratique.
                 raise NotImplementedError(
-                    f"Le mode de paiement '{self.value}' n'a pas de code Factur-X défini."
+                    f"Le mode de paiement '{self}' n'a pas de code Factur-X défini."
                 )
 
 
@@ -382,3 +382,9 @@ class FactureFacturX(FactureBase):
         from .utils.facturx import gen_facturx_en16931
 
         return gen_facturx_en16931(self)
+
+    def to_facturx_extended(self):
+        """Convertit le modèle en objet XML Factur-X au profil EXTENDED."""
+        from .utils.facturx import gen_facturx_extended
+
+        return gen_facturx_extended(self)

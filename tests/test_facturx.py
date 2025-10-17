@@ -27,6 +27,7 @@ from facture_electronique.utils.facturx import (
     FACTURX_MINIMUM,
     FACTURX_BASIC,
     FACTURX_EN16931,
+    FACTURX_EXTENDED,
 )
 from facture_electronique.exceptions import XSLTValidationError
 
@@ -177,6 +178,11 @@ def test_valider_xml_facturx_schematron(sample_facture):
     facturx_en16931_obj = sample_facture.to_facturx_en16931()
     xml_en16931_output = gen_xml_depuis_facture(facturx_en16931_obj)
     assert valider_xml_facturx_schematron(xml_en16931_output, FACTURX_EN16931) is True
+
+    # Test EXTENDED profile
+    facturx_extended_obj = sample_facture.to_facturx_extended()
+    xml_extended_output = gen_xml_depuis_facture(facturx_extended_obj)
+    assert valider_xml_facturx_schematron(xml_extended_output, FACTURX_EXTENDED) is True
 
     # Test for an invalid XML
     # Let's break the XML by removing the invoice number, which is mandatory

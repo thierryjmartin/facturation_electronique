@@ -27,6 +27,7 @@ from facture_electronique.utils.facturx import (
     FACTURX_BASIC,
     FACTURX_EN16931,
     FACTURX_MINIMUM,
+    FACTURX_EXTENDED,
     gen_xml_depuis_facture,
     valider_xml_facturx_schematron,
 )
@@ -346,6 +347,7 @@ if __name__ == "__main__":
     file_path_facturx_mini = file_path + ".facturx.minmum.pdf"
     file_path_facturx_basic = file_path + ".facturx.basic.pdf"
     file_path_facturx_en16931 = file_path + ".facturx.en16931.pdf"
+    file_path_facturx_extended = file_path + ".facturx.extended.pdf"
 
     # test generation factur-x minimum
     xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_minimum())
@@ -404,6 +406,26 @@ if __name__ == "__main__":
         output_pdf_file=file_path_facturx_en16931,
         flavor="factur-x",
         level="en16931",
+        check_xsd=True,
+    )
+
+    # test generation factur-x EXTENDED
+    xml = gen_xml_depuis_facture(exemple_facture_mode_pdf.to_facturx_extended())
+    valider_xml_facturx_schematron(xml, FACTURX_EXTENDED)
+    facturx.generate_from_file(
+        file_path_pdfa,
+        xml,
+        output_pdf_file=file_path_facturx_extended,
+        flavor="factur-x",
+        level="extended",
+        check_xsd=False,
+    )
+    facturx.generate_from_file(
+        file_path_pdfa,
+        xml,
+        output_pdf_file=file_path_facturx_extended,
+        flavor="factur-x",
+        level="extended",
         check_xsd=True,
     )
 

@@ -94,7 +94,7 @@ La norme Factur-X exige que le PDF porteur soit au format PDF/A-3. La fonction `
 
     assert os.path.exists(pdfa_output)
 
-    # On choisit ici le profil EN16931, le plus complet
+    # On choisit ici le profil EN16931 (ou EXTENDED pour plus de détails)
     xml_content = gen_xml_depuis_facture(facturx_invoice.to_facturx_en16931())
     
     # La validation lève une exception en cas de non-conformité
