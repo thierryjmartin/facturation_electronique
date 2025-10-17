@@ -94,17 +94,15 @@ On commence par envoyer le fichier Factur-X au système de fichiers de Chorus Pr
 
     assert isinstance(pj_id, int)
 
-    # On convertit le modèle FacturX en Chorus
+    # On convertit le modèle FacturX en Chorus.
+    # La plupart des champs peuvent être réutilisés directement.
     facture_chorus_pour_envoi = FactureChorus(
-        **facturx_invoice.model_dump(
-            exclude={"numero_facture", "date_echeance_paiement"}
-        ),
-        numero_facture_saisi=facturx_invoice.numero_facture,
+        **facturx_invoice.model_dump(),
         pieces_jointes_principales=[PieceJointePrincipale(designation="facture", id=pj_id)]
     )
 
     assert facture_chorus_pour_envoi.pieces_jointes_principales[0].id == pj_id
-    assert facture_chorus_pour_envoi.numero_facture_saisi == "FX-2024-001"
+    assert facture_chorus_pour_envoi.numero_facture == "FX-2024-001"
 
     payload = facture_chorus_pour_envoi.to_api_payload()
 
