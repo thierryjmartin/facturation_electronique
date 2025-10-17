@@ -516,7 +516,7 @@ def gen_facturx_en16931(
 
 
 def est_valide_facturx_extended(facture: FactureFacturX) -> None:
-    """Vérifie si les données de la facture sont compatibles avec le profil EN16931."""
+    """Vérifie si les données de la facture sont compatibles avec le profil EXTENDED."""
     return est_valide_pour_facturx_basic(facture)
 
 
