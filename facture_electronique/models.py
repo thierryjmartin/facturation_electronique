@@ -328,23 +328,38 @@ class FactureChorus(FactureBase):
 
     def to_api_payload(self) -> Dict[str, Any]:
         """
-        Convertit le modèle interne Pydantic en payload JSON conforme à l'API Chorus Pro.
-        Corrige la casse, les noms de champs, et supprime les données interdites.
+        Convertit le modèle interne Pydantic en payload JSON complet et conforme à l’API Chorus Pro.
+        Tous les champs définis dans le modèle sont convertis selon les conventions de l’API.
+        - Conversion Decimal → float
+        - Conversion snake_case → camelCase API
+        - Suppression des champs None
+        - Exclusion de la dateFacture (erreur 500 API)
         """
 
-        # Base minimale du payload
+        def to_float(value: Optional[Decimal]) -> Optional[float]:
+            return float(value) if value is not None else None
+
         payload = {
             "numeroFactureSaisi": self.numero_facture_saisi,
             "modeDepot": self.mode_depot,
             "destinataire": {
                 "codeDestinataire": self.destinataire.code_destinataire,
                 "codeServiceExecutant": self.destinataire.code_service_executant or "",
+                "nom": self.destinataire.nom,
             },
             "fournisseur": {
                 "idFournisseur": self.fournisseur.id_fournisseur,
+                "idServiceFournisseur": self.fournisseur.id_service_fournisseur,
+                "codeCoordonneesBancairesFournisseur": self.fournisseur.code_coordonnees_bancaires_fournisseur,
+                "nom": self.fournisseur.nom,
+                "siret": self.fournisseur.siret,
+                "numeroTvaIntra": self.fournisseur.numero_tva_intra,
+                "iban": self.fournisseur.iban,
             },
             "cadreDeFacturation": {
                 "codeCadreFacturation": self.cadre_de_facturation.code_cadre_facturation,
+                "codeServiceValideur": self.cadre_de_facturation.code_service_valideur,
+                "codeStructureValideur": self.cadre_de_facturation.code_structure_valideur,
             },
             "references": {
                 "deviseFacture": self.references.devise_facture,
@@ -352,69 +367,125 @@ class FactureChorus(FactureBase):
                 "typeFacture": self.references.type_facture,
                 "typeTva": self.references.type_tva,
                 "numeroMarche": self.references.numero_marche,
+                "motifExonerationTva": self.references.motif_exoneration_tva,
+                "numeroBonCommande": self.references.numero_bon_commande,
+                "numeroFactureOrigine": self.references.numero_facture_origine,
             },
             "commentaire": self.commentaire,
             "idUtilisateurCourant": self.id_utilisateur_courant or 0,
         }
 
-        # --- Fournisseur : champs optionnels
-        if self.fournisseur.id_service_fournisseur:
-            payload["fournisseur"]["idServiceFournisseur"] = (
-                self.fournisseur.id_service_fournisseur
-            )
-        if self.fournisseur.code_coordonnees_bancaires_fournisseur:
-            payload["fournisseur"]["codeCoordonneesBancairesFournisseur"] = (
-                self.fournisseur.code_coordonnees_bancaires_fournisseur
+        # --- Adresses postales ---
+        if self.destinataire.adresse_postale:
+            payload["destinataire"]["adressePostale"] = nettoyer_dict(
+                {
+                    "codePostal": self.destinataire.adresse_postale.code_postal,
+                    "ligneUn": self.destinataire.adresse_postale.ligne_un,
+                    "ligneDeux": self.destinataire.adresse_postale.ligne_deux,
+                    "nomVille": self.destinataire.adresse_postale.nom_ville,
+                    "paysCodeIso": self.destinataire.adresse_postale.pays_code_iso,
+                }
             )
 
-        # --- Lignes de poste
+        if self.fournisseur.adresse_postale:
+            payload["fournisseur"]["adressePostale"] = nettoyer_dict(
+                {
+                    "codePostal": self.fournisseur.adresse_postale.code_postal,
+                    "ligneUn": self.fournisseur.adresse_postale.ligne_un,
+                    "ligneDeux": self.fournisseur.adresse_postale.ligne_deux,
+                    "nomVille": self.fournisseur.adresse_postale.nom_ville,
+                    "paysCodeIso": self.fournisseur.adresse_postale.pays_code_iso,
+                }
+            )
+
+        # --- Lignes de poste ---
         payload["lignePoste"] = []
         for lp in self.lignes_de_poste:
             payload["lignePoste"].append(
-                {
-                    "lignePosteNumero": lp.numero,
-                    "lignePosteReference": lp.reference,
-                    "lignePosteDenomination": lp.denomination,
-                    "lignePosteQuantite": float(lp.quantite),
-                    "lignePosteUnite": lp.unite,
-                    "lignePosteMontantUnitaireHT": float(lp.montant_unitaire_ht),
-                    "lignePosteMontantRemiseHT": float(lp.montant_remise_ht or 0),
-                    "lignePosteTauxTvaManuel": float(lp.taux_tva_manuel or 0),
-                }
+                nettoyer_dict(
+                    {
+                        "lignePosteNumero": lp.numero,
+                        "lignePosteReference": lp.reference,
+                        "lignePosteDenomination": lp.denomination,
+                        "lignePosteQuantite": to_float(lp.quantite),
+                        "lignePosteUnite": lp.unite,
+                        "lignePosteMontantUnitaireHT": to_float(lp.montant_unitaire_ht),
+                        "lignePosteMontantRemiseHT": to_float(
+                            lp.montant_remise_ht or Decimal(0)
+                        ),
+                        "lignePosteTauxTva": lp.taux_tva,
+                        "lignePosteTauxTvaManuel": to_float(lp.taux_tva_manuel),
+                        "lignePosteCategorieTva": lp.categorie_tva
+                        if lp.categorie_tva
+                        else None,
+                        "lignePosteDateDebutPeriode": lp.date_debut_periode,
+                        "lignePosteDateFinPeriode": lp.date_fin_periode,
+                        "lignePosteCodeRaisonReduction": lp.code_raison_reduction
+                        if lp.code_raison_reduction
+                        else None,
+                        "lignePosteRaisonReduction": lp.raison_reduction,
+                    }
+                )
             )
 
-        # --- Lignes de TVA
+        # --- Lignes de TVA ---
         payload["ligneTva"] = []
         for lt in self.lignes_de_tva:
             payload["ligneTva"].append(
-                {
-                    "ligneTvaMontantBaseHtParTaux": float(lt.montant_base_ht),
-                    "ligneTvaMontantTvaParTaux": float(lt.montant_tva),
-                    "ligneTvaTauxManuel": float(lt.taux_manuel or 0),
-                }
+                nettoyer_dict(
+                    {
+                        "ligneTvaMontantBaseHtParTaux": to_float(lt.montant_base_ht),
+                        "ligneTvaMontantTvaParTaux": to_float(lt.montant_tva),
+                        "ligneTvaTaux": lt.taux,
+                        "ligneTvaTauxManuel": to_float(lt.taux_manuel),
+                        "ligneTvaCategorie": lt.categorie if lt.categorie else None,
+                    }
+                )
             )
 
-        # --- Montants totaux
-        payload["montantTotal"] = {
-            "montantHtTotal": float(self.montant_total.montant_ht_total),
-            "montantTVA": float(self.montant_total.montant_tva),
-            "montantTtcTotal": float(self.montant_total.montant_ttc_total),
-            "montantAPayer": float(self.montant_total.montant_a_payer),
-        }
+        # --- Montants totaux ---
+        payload["montantTotal"] = nettoyer_dict(
+            {
+                "montantHtTotal": to_float(self.montant_total.montant_ht_total),
+                "montantTVA": to_float(self.montant_total.montant_tva),
+                "montantTtcTotal": to_float(self.montant_total.montant_ttc_total),
+                "montantAPayer": to_float(self.montant_total.montant_a_payer),
+                "montantRemiseGlobaleTTC": to_float(
+                    self.montant_total.montant_remise_globale_ttc
+                ),
+                "motifRemiseGlobaleTTC": self.montant_total.motif_remise_globale_ttc,
+                "acompte": to_float(self.montant_total.acompte),
+            }
+        )
 
-        if self.montant_total.montant_remise_globale_ttc is not None:
-            payload["montantTotal"]["montantRemiseGlobaleTTC"] = float(
-                self.montant_total.montant_remise_globale_ttc
-            )
-        if self.montant_total.motif_remise_globale_ttc:
-            payload["montantTotal"]["motifRemiseGlobaleTTC"] = (
-                self.montant_total.motif_remise_globale_ttc
-            )
+        # --- Pièces jointes principales ---
+        if self.pieces_jointes_principales:
+            payload["pieceJointePrincipale"] = [
+                nettoyer_dict(
+                    {
+                        "pieceJointePrincipaleDesignation": pj.designation,
+                        "pieceJointePrincipaleId": pj.id,
+                    }
+                )
+                for pj in self.pieces_jointes_principales
+            ]
 
-        # --- Ne surtout pas inclure la date_facture (provoque une 500)
-        # (aucun champ "dateFacture" ajouté)
+        # --- Pièces jointes complémentaires ---
+        if self.pieces_jointes_complementaires:
+            payload["pieceJointeComplementaire"] = [
+                nettoyer_dict(
+                    {
+                        "pieceJointeComplementaireDesignation": pj.designation,
+                        "pieceJointeComplementaireId": pj.id,
+                        "pieceJointeComplementaireIdLiaison": pj.id_liaison,
+                        "pieceJointeComplementaireNumeroLigneFacture": pj.numero_ligne_facture,
+                        "pieceJointeComplementaireType": pj.type,
+                    }
+                )
+                for pj in self.pieces_jointes_complementaires
+            ]
 
-        # --- Nettoyage final : suppression des None
+        # --- Nettoyage final ---
         return nettoyer_dict(payload)
 
 
