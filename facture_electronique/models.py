@@ -4,12 +4,14 @@ from decimal import Decimal
 from typing import List, Optional, Annotated
 
 from .utils.strings_and_dicts import to_camel_case
+from .utils.datetime_utils import obtenir_date_iso_maintenant
 from .utils.facturx import ProfilFacturX
 from .constructeur import ConstructeurFacturX
 
 FRENCH_CAMEL_CASE_CONFIG = ConfigDict(
     alias_generator=to_camel_case,
     populate_by_name=True,
+    use_enum_values=True,
 )
 
 
@@ -255,27 +257,6 @@ class ModePaiement(str, Enum):
     AUTRE = "AUTRE"
     REPORT = "REPORT"
 
-    def to_facturx_code(self) -> str:
-        """Traduit le mode de paiement en code Factur-X standard."""
-        match self:
-            case ModePaiement.CHEQUE:
-                return "20"
-            case ModePaiement.PRELEVEMENT:
-                return "49"
-            case ModePaiement.VIREMENT:
-                return "30"
-            case ModePaiement.ESPECE:
-                return "10"
-            case ModePaiement.AUTRE:
-                return "57"
-            case ModePaiement.REPORT:
-                return "97"
-            case _:
-                # Cette branche ne devrait jamais être atteinte avec un Enum, mais c'est une bonne pratique.
-                raise NotImplementedError(
-                    f"Le mode de paiement '{self}' n'a pas de code Factur-X défini."
-                )
-
 
 class TypeFacture(str, Enum):
     """Type de document (facture ou avoir)."""
@@ -322,6 +303,7 @@ class FactureBase(BaseModel):
     """Modèle de base contenant les champs communs à toutes les factures."""
 
     model_config = FRENCH_CAMEL_CASE_CONFIG
+    date_facture: str = Field(default_factory=obtenir_date_iso_maintenant)
     mode_depot: ModeDepot
     destinataire: Destinataire
     fournisseur: Fournisseur
@@ -342,7 +324,6 @@ class FactureChorus(FactureBase):
     """Modèle spécifique pour une soumission à l'API Chorus Pro."""
 
     numero_facture_saisi: Optional[str] = None
-    date_facture: Optional[str] = None
     pieces_jointes_principales: Optional[List[PieceJointePrincipale]] = None
 
     def to_api_payload(self) -> dict:
@@ -363,12 +344,32 @@ class FactureFacturX(FactureBase):
     """Modèle de données pour une facture destinée à être convertie en Factur-X."""
 
     numero_facture: str
-    date_facture: str
     date_echeance_paiement: str
 
     def get_facturx_type_code(self) -> str:
         """Détermine le code de type de document Factur-X (380 pour facture, 381 pour avoir)."""
         return "381" if self.references.type_facture == TypeFacture.AVOIR else "380"
+
+    def get_facturx_mode_paiement_code(self) -> str:
+        """Traduit le mode de paiement en code Factur-X standard."""
+        match self.references.mode_paiement:
+            case ModePaiement.CHEQUE:
+                return "20"
+            case ModePaiement.PRELEVEMENT:
+                return "49"
+            case ModePaiement.VIREMENT:
+                return "30"
+            case ModePaiement.ESPECE:
+                return "10"
+            case ModePaiement.AUTRE:
+                return "57"
+            case ModePaiement.REPORT:
+                return "97"
+            case _:
+                # Cette branche ne devrait jamais être atteinte avec un Enum, mais c'est une bonne pratique.
+                raise NotImplementedError(
+                    f"Le mode de paiement '{self}' n'a pas de code Factur-X défini."
+                )
 
     def generer_facturx(self, profil: ProfilFacturX) -> ConstructeurFacturX:
         """

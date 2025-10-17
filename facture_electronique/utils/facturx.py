@@ -104,6 +104,11 @@ def _get_facturx_type_code(facture: FactureFacturX) -> str:
     return facture.get_facturx_type_code()
 
 
+def _get_facturx_mode_paiement_code(facture: FactureFacturX) -> str:
+    """Traduit le mode de paiement en code Factur-X standard."""
+    return facture.get_facturx_mode_paiement_code()
+
+
 def _get_facturx_quantity_units(unite: str) -> str:
     """Traduit une unité de quantité en code UN/ECE standard pour Factur-X."""
     equiv = {"lot": "C62", "Kg": "KGM", "L": "LTR", "m": "MTR", "m3": "MTQ", "t": "TNE"}
@@ -384,7 +389,7 @@ def _gen_facturx_profil_complexe(facture: FactureFacturX, profil: ProfilFacturX)
             specified_trade_settlement_payment_means=[
                 module.TradeSettlementPaymentMeansType(
                     type_code=module.PaymentMeansCodeType(
-                        value=facture.references.mode_paiement.to_facturx_code()
+                        value=_get_facturx_mode_paiement_code(facture)
                     ),
                     # payer_party_debtor_financial_account=module.DebtorFinancialAccountType(ibanid=),
                     payee_party_creditor_financial_account=module.CreditorFinancialAccountType(

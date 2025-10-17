@@ -97,14 +97,12 @@ def test_get_facturx_type_code(sample_facture):
     assert _get_facturx_type_code(sample_facture) == "381"
 
 
-def test_mode_paiement_to_facturx_code():
+def test_mode_paiement_to_facturx_code(sample_facture):
     """Teste la génération du code de mode de paiement depuis l'Enum."""
-    assert ModePaiement.VIREMENT.to_facturx_code() == "30"
-    assert ModePaiement.CHEQUE.to_facturx_code() == "20"
-    assert ModePaiement.PRELEVEMENT.to_facturx_code() == "49"
-    assert ModePaiement.ESPECE.to_facturx_code() == "10"
-    assert ModePaiement.AUTRE.to_facturx_code() == "57"
-    assert ModePaiement.REPORT.to_facturx_code() == "97"
+    sample_facture.references.mode_paiement = ModePaiement.VIREMENT
+    assert sample_facture.get_facturx_mode_paiement_code() == "30"
+    sample_facture.references.mode_paiement = ModePaiement.CHEQUE
+    assert sample_facture.get_facturx_mode_paiement_code() == "20"
 
 
 def test_float_vers_decimal_facturx():

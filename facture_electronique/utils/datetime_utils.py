@@ -1,4 +1,12 @@
-from datetime import datetime
+from datetime import datetime, date
+
+
+def obtenir_date_iso_maintenant() -> str:
+    """
+    Retourne la date et l'heure actuelles, au format ISO 8601
+    Exemple: "2024-07-26"
+    """
+    return date.today().isoformat()
 
 
 def format_datetime_to_iso(dt: datetime) -> str:
