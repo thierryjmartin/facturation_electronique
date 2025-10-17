@@ -9,7 +9,7 @@ description = "Facturation Electronique SDK est une bibliothèque Python qui sim
 readme = { file = "readme.md", content-type = "text/markdown" }
 authors = [{ name = "Thierry Martin", email = "thierry.martin.2008@gadz.org" }]
 license = { text = "MIT" }
-keywords = ["chorus pro", "choruspro", "facturx", "factur-x", "facture électronique"]
+keywords = ["chorus pro", "choruspro", "facturx", "factur-x", "facture électronique", "EN16931", "invoice"]
 classifiers = [
 	"Development Status :: 3 - Alpha",
 	"Programming Language :: Python :: 3",

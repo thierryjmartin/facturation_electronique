@@ -198,8 +198,10 @@ La norme Factur-X exige que le PDF porteur soit au format PDF/A-3. La fonction `
     try:
         valider_xml_facturx_schematron(xml_content_extended, FACTURX_EXTENDED)
         validation_ok_extended = True
-    except Exception:
+    except XSLTValidationError:
         validation_ok_extended = False
+
+    assert validation_ok_extended is False
 
     assert validation_ok_extended is True
     assert "<rsm:ExchangedDocumentContext>" in xml_content_extended
