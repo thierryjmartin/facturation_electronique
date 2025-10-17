@@ -121,4 +121,30 @@ La norme Factur-X exige que le PDF porteur soit au format PDF/A-3. La fonction `
     assert os.path.exists(facturx_output)
 
 
+    # On choisit ici le profil EXTENDED
+    xml_content_extended = gen_xml_depuis_facture(facturx_invoice.to_facturx_extended())
+
+    try:
+        valider_xml_facturx_schematron(xml_content_extended, FACTURX_EXTENDED)
+        validation_ok_extended = True
+    except Exception:
+        validation_ok_extended = False
+
+    assert validation_ok_extended is True
+    assert "<rsm:ExchangedDocumentContext>" in xml_content_extended
+
+    facturx_output_extended = os.path.join(output_dir, "facture_extended.pdf")
+
+    facturx.generate_from_file(
+        pdfa_output, # Le PDF/A généré à l'étape 2
+        xml_content_extended, # Le XML généré
+        output_pdf_file=facturx_output_extended,
+        flavor="factur-x",
+        level="extended",
+        check_xsd=True, # Active la validation XSD interne
+    )
+
+    assert os.path.exists(facturx_output_extended)
+
+
 Le fichier `facture_en16931.pdf` est maintenant une facture Factur-X valide, prête à être envoyée.

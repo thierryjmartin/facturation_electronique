@@ -163,6 +163,10 @@ Développé par Thierry Martin
 
 ## Changelog
 
+### 0.6.0 (17 octobre 2025)
+- **Nouvelle fonctionnalité** : Ajout du support pour le profil Factur-X EXTENDED.
+- **Changement d'API (potentiellement non rétrocompatible)** : La fonction `valider_xml_xldt` a été renommée en `valider_xml_facturx_schematron` dans `facture_electronique/utils/facturx.py` pour une meilleure clarté et cohérence.
+
 ### 0.5.9
 - Mise à jour pour le support de Factur-X 1.0.7.3.
 
