@@ -223,7 +223,7 @@ if __name__ == "__main__":
             "motifRemiseGlobaleTTC": "Geste commercial",
         },
     }
-    print(exemple_facture_mode_api.to_api_payload())
+    # print(exemple_facture_mode_api.to_api_payload())
     res = c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
     # print(payload)
     # res = c.envoyer_facture(payload)
