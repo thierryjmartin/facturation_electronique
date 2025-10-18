@@ -17,6 +17,7 @@ from facture_electronique.models import (
     AdressePostale,
     CategorieTVA,
     ModeDepot,
+    AdresseElectronique,
 )
 from facture_electronique.utils.facturx import (
     _get_facturx_type_code,
@@ -39,14 +40,14 @@ def sample_facture() -> FactureFacturX:
         date_facture="2024-10-26",
         date_echeance_paiement="2024-11-26",
         destinataire=Destinataire(
-            code_destinataire="12345678901234",
+            adresse_electronique=AdresseElectronique(identifiant="12345678901234"),
             nom="Acheteur SA",
             adresse_postale=AdressePostale(pays_code_iso="FR"),
         ),
         fournisseur=Fournisseur(
             id_fournisseur=123,
+            adresse_electronique=AdresseElectronique(identifiant="11122233300011"),
             nom="Vendeur SAS",
-            siret="11122233300011",
             numero_tva_intra="FR12111222333",
             iban="FR7630006000011234567890189",
             adresse_postale=AdressePostale(pays_code_iso="FR"),

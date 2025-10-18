@@ -65,6 +65,36 @@ N'oubliez pas d'ajouter le fichier `.env` à votre `.gitignore`.
 Les classes API, comme `ChorusProAPI`, liront automatiquement ces variables. Vous pouvez également les fournir explicitement lors de l'instanciation.
 
 
+## Construire une Adresse Électronique (Recommandé)
+
+La norme de facturation électronique française (AFNOR XP Z12-014) définit des formats d'adressage précis basés sur le SIREN, comme `SIREN_SIRET` ou `SIREN_SIRET_CODEROUTAGE`. Pour simplifier la création de ces identifiants et éviter les erreurs, la bibliothèque fournit un constructeur dédié : `ConstructeurAdresse`.
+
+L'utilisation de ce "builder" est la méthode recommandée pour garantir la conformité de vos adresses.
+
+```python
+from facture_electronique.models import ConstructeurAdresse, AdresseElectronique, SchemeID
+
+# Cas 1 : Adresse simple avec SIREN
+adresse_simple = ConstructeurAdresse(siren="123456789").construire()
+# -> identifiant = "123456789"
+
+# Cas 2 : Adresse avec SIRET pour un établissement
+adresse_etablissement = ConstructeurAdresse(siren="123456789").avec_siret("12345678901234").construire()
+# -> identifiant = "123456789_12345678901234"
+
+# Cas 3 : Adresse avec un code de routage pour un service public
+adresse_service = (
+    ConstructeurAdresse(siren="123456789")
+    .avec_siret("12345678901234")
+    .avec_code_routage("SERVICE01")
+    .construire()
+)
+# -> identifiant = "123456789_12345678901234_SERVICE01"
+
+# Il reste possible de créer une adresse manuellement (non recommandé pour les cas complexes)
+adresse_manuelle = AdresseElectronique(identifiant="123456789", scheme_id=SchemeID.FR_SIREN)
+```
+
 ## Utilisation
 
 Voici des exemples simples pour les cas d'usage les plus courants. Pour des scénarios plus avancés (tous les profils Factur-X, signature, envoi de PDF...), consultez le fichier `facture_electronique/exemples/exemple_decoupe.py`.

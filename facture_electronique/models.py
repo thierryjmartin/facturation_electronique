@@ -67,6 +67,62 @@ class AdresseElectronique(BaseModel):
     scheme_id: SchemeID = SchemeID.FR_SIREN
 
 
+class ConstructeurAdresse:
+    """
+    Classe utilitaire "builder" pour construire une adresse électronique complexe
+    de manière programmatique, en chaînant les appels.
+
+    Elle valide les formats des composants (SIREN, SIRET) et les assemble
+    correctement, réduisant ainsi les risques d'erreur.
+    """
+
+    def __init__(self, siren: str):
+        """Initialise le constructeur avec un SIREN de base."""
+        if not (siren.isdigit() and len(siren) == 9):
+            raise ValueError("Le SIREN doit être une chaîne de 9 chiffres.")
+        self._elements = [siren]
+
+    def avec_siret(self, siret: str):
+        """Ajoute un SIRET à l'adresse."""
+        if not (siret.isdigit() and len(siret) == 14):
+            raise ValueError("Le SIRET doit être une chaîne de 14 chiffres.")
+        if not siret.startswith(self._elements[0]):
+            raise ValueError("Le SIRET ne semble pas correspondre au SIREN de base.")
+        self._elements.append(siret)
+        return self
+
+    def avec_code_routage(self, code: str):
+        """Ajoute un code de routage à l'adresse."""
+        if not code or not code.isalnum() or "_" in code:
+            raise ValueError(
+                "Le code de routage ne doit contenir que des caractères alphanumériques."
+            )
+        self._elements.append(code)
+        return self
+
+    def avec_suffixe(self, suffixe: str):
+        """Ajoute un suffixe libre à l'adresse."""
+        if not suffixe or not suffixe.isalnum() or "_" in suffixe:
+            raise ValueError(
+                "Le suffixe ne doit contenir que des caractères alphanumériques."
+            )
+        self._elements.append(suffixe)
+        return self
+
+    def construire(self) -> AdresseElectronique:
+        """Construit et retourne l'objet AdresseElectronique final."""
+        # S'assure qu'il n'y a pas de doublon de SIRET si le SIRET est le 2ème élément
+        if len(self._elements) > 1 and self._elements[1].startswith(self._elements[0]):
+            # Cas SIREN_SIRET, on ne garde que le SIRET
+            if len(self._elements) == 2 and len(self._elements[1]) == 14:
+                pass  # On garde les deux pour former SIREN_SIRET
+
+        identifiant_final = "_".join(self._elements)
+        return AdresseElectronique(
+            identifiant=identifiant_final, scheme_id=SchemeID.FR_SIREN
+        )
+
+
 class Destinataire(BaseModel):
     """Informations sur le destinataire de la facture (le client)."""
 
