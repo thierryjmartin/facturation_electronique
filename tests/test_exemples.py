@@ -1,53 +1,58 @@
+# facture_electronique/tests/test_exemples.py
+
+import os
 import subprocess
 import sys
-import os
+from pathlib import Path
+
+import pytest
+
+# On définit le chemin de base vers le répertoire des exemples de manière robuste.
+# __file__ -> chemin de ce fichier de test
+# .parent -> répertoire 'tests'
+# .parent -> répertoire 'facture_electronique'
+CHEMIN_BASE_EXEMPLES = Path(__file__).parent.parent / "facture_electronique" / "exemples"
+
+# Liste des scripts à tester. Facile à maintenir et à étendre.
+SCRIPTS_A_TESTER = [
+    "exemple.py",
+    "exemple_decoupe.py",
+]
 
 
-def test_exemple_principal_runs_without_error():
-    """Vérifie que le script principal d'exemple s'exécute sans erreur."""
-    script_path = "facture_electronique/exemples/exemple.py"
+@pytest.mark.parametrize("nom_script", SCRIPTS_A_TESTER)
+def test_execution_exemple_sans_erreur(nom_script):
+    """
+    Vérifie qu'un script d'exemple s'exécute sans erreur.
+    Ce test est paramétré pour s'exécuter pour chaque script dans SCRIPTS_A_TESTER.
+    """
+    chemin_script = CHEMIN_BASE_EXEMPLES / nom_script
 
-    # Utilise sys.executable pour garantir l'utilisation du même interpréteur Python
-    # que celui qui exécute pytest.
-    # On ajoute les identifiants fictifs à l'environnement pour ce sous-processus.
+    # Vérifie que le fichier script existe avant de tenter de l'exécuter
+    assert chemin_script.exists(), f"Le fichier script {chemin_script} n'a pas été trouvé."
+
+    # Création d'un environnement isolé pour le sous-processus
     env = os.environ.copy()
     env["PISTE_CLIENT_ID"] = "dummy"
     env["PISTE_CLIENT_SECRET"] = "dummy"
     env["CHORUS_PRO_LOGIN"] = "dummy"
     env["CHORUS_PRO_PASSWORD"] = "dummy"
 
-    result = subprocess.run(
-        [sys.executable, script_path],
-        capture_output=True,
-        text=True,
-        env=env,
-        check=False,  # On ne veut pas que subprocess lève une erreur, on la gère nous-mêmes
-    )
-
-    # Affiche la sortie d'erreur du script si le test échoue pour faciliter le débogage
-    assert (
-        result.returncode == 0
-    ), f"Le script {script_path} a échoué avec le code {result.returncode}.\nErreur:\n{result.stderr}"
-
-
-def test_exemple_decoupe_runs_without_error():
-    """Vérifie que le script découpé d'exemple s'exécute sans erreur."""
-    script_path = "facture_electronique/exemples/exemple_decoupe.py"
-
-    env = os.environ.copy()
-    env["PISTE_CLIENT_ID"] = "dummy"
-    env["PISTE_CLIENT_SECRET"] = "dummy"
-    env["CHORUS_PRO_LOGIN"] = "dummy"
-    env["CHORUS_PRO_PASSWORD"] = "dummy"
-
-    result = subprocess.run(
-        [sys.executable, script_path],
+    resultat = subprocess.run(
+        [
+            sys.executable,
+            str(chemin_script),
+        ],  # str() est nécessaire car subprocess attend des chaînes
         capture_output=True,
         text=True,
         env=env,
         check=False,
     )
 
-    assert (
-        result.returncode == 0
-    ), f"Le script {script_path} a échoué avec le code {result.returncode}.\nErreur:\n{result.stderr}"
+    message_erreur = "Le script {script} a échoué avec le code {code}.\nErreur:\n{stderr}".format(
+        script=chemin_script,
+        code=resultat.returncode,
+        stderr=resultat.stderr,
+    )
+
+    assert resultat.returncode == 0, message_erreur

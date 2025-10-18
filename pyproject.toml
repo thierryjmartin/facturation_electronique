@@ -69,3 +69,6 @@ include = ["facture_electronique*"]
 
 [tool.pytest.ini_options]
 addopts = "--markdown-docs"
+
+[tool.ruff]
+line-length = 100
