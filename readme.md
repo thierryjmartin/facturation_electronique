@@ -108,7 +108,7 @@ from decimal import Decimal
 from facture_electronique.models import (
     FactureFacturX, ModeDepot, Destinataire, Fournisseur, CadreDeFacturation,
     CodeCadreFacturation, References, TypeFacture, TypeTVA, ModePaiement,
-    LigneDePoste, LigneDeTVA, MontantTotal, AdresseElectronique, SchemeID
+    LigneDePoste, LigneDeTVA, MontantTotal, AdresseElectronique, SchemeID, AdressePostale
 )
 from facture_electronique.utils.facturx import ProfilFacturX
 from facture_electronique.utils.files import get_absolute_path
@@ -119,16 +119,21 @@ facture_simple = FactureFacturX(
     numero_facture="F2025-001",
     date_echeance_paiement="2025-11-17",
     destinataire=Destinataire(
+        nom="Client Test SAS",
         adresse_electronique=AdresseElectronique(
             identifiant="12345678901234", scheme_id=SchemeID.FR_SIREN
-        )
+        ),
+        adresse_postale=AdressePostale(pays_code_iso="FR"),
     ),
     fournisseur=Fournisseur(
+        nom="Fournisseur Test SARL",
         adresse_electronique=AdresseElectronique(
             identifiant="11122233300011", scheme_id=SchemeID.FR_SIREN
         ),
         id_fournisseur=12345,  # ID Chorus Pro du fournisseur (fictif ici)
         numero_tva_intra="FR12111222333",
+        iban="FR7630006000011234567890189",
+        adresse_postale=AdressePostale(pays_code_iso="FR"),
     ),
     cadre_de_facturation=CadreDeFacturation(
         code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR
@@ -190,7 +195,7 @@ from facture_electronique.api.chorus_pro import ChorusProAPI
 from facture_electronique.models import (
     FactureChorus, ModeDepot, Destinataire, Fournisseur, CadreDeFacturation,
     CodeCadreFacturation, References, TypeFacture, TypeTVA, ModePaiement,
-    LigneDePoste, LigneDeTVA, MontantTotal, AdresseElectronique, SchemeID
+    LigneDePoste, LigneDeTVA, MontantTotal, AdresseElectronique, SchemeID, AdressePostale
 )
 
 # 1. Initialiser le client API (en mode sandbox)
@@ -208,16 +213,21 @@ except Exception as e:
 facture_api = FactureChorus(
     mode_depot=ModeDepot.SAISIE_API,
     numero_facture="API-2025-001",
+    date_echeance_paiement="2025-12-17",
     destinataire=Destinataire(
+        nom="Client Public Test",
         adresse_electronique=AdresseElectronique(
             identifiant="12345678901234", scheme_id=SchemeID.FR_SIREN
-        )
+        ),
+        adresse_postale=AdressePostale(pays_code_iso="FR"),
     ),  # SIRET du client public
     fournisseur=Fournisseur(
+        nom="Mon Entreprise Test",
         id_fournisseur=12345,  # Votre ID technique Chorus Pro
         adresse_electronique=AdresseElectronique(
             identifiant="11122233300011", scheme_id=SchemeID.FR_SIREN
         ),
+        adresse_postale=AdressePostale(pays_code_iso="FR"),
     ),
     cadre_de_facturation=CadreDeFacturation(
         code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR
@@ -288,6 +298,20 @@ Ce projet est sous licence MIT.
 Développé par Thierry Martin
 
 ## Changelog
+
+### 0.7.0 (18 octobre 2025)
+- **CHANGEMENT MAJEUR (non rétrocompatible)**: Refonte complète de la gestion des adresses des partenaires commerciaux pour se conformer à la norme AFNOR XP Z12-014.
+  - Les modèles `Destinataire` et `Fournisseur` n'utilisent plus de simples chaînes de caractères pour les identifiants.
+  - Introduction du modèle `AdresseElectronique` (contenant un `identifiant` et un `scheme_id`) qui est maintenant un champ obligatoire pour `Destinataire` et `Fournisseur`.
+  - Le champ `code_destinataire` a été supprimé du modèle `Destinataire`.
+- **Nouvelle fonctionnalité**: Ajout d'un constructeur `ConstructeurAdresse` pour créer de manière fluide et sécurisée des adresses électroniques complexes (ex: `SIREN_SIRET_CODEROUTAGE`).
+- **Améliorations**:
+  - La robustesse du client `ChorusProAPI` a été améliorée pour mieux gérer les erreurs réseau lors de l'authentification, en levant une `ErreurConfiguration` cohérente.
+  - La couverture de test a été étendue pour inclure les exemples de code du fichier `readme.md` grâce à l'intégration de `pytest-markdown-docs`.
+- **Corrections**:
+  - Mise à jour de l'ensemble des tests unitaires et des tests de la documentation pour s'aligner sur la nouvelle structure des modèles de données.
+  - Correction d'une logique de test erronée pour la validation de la configuration de l'API.
+- **Documentation**: Mise à jour complète du `readme.md` et des guides pour refléter l'utilisation des nouveaux modèles `AdresseElectronique` et `ConstructeurAdresse`.
 
 ### 0.6.0 (17 octobre 2025)
 - **Nouvelle fonctionnalité** : Ajout du support pour le profil Factur-X EXTENDED.

@@ -98,9 +98,14 @@ class ChorusProAPI:
             "client_secret": self.secret_client_piste,
             "scope": "openid",
         }
-        reponse = requests.post(url, headers=headers, data=donnees, verify=True)
-        reponse.raise_for_status()
-        return reponse.json()["access_token"]
+        try:
+            reponse = requests.post(url, headers=headers, data=donnees, verify=True)
+            reponse.raise_for_status()
+            return reponse.json()["access_token"]
+        except requests.exceptions.RequestException as e:
+            raise ErreurConfiguration(
+                f"Échec de l'obtention du jeton d'authentification PISTE: {e}"
+            ) from e
 
     def _creer_compte_cpro_base64(self):
         """

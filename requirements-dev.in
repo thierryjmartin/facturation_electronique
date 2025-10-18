@@ -2,3 +2,19 @@
 sphinx
 sphinx-rtd-theme
 myst-parser
+
+black
+isort
+rstcheck
+codespell
+
+# Tests
+pytest
+pytest-cov
+pytest-django
+pytest-markdown-docs
+
+# Documentation
+sphinx
+sphinx_rtd_theme
+myst_parser

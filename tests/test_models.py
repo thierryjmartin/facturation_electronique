@@ -212,7 +212,7 @@ class TestConstructeurAdresse:
         ):
             ConstructeurAdresse(siren="123456789").avec_siret("98765432101234")
 
-    @pytest.mark.parametrize("code_invalide", ["CODE!", "CODE_AVEC_UNDERSCORE"])
+    @pytest.mark.parametrize("code_invalide", ["CODE!", "CODE-AVEC-TIRET"])
     def test_echec_code_routage_invalide(self, code_invalide):
         """Vérifie les erreurs pour un code de routage invalide."""
         with pytest.raises(ValueError, match="caractères alphanumériques"):

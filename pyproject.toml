@@ -65,3 +65,6 @@ package-data = { "facture_electronique" = ["xsd/**/*.xslt", "xsd/**/*.xsd"] }
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["facture_electronique*"]
+
+[tool.pytest.ini_options]
+addopts = "--markdown-docs"

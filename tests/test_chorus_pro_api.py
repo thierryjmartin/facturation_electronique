@@ -84,7 +84,11 @@ class TestConfigurationChorusProAPI:
         for nom, valeur in variables.items():
             monkeypatch.setenv(nom, valeur)
 
+        # On s'assure que la variable testée est bien absente de l'environnement
+        monkeypatch.delenv(variable_manquante, raising=False)
+
         with pytest.raises(ErreurConfiguration) as excinfo:
+            # L'erreur doit être levée dès l'initialisation
             ChorusProAPI()
 
         assert variable_manquante in str(excinfo.value)
