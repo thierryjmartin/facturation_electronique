@@ -46,6 +46,7 @@ dependencies = [
 test = [
     "pytest",
     "pytest-cov",
+    "pytest-markdown-docs",
 ]
 dev = [
     "ruff",
