@@ -13,6 +13,10 @@ Le mode `SAISIE_API` permet de soumettre une facture en fournissant toutes les d
 
 La première étape est de construire un objet `FactureChorus` qui représente la facture avec toutes ses informations : destinataire, fournisseur, lignes de facture, montants, etc.
 
+.. testsetup::
+
+    from facture_electronique.models import AdresseElectronique, SchemeID
+
 .. testcode::
 
     # L'identifiant technique du fournisseur sur Chorus Pro.
@@ -21,12 +25,19 @@ La première étape est de construire un objet `FactureChorus` qui représente l
 
     facture_api = FactureChorus(
         mode_depot=ModeDepot.SAISIE_API,
+        numero_facture="API-2025-002",
+        date_echeance_paiement="2025-12-17",
         id_utilisateur_courant=0, # L'ID de l'utilisateur qui effectue l'action
         destinataire=Destinataire(
-            code_destinataire="99986401570264", # SIRET du client
+            adresse_electronique=AdresseElectronique(
+                identifiant="99986401570264", scheme_id=SchemeID.FR_SIREN
+            )
         ),
         fournisseur=Fournisseur(
             id_fournisseur=identifiant_fournisseur_chorus,
+            adresse_electronique=AdresseElectronique(
+                identifiant="11122233300011", scheme_id=SchemeID.FR_SIREN
+            ),
         ),
         cadre_de_facturation=CadreDeFacturation(
             code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR,

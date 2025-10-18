@@ -125,7 +125,8 @@ def _gen_applicable_header_trade_agreement(facturx_module, facture: FactureFactu
             name=facturx_module.TextType(value=facture.fournisseur.nom),
             specified_legal_organization=facturx_module.LegalOrganizationType(
                 id=facturx_module.Idtype(
-                    scheme_id="0002", value=facture.fournisseur.siret
+                    scheme_id=facture.fournisseur.adresse_electronique.scheme_id,
+                    value=facture.fournisseur.adresse_electronique.identifiant,
                 )
             ),
             postal_trade_address=facturx_module.TradeAddressType(
@@ -145,7 +146,8 @@ def _gen_applicable_header_trade_agreement(facturx_module, facture: FactureFactu
             name=facturx_module.TextType(value=facture.destinataire.nom),
             specified_legal_organization=facturx_module.LegalOrganizationType(
                 id=facturx_module.Idtype(
-                    scheme_id="0002", value=facture.destinataire.code_destinataire
+                    scheme_id=facture.destinataire.adresse_electronique.scheme_id,
+                    value=facture.destinataire.adresse_electronique.identifiant,
                 )
             ),
             postal_trade_address=facturx_module.TradeAddressType(

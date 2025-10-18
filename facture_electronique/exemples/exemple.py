@@ -21,7 +21,9 @@ from facture_electronique.models import (
     LigneDeTVA,
     MontantTotal,
     CategorieTVA,
-    AdressePostale,  # Ajout pour la partie Chorus
+    AdressePostale,
+    AdresseElectronique,  # Ajout
+    SchemeID,  # Ajout
 )
 
 # Le seul import nécessaire pour la génération Factur-X !
@@ -33,27 +35,16 @@ if __name__ == "__main__":
     c = ChorusProAPI(sandbox=True)
 
     # --- 1. Cinématique Chorus Pro (conservée à l'identique) ---
-    """
-	 A titre d'exemple, voici une cinématique nominale pour avoir des informations sur une structure et ses services:
+    fournisseur_siret = "26073617692140"
+    destinataire_siret = "99986401570264"
 
-			  1- Faire appel à l'API "RechercherStructure" afin de retrouver des structures avec quelques informations en sortie notamment "idStructureCPP
-
-			  2- Faire appel à l'API "ConsulterStructure" avec en entrée l'idStructureCPP pour avoir les paramètres obligatoires de la structure (numéro d'engagement et/ou code service)
-
-			  3- Faire appel à l'API "rechercherServicesStructure" avec "idStructure" en entrée de la requête afin de visualiser les services actifs de la structure renseignée
-
-			  4- Faire appel à l'API consulterServiceStructure avec idService en entrée de la requête afin de consulter les paramètres obligatoires du service.
-	"""
     payload = {
         "parametres": {
             "nbResultatsParPage": 10,
             "pageResultatDemandee": 1,
-            "triColonne": "IdentifiantStructure",
-            "triSens": "Descendant",
         },
-        "restreindreStructuresPrivees": False,
         "structure": {
-            "identifiantStructure": "26073617692140",
+            "identifiantStructure": fournisseur_siret,
             "typeIdentifiantStructure": "SIRET",
         },
     }
@@ -61,24 +52,32 @@ if __name__ == "__main__":
     identifiant_cpro = 0
     if recherche_structure["parametresRetour"]["total"] == 1:
         identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
-        print(identifiant_cpro)
-    # identifiant_cpro = 12345
-    # identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140")
-    # c.consulter_structure(26300989)
-    # c.rechercher_services_structure(26300989)
-    # service = c.consulter_service_structure(id_structure=26311042, id_service=10657669)
-    # print(service)
+        print(
+            f"ID Chorus Pro trouvé pour le SIRET {fournisseur_siret}: {identifiant_cpro}"
+        )
+    else:
+        identifiant_cpro = 26300989  # Fallback pour l'exemple
+        print(
+            f"Aucun ID Chorus Pro trouvé, utilisation de la valeur par défaut: {identifiant_cpro}"
+        )
 
-    # --- 2. Préparation des données de facture (conservée à l'identique) ---
+    # --- 2. Préparation des données de facture (Mise à jour avec AdresseElectronique) ---
     exemple_facture_mode_api = FactureChorus(
         mode_depot=ModeDepot("SAISIE_API"),
         numero_facture="2025-002",
+        date_echeance_paiement="2025-11-17",
         id_utilisateur_courant=0,
         destinataire=Destinataire(
-            code_destinataire="99986401570264", code_service_executant=""
+            adresse_electronique=AdresseElectronique(
+                identifiant=destinataire_siret, scheme_id=SchemeID.FR_SIREN
+            ),
+            code_service_executant="",
         ),
         fournisseur=Fournisseur(
-            id_fournisseur=26300989,
+            id_fournisseur=identifiant_cpro,
+            adresse_electronique=AdresseElectronique(
+                identifiant=fournisseur_siret, scheme_id=SchemeID.FR_SIREN
+            ),
             id_service_fournisseur=10652252,
         ),
         cadre_de_facturation=CadreDeFacturation(
@@ -114,56 +113,26 @@ if __name__ == "__main__":
                 taux_tva="",
                 taux_tva_manuel=Decimal("2.1"),
             ),
-            LigneDePoste(
-                numero=3,
-                reference="R3",
-                denomination="D3",
-                quantite=Decimal("16"),
-                unite="lot",
-                montant_unitaire_ht=Decimal("24.00"),
-                montant_remise_ht=Decimal("0"),
-                taux_tva="",
-                taux_tva_manuel=Decimal("5"),
-            ),
-            LigneDePoste(
-                numero=4,
-                reference="XX",
-                denomination="XX",
-                quantite=Decimal("1"),
-                unite="lot",
-                montant_unitaire_ht=Decimal("10.00"),
-                montant_remise_ht=Decimal("0"),
-                taux_tva="",
-                taux_tva_manuel=Decimal("20"),
-            ),
         ],
         lignes_de_tva=[
             LigneDeTVA(
                 taux_manuel=Decimal("20"),
                 taux=None,
-                montant_base_ht=Decimal("510.00"),
-                montant_tva=Decimal("102.00"),
+                montant_base_ht=Decimal("500.00"),
+                montant_tva=Decimal("100.00"),
             ),
             LigneDeTVA(
                 taux_manuel=Decimal("2.1"),
                 taux=None,
                 montant_base_ht=Decimal("432.00"),
-                montant_tva=Decimal("9.072"),
-            ),
-            LigneDeTVA(
-                taux_manuel=Decimal("5"),
-                taux=None,
-                montant_base_ht=Decimal("384.00"),
-                montant_tva=Decimal("19.20"),
+                montant_tva=Decimal("9.07"),
             ),
         ],
         montant_total=MontantTotal(
-            montant_ht_total=Decimal("1326.00"),
-            montant_tva=Decimal("130.272"),
-            montant_ttc_total=Decimal("1406.272"),
-            montant_remise_globale_ttc=Decimal("50.00"),
-            motif_remise_globale_ttc="Geste commercial",
-            montant_a_payer=Decimal("1400.00"),
+            montant_ht_total=Decimal("932.00"),
+            montant_tva=Decimal("109.07"),
+            montant_ttc_total=Decimal("1041.07"),
+            montant_a_payer=Decimal("1041.07"),
         ),
         commentaire="Création_VABF_SoumettreFacture",
     )
@@ -225,9 +194,7 @@ if __name__ == "__main__":
     }
     # print(exemple_facture_mode_api.to_api_payload())
     res = c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
-    # print(payload)
-    # res = c.envoyer_facture(payload)
-    print(res)
+    print(f"  -> Réponse de Chorus Pro: {res}")
 
     exemple_facture_mode_pdf = FactureFacturX(
         mode_depot=ModeDepot("DEPOT_PDF_API"),
@@ -237,7 +204,9 @@ if __name__ == "__main__":
         id_utilisateur_courant=0,
         destinataire=Destinataire(
             nom="acheteur 99986401570264",
-            code_destinataire="99986401570264",
+            adresse_electronique=AdresseElectronique(
+                identifiant=destinataire_siret, scheme_id=SchemeID.FR_SIREN
+            ),
             adresse_postale=AdressePostale(
                 code_postal="122345",
                 ligne_un="adresse du destinataire",
@@ -247,9 +216,11 @@ if __name__ == "__main__":
             code_service_executant="",
         ),
         fournisseur=Fournisseur(
-            id_fournisseur=12345,
+            id_fournisseur=identifiant_cpro,
             nom="Fournisseur 26073617692140",
-            siret="26073617692140",
+            adresse_electronique=AdresseElectronique(
+                identifiant=fournisseur_siret, scheme_id=SchemeID.FR_SIREN
+            ),
             numero_tva_intra="FR61529571234",
             iban="FR7630006000011234567890189",
             adresse_postale=AdressePostale(

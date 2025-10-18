@@ -15,6 +15,10 @@ Le processus se déroule en trois temps : l'envoi du fichier, la création de l'
 
 On commence par envoyer le fichier Factur-X au système de fichiers de Chorus Pro avec `ajouter_fichier_dans_systeme`. L'API nous retourne un identifiant pour cette pièce jointe.
 
+.. testsetup::
+
+    from facture_electronique.models import AdresseElectronique, SchemeID
+
 .. testcode::
 
     facturx_invoice = FactureFacturX(
@@ -23,7 +27,9 @@ On commence par envoyer le fichier Factur-X au système de fichiers de Chorus Pr
         date_facture="2024-10-18",
         date_echeance_paiement="2024-11-18",
         destinataire=Destinataire(
-            code_destinataire="99986401570264",
+            adresse_electronique=AdresseElectronique(
+                identifiant="99986401570264", scheme_id=SchemeID.FR_SIREN
+            ),
             nom="Client Principal SA",
             adresse_postale=AdressePostale(
                 ligne_un="123 Rue du Test", code_postal="75001", nom_ville="Paris"
@@ -31,7 +37,9 @@ On commence par envoyer le fichier Factur-X au système de fichiers de Chorus Pr
         ),
         fournisseur=Fournisseur(
             id_fournisseur=12345,
-            siret="26073617692140",
+            adresse_electronique=AdresseElectronique(
+                identifiant="26073617692140", scheme_id=SchemeID.FR_SIREN
+            ),
             numero_tva_intra="FR61529571234",
             nom="Mon Entreprise SAS",
             adresse_postale=AdressePostale(

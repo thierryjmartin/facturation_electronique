@@ -13,6 +13,10 @@ Factur-X est une norme franco-allemande de facture électronique qui consiste en
 
 Cet objet contient toutes les données nécessaires à la fois pour le fichier XML et pour l'envoi ultérieur à Chorus Pro.
 
+.. testsetup::
+
+    from facture_electronique.models import AdresseElectronique, SchemeID
+
 .. testcode::
 
     facturx_invoice = FactureFacturX(
@@ -23,7 +27,9 @@ Cet objet contient toutes les données nécessaires à la fois pour le fichier X
         id_utilisateur_courant=0,
         destinataire=Destinataire(
             nom="acheteur 99986401570264",
-            code_destinataire="99986401570264",
+            adresse_electronique=AdresseElectronique(
+                identifiant="99986401570264", scheme_id=SchemeID.FR_SIREN
+            ),
             adresse_postale=AdressePostale(
                 code_postal="122345",
                 ligne_un="adresse du destinataire",
@@ -35,7 +41,9 @@ Cet objet contient toutes les données nécessaires à la fois pour le fichier X
         fournisseur=Fournisseur(
             id_fournisseur=12345,  # identifiant_cpro,
             nom="Fournisseur 26073617692140",
-            siret="26073617692140",
+            adresse_electronique=AdresseElectronique(
+                identifiant="26073617692140", scheme_id=SchemeID.FR_SIREN
+            ),
             numero_tva_intra="FR61529571234",
             adresse_postale=AdressePostale(
                 code_postal="122345",

@@ -46,7 +46,7 @@ from facture_electronique.models import (
     FactureChorus, FactureFacturX, ModeDepot, Destinataire, Fournisseur,
     CadreDeFacturation, CodeCadreFacturation, References, TypeFacture,
     TypeTVA, ModePaiement, LigneDePoste, LigneDeTVA, MontantTotal,
-    AdressePostale, CategorieTVA, PieceJointePrincipale
+    AdressePostale, CategorieTVA, PieceJointePrincipale, AdresseElectronique, SchemeID
 )
 from facture_electronique.utils.files import get_absolute_path, file_to_base64, guess_mime_type, get_file_extension
 from facture_electronique.utils.pdfs import convert_to_pdfa, sign_pdf

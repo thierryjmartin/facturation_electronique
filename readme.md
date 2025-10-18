@@ -78,7 +78,7 @@ from decimal import Decimal
 from facture_electronique.models import (
     FactureFacturX, ModeDepot, Destinataire, Fournisseur, CadreDeFacturation,
     CodeCadreFacturation, References, TypeFacture, TypeTVA, ModePaiement,
-    LigneDePoste, LigneDeTVA, MontantTotal
+    LigneDePoste, LigneDeTVA, MontantTotal, AdresseElectronique, SchemeID
 )
 from facture_electronique.utils.facturx import ProfilFacturX
 from facture_electronique.utils.files import get_absolute_path
@@ -88,10 +88,16 @@ facture_simple = FactureFacturX(
     mode_depot=ModeDepot.DEPOT_PDF_API,
     numero_facture="F2025-001",
     date_echeance_paiement="2025-11-17",
-    destinataire=Destinataire(code_destinataire="12345678901234"),  # SIRET du client
+    destinataire=Destinataire(
+        adresse_electronique=AdresseElectronique(
+            identifiant="12345678901234", scheme_id=SchemeID.FR_SIREN
+        )
+    ),
     fournisseur=Fournisseur(
+        adresse_electronique=AdresseElectronique(
+            identifiant="11122233300011", scheme_id=SchemeID.FR_SIREN
+        ),
         id_fournisseur=12345,  # ID Chorus Pro du fournisseur (fictif ici)
-        siret="11122233300011",
         numero_tva_intra="FR12111222333",
     ),
     cadre_de_facturation=CadreDeFacturation(
@@ -154,7 +160,7 @@ from facture_electronique.api.chorus_pro import ChorusProAPI
 from facture_electronique.models import (
     FactureChorus, ModeDepot, Destinataire, Fournisseur, CadreDeFacturation,
     CodeCadreFacturation, References, TypeFacture, TypeTVA, ModePaiement,
-    LigneDePoste, LigneDeTVA, MontantTotal
+    LigneDePoste, LigneDeTVA, MontantTotal, AdresseElectronique, SchemeID
 )
 
 # 1. Initialiser le client API (en mode sandbox)
@@ -172,8 +178,17 @@ except Exception as e:
 facture_api = FactureChorus(
     mode_depot=ModeDepot.SAISIE_API,
     numero_facture="API-2025-001",
-    destinataire=Destinataire(code_destinataire="12345678901234"),  # SIRET du client public
-    fournisseur=Fournisseur(id_fournisseur=12345),  # Votre ID technique Chorus Pro
+    destinataire=Destinataire(
+        adresse_electronique=AdresseElectronique(
+            identifiant="12345678901234", scheme_id=SchemeID.FR_SIREN
+        )
+    ),  # SIRET du client public
+    fournisseur=Fournisseur(
+        id_fournisseur=12345,  # Votre ID technique Chorus Pro
+        adresse_electronique=AdresseElectronique(
+            identifiant="11122233300011", scheme_id=SchemeID.FR_SIREN
+        ),
+    ),
     cadre_de_facturation=CadreDeFacturation(
         code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR
     ),

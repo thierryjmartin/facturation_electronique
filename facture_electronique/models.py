@@ -42,11 +42,36 @@ class AdressePostale(BaseModel):
     pays_code_iso: Optional[str] = "FR"
 
 
+class SchemeID(str, Enum):
+    """
+    Codes de schémas d'identification (Electronic Address Scheme - EAS),
+    principalement pour l'adressage des factures électroniques.
+    """
+
+    FR_SIREN = "0225"  # Le plus commun pour la France (remplace l'ancien "0002")
+    GLN = "0088"  # Global Location Number
+    DUNS = "0060"  # Data Universal Numbering System
+    FR_TVA_INTRA = "9957"  # Numéro de TVA intracommunautaire français
+    GLEIF = "0199"  # Global Legal Entity Identifier Foundation
+
+
+class AdresseElectronique(BaseModel):
+    """
+    Représente une adresse de facturation électronique, composée d'un identifiant
+    et de son schéma (SchemeID) conformément à la norme EN16931.
+    Exemple: { "identifiant": "123456789", "scheme_id": "0225" }
+    """
+
+    model_config = FRENCH_CAMEL_CASE_CONFIG
+    identifiant: str
+    scheme_id: SchemeID = SchemeID.FR_SIREN
+
+
 class Destinataire(BaseModel):
     """Informations sur le destinataire de la facture (le client)."""
 
     model_config = FRENCH_CAMEL_CASE_CONFIG
-    code_destinataire: str  # SIRET
+    adresse_electronique: AdresseElectronique
     code_service_executant: Optional[str] = None
     nom: Optional[str] = None
     adresse_postale: Optional[AdressePostale] = None
@@ -56,11 +81,12 @@ class Fournisseur(BaseModel):
     """Informations sur le fournisseur qui émet la facture."""
 
     model_config = FRENCH_CAMEL_CASE_CONFIG
+    adresse_electronique: AdresseElectronique
     id_fournisseur: int  # Identifiant Chorus Pro
     code_coordonnees_bancaires_fournisseur: Optional[int] = None
     id_service_fournisseur: Optional[int] = None
     nom: Optional[str] = None
-    siret: Optional[str] = None
+    siret: Optional[str] = None  # Gardé pour compatibilité ou autre usage
     numero_tva_intra: Optional[str] = None
     iban: Optional[str] = None
     adresse_postale: Optional[AdressePostale] = None
@@ -346,7 +372,7 @@ class FactureChorus(FactureBase):
             "numeroFactureSaisi": self.numero_facture,
             "modeDepot": self.mode_depot,
             "destinataire": {
-                "codeDestinataire": self.destinataire.code_destinataire,
+                "codeDestinataire": self.destinataire.adresse_electronique.identifiant,
                 "codeServiceExecutant": self.destinataire.code_service_executant or "",
                 "nom": self.destinataire.nom,
             },

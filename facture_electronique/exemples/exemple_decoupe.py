@@ -17,6 +17,8 @@ from facture_electronique.models import (
     MontantTotal,
     AdressePostale,
     CategorieTVA,
+    AdresseElectronique,  # Ajout
+    SchemeID,  # Ajout
 )
 from facture_electronique.utils.files import get_absolute_path
 from dotenv import load_dotenv
@@ -29,19 +31,26 @@ if __name__ == "__main__":
     load_dotenv()
     # --- Initialisation de l'API (inchangé) ---
     c = ChorusProAPI()
-    # identifiant_cpro = c.obtenir_identifiant_cpro_depuis_siret("26073617692140") or 12345
-    identifiant_cpro = 12345
+    fournisseur_siret = "26073617692140"
+    destinataire_siret = "99986401570264"
+    identifiant_cpro = 12345  # ID CPro du fournisseur
 
-    # --- 1. Exemple de facture pour l'API Chorus Pro (Mode SAISIE_API) - (inchangé) ---
-    # Les données de cet exemple sont corrigées pour être mathématiquement cohérentes.
+    # --- 1. Exemple de facture pour l'API Chorus Pro (Mode SAISIE_API) - (Mise à jour) ---
     chorus_invoice = FactureChorus(
         mode_depot=ModeDepot.SAISIE_API,
+        numero_facture="API-2025-003",
+        date_echeance_paiement="2025-12-01",
         id_utilisateur_courant=0,
         destinataire=Destinataire(
-            code_destinataire="99986401570264",
+            adresse_electronique=AdresseElectronique(
+                identifiant=destinataire_siret, scheme_id=SchemeID.FR_SIREN
+            ),
         ),
         fournisseur=Fournisseur(
             id_fournisseur=identifiant_cpro,
+            adresse_electronique=AdresseElectronique(
+                identifiant=fournisseur_siret, scheme_id=SchemeID.FR_SIREN
+            ),
         ),
         cadre_de_facturation=CadreDeFacturation(
             code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR,
@@ -98,15 +107,16 @@ if __name__ == "__main__":
     # print(payload)
     # c.envoyer_facture(payload)
 
-    # --- 2. Exemple de facture pour Factur-X (et envoi via DEPOT_PDF_API) ---
-    # Les données de cet exemple sont corrigées pour être mathématiquement cohérentes.
+    # --- 2. Exemple de facture pour Factur-X (et envoi via DEPOT_PDF_API) - (Mise à jour) ---
     facturx_invoice = FactureFacturX(
         mode_depot=ModeDepot.DEPOT_PDF_API,
         numero_facture="FX-2024-001",
         date_facture="2024-01-01",
         date_echeance_paiement="2024-11-18",
         destinataire=Destinataire(
-            code_destinataire="99986401570264",
+            adresse_electronique=AdresseElectronique(
+                identifiant=destinataire_siret, scheme_id=SchemeID.FR_SIREN
+            ),
             nom="Client Principal SA",
             adresse_postale=AdressePostale(
                 ligne_un="123 Rue du Test",
@@ -117,7 +127,9 @@ if __name__ == "__main__":
         ),
         fournisseur=Fournisseur(
             id_fournisseur=identifiant_cpro,
-            siret="26073617692140",
+            adresse_electronique=AdresseElectronique(
+                identifiant=fournisseur_siret, scheme_id=SchemeID.FR_SIREN
+            ),
             numero_tva_intra="FR61529571234",
             nom="Mon Entreprise SAS",
             iban="FR7630006000011234567890189",
