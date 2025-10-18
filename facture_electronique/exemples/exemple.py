@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 from decimal import Decimal
 
-# --- Imports mis à jour ---
 # On importe les modèles, l'API Chorus, et les utilitaires de bas niveau si besoin.
 from facture_electronique.api.chorus_pro import ChorusProAPI
 from facture_electronique.utils.files import get_absolute_path
@@ -22,9 +21,10 @@ from facture_electronique.models import (
     MontantTotal,
     CategorieTVA,
     AdressePostale,
-    AdresseElectronique,  # Ajout
-    SchemeID,  # Ajout
+    AdresseElectronique,
+    SchemeID,
 )
+from facture_electronique.exceptions import ErreurConfiguration
 
 # Le seul import nécessaire pour la génération Factur-X !
 from facture_electronique.utils.facturx import ProfilFacturX
@@ -48,9 +48,12 @@ if __name__ == "__main__":
             "typeIdentifiantStructure": "SIRET",
         },
     }
-    recherche_structure = c.rechercher_structure(payload)
+    try:
+        recherche_structure = c.rechercher_structure(payload)
+    except ErreurConfiguration:
+        recherche_structure = None
     identifiant_cpro = 0
-    if recherche_structure["parametresRetour"]["total"] == 1:
+    if recherche_structure and recherche_structure["parametresRetour"]["total"] == 1:
         identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
         print(
             f"ID Chorus Pro trouvé pour le SIRET {fournisseur_siret}: {identifiant_cpro}"
@@ -193,8 +196,11 @@ if __name__ == "__main__":
         },
     }
     # print(exemple_facture_mode_api.to_api_payload())
-    res = c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
-    print(f"  -> Réponse de Chorus Pro: {res}")
+    try:
+        res = c.envoyer_facture(exemple_facture_mode_api.to_api_payload())
+        print(f"  -> Réponse de Chorus Pro: {res}")
+    except ErreurConfiguration:
+        res = None
 
     exemple_facture_mode_pdf = FactureFacturX(
         mode_depot=ModeDepot("DEPOT_PDF_API"),

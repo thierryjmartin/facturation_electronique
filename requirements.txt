@@ -42,6 +42,10 @@ lxml==6.0.2
     # via
     #   factur-x
     #   pyhanko
+markdown-it-py==3.0.0
+    # via pytest-markdown-docs
+mdurl==0.1.2
+    # via markdown-it-py
 oscrypto==1.3.0
     # via pyhanko-certvalidator
 packaging==25.0
@@ -72,7 +76,10 @@ pytest==8.4.2
     # via
     #   facture-electronique
     #   pytest-cov
+    #   pytest-markdown-docs
 pytest-cov==7.0.0
+    # via facture-electronique
+pytest-markdown-docs==0.9.0
     # via facture-electronique
 python-barcode==0.15.1
     # via pyhanko

@@ -13,6 +13,7 @@ pytest
 pytest-cov
 pytest-django
 pytest-markdown-docs
+dotenv
 
 # Documentation
 sphinx
