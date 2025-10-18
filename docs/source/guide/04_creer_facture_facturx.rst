@@ -22,132 +22,62 @@ Cet objet contient toutes les données nécessaires à la fois pour le fichier X
     facturx_invoice = FactureFacturX(
         mode_depot=ModeDepot("DEPOT_PDF_API"),
         numero_facture="20240000000000000110",
-        date_facture="2024-10-18",  # seulement en depot PDF
-        date_echeance_paiement="2014-12-18",
-        id_utilisateur_courant=0,
+        date_facture="2024-10-18",
+        date_echeance_paiement="2024-11-18",
         destinataire=Destinataire(
-            nom="acheteur 99986401570264",
-            adresse_electronique=AdresseElectronique(
-                identifiant="99986401570264", scheme_id=SchemeID.FR_SIREN
-            ),
+            nom="Acheteur Principal SA",
+            adresse_electronique=AdresseElectronique(identifiant="404833048"),  # SIREN 9 chiffres
             adresse_postale=AdressePostale(
-                code_postal="122345",
-                ligne_un="adresse du destinataire",
-                nom_ville="PARIS",
+                ligne_un="123 Rue de l'Exemple",
+                code_postal="75001",
+                nom_ville="Paris",
                 pays_code_iso="FR",
             ),
-            code_service_executant="",
         ),
         fournisseur=Fournisseur(
-            id_fournisseur=12345,  # identifiant_cpro,
-            nom="Fournisseur 26073617692140",
-            adresse_electronique=AdresseElectronique(
-                identifiant="26073617692140", scheme_id=SchemeID.FR_SIREN
-            ),
-            numero_tva_intra="FR61529571234",
+            id_fournisseur=12345,
+            nom="Fournisseur & Co.",
+            adresse_electronique=AdresseElectronique(identifiant="802369878"),  # SIREN 9 chiffres
+            numero_tva_intra="FR86802369878",  # N° TVA correspondant au SIREN
+            iban="FR7630006000011234567890189",  # IBAN ajouté pour la conformité
             adresse_postale=AdressePostale(
-                code_postal="122345",
-                ligne_un="2 rue de l andouillette",
-                nom_ville="PARIS",
+                ligne_un="456 Avenue du Test",
+                code_postal="69002",
+                nom_ville="Lyon",
                 pays_code_iso="FR",
             ),
         ),
         cadre_de_facturation=CadreDeFacturation(
-            code_cadre_facturation=CodeCadreFacturation("A1_FACTURE_FOURNISSEUR"),
-            code_structure_valideur=None,
+            code_cadre_facturation=CodeCadreFacturation.A1_FACTURE_FOURNISSEUR
         ),
         references=References(
-            devise_facture="EUR",
-            type_facture=TypeFacture("FACTURE"),
-            type_tva=TypeTVA("TVA_SUR_DEBIT"),
-            motif_exoneration_tva=None,
-            numero_marche="VABFM001",
-            numero_bon_commande="coucou",
-            numero_facture_origine=None,
-            mode_paiement=ModePaiement("ESPECE"),
+            type_facture=TypeFacture.FACTURE,
+            type_tva=TypeTVA.SUR_DEBIT,
+            mode_paiement=ModePaiement.VIREMENT,
         ),
         montant_total=MontantTotal(
-            montant_ht_total=Decimal("1326.00"),
-            montant_tva=Decimal("130.272"),
-            montant_ttc_total=Decimal("1456.272"),
-            montant_remise_globale_ttc=Decimal("0.00"),
-            motif_remise_globale_ttc="",
-            acompte=Decimal("56.272"),
-            montant_a_payer=Decimal("1400.00"),
+            montant_ht_total=Decimal("1000.00"),
+            montant_tva=Decimal("200.00"),
+            montant_ttc_total=Decimal("1200.00"),
+            montant_a_payer=Decimal("1200.00"),
         ),
-        commentaire="voici mon commentaire",
         lignes_de_poste=[
             LigneDePoste(
                 numero=1,
-                reference="R1",
-                denomination="D1",
-                quantite=Decimal("10"),
-                unite="lot",
-                montant_unitaire_ht=Decimal("50.00"),
-                montant_remise_ht=Decimal("5"),
-                taux_tva="",
-                taux_tva_manuel=Decimal("20"),
-                categorie_tva=CategorieTVA("S"),
-                raison_reduction="parce que je suis sympa",
-            ),
-            LigneDePoste(
-                numero=2,
-                reference="R2",
-                denomination="D2",
-                quantite=Decimal("12"),
-                unite="Kg",
-                montant_unitaire_ht=Decimal("36.00"),
-                montant_remise_ht=Decimal("0"),
-                taux_tva="",
-                taux_tva_manuel=Decimal("2.1"),
-                categorie_tva=CategorieTVA("S"),
-            ),
-            LigneDePoste(
-                numero=3,
-                reference="R3",
-                denomination="D3",
-                quantite=Decimal("16"),
-                unite="lot",
-                montant_unitaire_ht=Decimal("24.00"),
-                montant_remise_ht=Decimal("0"),
-                taux_tva="",
-                taux_tva_manuel=Decimal("5"),
-                categorie_tva=CategorieTVA("S"),
-            ),
-            LigneDePoste(
-                numero=4,
-                reference="XX",
-                denomination="XX",
+                denomination="Prestation de service",
                 quantite=Decimal("1"),
-                unite="lot",
-                montant_unitaire_ht=Decimal("10.00"),
-                montant_remise_ht=Decimal("0"),
-                taux_tva="",
+                unite="pce",
+                montant_unitaire_ht=Decimal("1000.00"),
                 taux_tva_manuel=Decimal("20"),
-                categorie_tva=CategorieTVA("S"),
+                categorie_tva=CategorieTVA.STANDARD,
             ),
         ],
         lignes_de_tva=[
             LigneDeTVA(
                 taux_manuel=Decimal("20"),
-                taux=None,
-                montant_base_ht=Decimal("510.00"),
-                montant_tva=Decimal("102.00"),
-                categorie=CategorieTVA("S"),
-            ),
-            LigneDeTVA(
-                taux_manuel=Decimal("2.1"),
-                taux=None,
-                montant_base_ht=Decimal("432.00"),
-                montant_tva=Decimal("9.072"),
-                categorie=CategorieTVA("S"),
-            ),
-            LigneDeTVA(
-                taux_manuel=Decimal("5"),
-                taux=None,
-                montant_base_ht=Decimal("384.00"),
-                montant_tva=Decimal("19.20"),
-                categorie=CategorieTVA("S"),
+                montant_base_ht=Decimal("1000.00"),
+                montant_tva=Decimal("200.00"),
+                categorie=CategorieTVA.STANDARD,
             ),
         ],
     )
@@ -169,9 +99,9 @@ La nouvelle API fluide permet de générer tous les profils Factur-X de manière
     output_dir = "test_outputs"
     os.makedirs(output_dir, exist_ok=True)
 
-    chemin_pdf_source = get_absolute_path("facture_electronique/exemples/dummy.pdf")
-    chemin_cle_signature = get_absolute_path("facture_electronique/exemples/key.key")
-    chemin_cert_signature = get_absolute_path("facture_electronique/exemples/cert.cert")
+    chemin_pdf_source = get_absolute_path("../facture_electronique/exemples/dummy.pdf")
+    chemin_cle_signature = get_absolute_path("../facture_electronique/exemples/key.key")
+    chemin_cert_signature = get_absolute_path("../facture_electronique/exemples/cert.cert")
 
     chemins_factures_generees = {}
     for profil in ProfilFacturX:

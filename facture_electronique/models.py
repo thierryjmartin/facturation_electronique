@@ -93,18 +93,18 @@ class ConstructeurAdresse:
 
     def avec_code_routage(self, code: str):
         """Ajoute un code de routage à l'adresse."""
-        if not code or not code.isalnum() or "_" in code:
+        if not code or not code.replace("_", "").isalnum():
             raise ValueError(
-                "Le code de routage ne doit contenir que des caractères alphanumériques."
+                "Le code de routage ne doit contenir que des caractères alphanumériques et des underscores."
             )
         self._elements.append(code)
         return self
 
     def avec_suffixe(self, suffixe: str):
         """Ajoute un suffixe libre à l'adresse."""
-        if not suffixe or not suffixe.isalnum() or "_" in suffixe:
+        if not suffixe or not suffixe.replace("_", "").isalnum():
             raise ValueError(
-                "Le suffixe ne doit contenir que des caractères alphanumériques."
+                "Le suffixe ne doit contenir que des caractères alphanumériques et des underscores."
             )
         self._elements.append(suffixe)
         return self

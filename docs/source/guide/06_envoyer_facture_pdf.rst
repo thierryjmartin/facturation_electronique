@@ -118,4 +118,4 @@ On commence par envoyer le fichier Factur-X au système de fichiers de Chorus Pr
         reponse_envoi = c.envoyer_facture(payload)
         # id_facture_cpp = reponse_envoi['identifiantFactureCPP']
 
-    assert payload["piecesJointesPrincipales"][0]["id"] == pj_id
+    assert payload["pieceJointePrincipale"][0]["pieceJointePrincipaleId"] == pj_id
