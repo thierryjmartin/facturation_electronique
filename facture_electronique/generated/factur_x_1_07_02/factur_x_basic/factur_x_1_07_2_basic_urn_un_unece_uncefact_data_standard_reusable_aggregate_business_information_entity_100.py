@@ -23,9 +23,7 @@ from facture_electronique.generated.factur_x_1_07_02.factur_x_basic.factur_x_1_0
     TextType,
 )
 
-__NAMESPACE__ = (
-    "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
-)
+__NAMESPACE__ = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
 
 
 @dataclass
@@ -520,9 +518,7 @@ class ExchangedDocumentContextType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    guideline_specified_document_context_parameter: Optional[
-        DocumentContextParameterType
-    ] = field(
+    guideline_specified_document_context_parameter: Optional[DocumentContextParameterType] = field(
         default=None,
         metadata={
             "name": "GuidelineSpecifiedDocumentContextParameter",
@@ -714,15 +710,13 @@ class TradeSettlementPaymentMeansType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    payee_party_creditor_financial_account: Optional[CreditorFinancialAccountType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "PayeePartyCreditorFinancialAccount",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            },
-        )
+    payee_party_creditor_financial_account: Optional[CreditorFinancialAccountType] = field(
+        default=None,
+        metadata={
+            "name": "PayeePartyCreditorFinancialAccount",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
     )
 
 
@@ -851,15 +845,13 @@ class HeaderTradeSettlementType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    specified_trade_settlement_payment_means: List[TradeSettlementPaymentMeansType] = (
-        field(
-            default_factory=list,
-            metadata={
-                "name": "SpecifiedTradeSettlementPaymentMeans",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            },
-        )
+    specified_trade_settlement_payment_means: List[TradeSettlementPaymentMeansType] = field(
+        default_factory=list,
+        metadata={
+            "name": "SpecifiedTradeSettlementPaymentMeans",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
     )
     applicable_trade_tax: List[TradeTaxType] = field(
         default_factory=list,
@@ -913,9 +905,7 @@ class HeaderTradeSettlementType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    receivable_specified_trade_accounting_account: Optional[
-        TradeAccountingAccountType
-    ] = field(
+    receivable_specified_trade_accounting_account: Optional[TradeAccountingAccountType] = field(
         default=None,
         metadata={
             "name": "ReceivableSpecifiedTradeAccountingAccount",

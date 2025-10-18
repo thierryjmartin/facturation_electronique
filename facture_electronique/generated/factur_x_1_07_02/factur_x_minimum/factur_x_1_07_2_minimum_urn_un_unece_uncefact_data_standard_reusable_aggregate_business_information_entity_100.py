@@ -13,9 +13,7 @@ from facture_electronique.generated.factur_x_1_07_02.factur_x_minimum.factur_x_1
     TextType,
 )
 
-__NAMESPACE__ = (
-    "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
-)
+__NAMESPACE__ = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
 
 
 @dataclass
@@ -170,9 +168,7 @@ class ExchangedDocumentContextType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    guideline_specified_document_context_parameter: Optional[
-        DocumentContextParameterType
-    ] = field(
+    guideline_specified_document_context_parameter: Optional[DocumentContextParameterType] = field(
         default=None,
         metadata={
             "name": "GuidelineSpecifiedDocumentContextParameter",

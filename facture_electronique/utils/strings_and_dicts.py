@@ -18,10 +18,7 @@ def transform_dict_keys(d: Dict, transform_func) -> Union[List[Dict], Dict]:
     :return: Nouveau dictionnaire avec les clés transformées.
     """
     if isinstance(d, dict):
-        return {
-            transform_func(k): transform_dict_keys(v, transform_func)
-            for k, v in d.items()
-        }
+        return {transform_func(k): transform_dict_keys(v, transform_func) for k, v in d.items()}
     elif isinstance(d, list):
         return [transform_dict_keys(item, transform_func) for item in d]
     else:
@@ -32,6 +29,4 @@ def nettoyer_dict(d: Any) -> Any:
     """Fonction utilitaire récursive pour retirer les clés avec valeur None."""
     if not isinstance(d, dict):
         return d
-    return {
-        cle: nettoyer_dict(valeur) for cle, valeur in d.items() if valeur is not None
-    }
+    return {cle: nettoyer_dict(valeur) for cle, valeur in d.items() if valeur is not None}

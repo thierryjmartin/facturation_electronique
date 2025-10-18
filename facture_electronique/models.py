@@ -118,9 +118,7 @@ class ConstructeurAdresse:
                 pass  # On garde les deux pour former SIREN_SIRET
 
         identifiant_final = "_".join(self._elements)
-        return AdresseElectronique(
-            identifiant=identifiant_final, scheme_id=SchemeID.FR_SIREN
-        )
+        return AdresseElectronique(identifiant=identifiant_final, scheme_id=SchemeID.FR_SIREN)
 
 
 class Destinataire(BaseModel):
@@ -495,14 +493,10 @@ class FactureChorus(FactureBase):
                         "lignePosteQuantite": to_float(lp.quantite),
                         "lignePosteUnite": lp.unite,
                         "lignePosteMontantUnitaireHT": to_float(lp.montant_unitaire_ht),
-                        "lignePosteMontantRemiseHT": to_float(
-                            lp.montant_remise_ht or Decimal(0)
-                        ),
+                        "lignePosteMontantRemiseHT": to_float(lp.montant_remise_ht or Decimal(0)),
                         "lignePosteTauxTva": lp.taux_tva,
                         "lignePosteTauxTvaManuel": to_float(lp.taux_tva_manuel),
-                        "lignePosteCategorieTva": lp.categorie_tva
-                        if lp.categorie_tva
-                        else None,
+                        "lignePosteCategorieTva": lp.categorie_tva if lp.categorie_tva else None,
                         "lignePosteDateDebutPeriode": lp.date_debut_periode,
                         "lignePosteDateFinPeriode": lp.date_fin_periode,
                         "lignePosteCodeRaisonReduction": lp.code_raison_reduction
@@ -535,9 +529,7 @@ class FactureChorus(FactureBase):
                 "montantTVA": to_float(self.montant_total.montant_tva),
                 "montantTtcTotal": to_float(self.montant_total.montant_ttc_total),
                 "montantAPayer": to_float(self.montant_total.montant_a_payer),
-                "montantRemiseGlobaleTTC": to_float(
-                    self.montant_total.montant_remise_globale_ttc
-                ),
+                "montantRemiseGlobaleTTC": to_float(self.montant_total.montant_remise_globale_ttc),
                 "motifRemiseGlobaleTTC": self.montant_total.motif_remise_globale_ttc,
                 "acompte": to_float(self.montant_total.acompte),
             }

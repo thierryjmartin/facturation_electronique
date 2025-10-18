@@ -76,9 +76,7 @@ class ConstructeurFacturX:
             )
 
         chemin_pdfa = self._creer_fichier_temporaire(suffix=".pdfa.pdf")
-        chemin_facturx = self._creer_fichier_temporaire(
-            suffix=f".{self.profil.id_str}.pdf"
-        )
+        chemin_facturx = self._creer_fichier_temporaire(suffix=f".{self.profil.id_str}.pdf")
         convert_to_pdfa(chemin_pdf_source, chemin_pdfa)
 
         facturx.generate_from_file(
@@ -109,9 +107,7 @@ class ConstructeurFacturX:
             autres_certs,
         )
 
-        logger.warning(
-            "AVERTISSEMENT : La signature numérique peut invalider la conformité PDF/A."
-        )
+        logger.warning("AVERTISSEMENT : La signature numérique peut invalider la conformité PDF/A.")
         self.chemin_pdf_courant = chemin_sortie
         return self
 

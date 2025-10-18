@@ -39,15 +39,11 @@ class XSLTValidationError(Exception):
     def __init__(self, messages: list, *args):
         self.messages = messages
         # Translators: The placeholder is the number of validation errors.
-        message = _("{num_errors} erreur(s) de validation XSLT.").format(
-            num_errors=len(messages)
-        )
+        message = _("{num_errors} erreur(s) de validation XSLT.").format(num_errors=len(messages))
         super().__init__(message, *args)
 
     def __str__(self):
         # Fournir une représentation simple et lisible
         # Translators: The placeholder is a list of the first 3 error messages.
         details = "\n - ".join(self.messages[:3])
-        return f"{super().__str__()} " + _("Détails :\n - {details}").format(
-            details=details
-        )
+        return f"{super().__str__()} " + _("Détails :\n - {details}").format(details=details)

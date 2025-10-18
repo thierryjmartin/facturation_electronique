@@ -55,9 +55,7 @@ if __name__ == "__main__":
     identifiant_cpro = 0
     if recherche_structure and recherche_structure["parametresRetour"]["total"] == 1:
         identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
-        print(
-            f"ID Chorus Pro trouvé pour le SIRET {fournisseur_siret}: {identifiant_cpro}"
-        )
+        print(f"ID Chorus Pro trouvé pour le SIRET {fournisseur_siret}: {identifiant_cpro}")
     else:
         identifiant_cpro = 26300989  # Fallback pour l'exemple
         print(
@@ -318,9 +316,7 @@ if __name__ == "__main__":
             montant_ht_total=Decimal("1276.00"),  # 460 + 432 + 384
             montant_tva=Decimal("120.27"),  # 92 + 9.07 + 19.20
             montant_ttc_total=Decimal("1396.27"),  # 1276 + 120.27
-            montant_remise_globale_ttc=Decimal(
-                "0.00"
-            ),  # Pas de remise globale pour ces profils
+            montant_remise_globale_ttc=Decimal("0.00"),  # Pas de remise globale pour ces profils
             acompte=Decimal("56.27"),
             montant_a_payer=Decimal("1340.00"),  # 1396.27 - 56.27
         ),
@@ -341,18 +337,14 @@ if __name__ == "__main__":
         nom_fichier = f"facture_generee_{profil.name.lower()}.pdf"
         print(f"\n[Génération] Profil: {profil.name} -> Fichier: {nom_fichier}")
         try:
-            with exemple_facture_mode_pdf.generer_facturx(
-                profil=profil
-            ) as constructeur:
+            with exemple_facture_mode_pdf.generer_facturx(profil=profil) as constructeur:
                 resultat = (
                     constructeur.valider_conformite()
                     .integrer_dans_pdfa(chemin_pdf_source)
                     .enregistrer_sous(nom_fichier)
                 )
             chemins_factures_generees[profil] = resultat["chemin_fichier"]
-            print(
-                f"  -> Succès ! Fichier '{resultat['chemin_fichier']}' créé et validé."
-            )
+            print(f"  -> Succès ! Fichier '{resultat['chemin_fichier']}' créé et validé.")
         except Exception as e:
             print(f"  -> ERREUR lors de la génération du profil {profil.name}: {e}")
 

@@ -179,21 +179,15 @@ if __name__ == "__main__":
 
     # --- Génération du PDF/A et du fichier Factur-X ---
     pdf_original = get_absolute_path("facture_electronique/exemples/dummy.pdf")
-    facturx_output = get_absolute_path(
-        "facture_electronique/exemples/facture_en16931.pdf"
-    )
+    facturx_output = get_absolute_path("facture_electronique/exemples/facture_en16931.pdf")
 
     # --- MISE À JOUR : Remplacement du bloc de génération procédural ---
     # L'ancien bloc de 4 étapes manuelles est remplacé par un seul appel fluide.
     # L'API s'occupe de la validation, de la conversion PDF/A et de l'intégration du XML.
 
-    print(
-        f"Génération de la facture Factur-X (profil EN16931) vers '{facturx_output}'..."
-    )
+    print(f"Génération de la facture Factur-X (profil EN16931) vers '{facturx_output}'...")
     try:
-        with facturx_invoice.generer_facturx(
-            profil=ProfilFacturX.EN16931
-        ) as constructeur:
+        with facturx_invoice.generer_facturx(profil=ProfilFacturX.EN16931) as constructeur:
             resultat = (
                 constructeur.valider_conformite()
                 .integrer_dans_pdfa(pdf_original)

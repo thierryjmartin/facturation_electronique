@@ -48,15 +48,11 @@ class ChorusProAPI:
         self.sandbox = sandbox
 
         # La logique de chargement de la configuration reste la même, elle est excellente
-        self.identifiant_client_piste = identifiant_client_piste or os.getenv(
-            "PISTE_CLIENT_ID"
-        )
+        self.identifiant_client_piste = identifiant_client_piste or os.getenv("PISTE_CLIENT_ID")
         if not self.identifiant_client_piste:
             raise ErreurConfiguration("PISTE_CLIENT_ID")
 
-        self.secret_client_piste = secret_client_piste or os.getenv(
-            "PISTE_CLIENT_SECRET"
-        )
+        self.secret_client_piste = secret_client_piste or os.getenv("PISTE_CLIENT_SECRET")
         if not self.secret_client_piste:
             raise ErreurConfiguration("PISTE_CLIENT_SECRET")
 
@@ -83,9 +79,7 @@ class ChorusProAPI:
             url_base = self.URL_API_PROD if not self.sandbox else self.URL_API_SANDBOX
 
             self._client_instance = HttpClient(base_url=url_base, api_key=self._token)
-            self._client_instance.headers["cpro-account"] = (
-                self._creer_compte_cpro_base64()
-            )
+            self._client_instance.headers["cpro-account"] = self._creer_compte_cpro_base64()
         return self._client_instance
 
     def _obtenir_jeton(self):
@@ -199,9 +193,7 @@ class ChorusProAPI:
         :param payload: Le dictionnaire de critères de recherche.
         :return: La réponse JSON de l'API.
         """
-        reponse = self.client.post(
-            "/organisations/v1/structures/recherche", json=payload
-        )
+        reponse = self.client.post("/organisations/v1/structures/recherche", json=payload)
         return reponse.json()
 
     def rechercher_structure(self, payload) -> dict:
@@ -262,7 +254,5 @@ class ChorusProAPI:
         recherche_structure = self.rechercher_structure(payload)
         identifiant_cpro = 0
         if recherche_structure["parametresRetour"]["total"] == 1:
-            identifiant_cpro = recherche_structure["listeStructures"][0][
-                "idStructureCPP"
-            ]
+            identifiant_cpro = recherche_structure["listeStructures"][0]["idStructureCPP"]
         return identifiant_cpro

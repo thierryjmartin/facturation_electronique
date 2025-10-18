@@ -69,9 +69,7 @@ class TestConfigurationChorusProAPI:
             "CHORUS_PRO_PASSWORD",
         ],
     )
-    def test_echec_initialisation_si_variable_manquante(
-        self, monkeypatch, variable_manquante
-    ):
+    def test_echec_initialisation_si_variable_manquante(self, monkeypatch, variable_manquante):
         """Vérifie qu'une ErreurConfiguration est levée si une variable manque."""
         # On met toutes les variables sauf celle à tester
         variables = {
@@ -98,9 +96,7 @@ class TestAppelsAPIChorusPro:
     """Groupe de tests pour les méthodes publiques qui interagissent avec l'API."""
 
     @patch("facture_electronique.api.chorus_pro.requests.post")
-    def test_initialisation_paresseuse_de_la_session(
-        self, mock_post, mock_variables_env
-    ):
+    def test_initialisation_paresseuse_de_la_session(self, mock_post, mock_variables_env):
         """
         Vérifie que l'appel d'authentification n'est fait qu'une seule fois.
         """
@@ -128,9 +124,7 @@ class TestAppelsAPIChorusPro:
 
     @patch("facture_electronique.api.chorus_pro.requests.post")
     @patch.object(HttpClient, "post")
-    def test_envoyer_facture(
-        self, mock_client_post, mock_auth_post, mock_variables_env
-    ):
+    def test_envoyer_facture(self, mock_client_post, mock_auth_post, mock_variables_env):
         """
         Vérifie la méthode envoyer_facture de bout en bout (avec mocks).
         """
@@ -172,9 +166,7 @@ class TestAppelsAPIChorusPro:
         assert api.client.headers["cpro-account"] == CPRO_ACCOUNT_FICTIF_ENCODE
 
         # c) Vérifier l'appel à l'API Chorus Pro
-        mock_client_post.assert_called_once_with(
-            "/factures/v1/soumettre", json=donnees_facture
-        )
+        mock_client_post.assert_called_once_with("/factures/v1/soumettre", json=donnees_facture)
 
         # d) Vérifier que le résultat est correct
         assert resultat == reponse_api_attendue

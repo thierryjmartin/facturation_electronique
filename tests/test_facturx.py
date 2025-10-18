@@ -128,9 +128,7 @@ def test_gen_facturx_en16931_structure(sample_facture):
     assert facturx_obj.exchanged_document.id.value == "FA-2024-001"
     summation = facturx_obj.supply_chain_trade_transaction.applicable_header_trade_settlement.specified_trade_settlement_header_monetary_summation
     assert summation.grand_total_amount.value == Decimal("1200.00")
-    lines = (
-        facturx_obj.supply_chain_trade_transaction.included_supply_chain_trade_line_item
-    )
+    lines = facturx_obj.supply_chain_trade_transaction.included_supply_chain_trade_line_item
     assert lines[0].specified_trade_product.name.value == "REF001 Produit 1"
 
 
@@ -167,14 +165,10 @@ def test_intercepter_xslt_validation_error(sample_facture):
 
     with pytest.raises(XSLTValidationError) as excinfo:
         # On utilise la nouvelle API pour générer le XML invalide
-        with invalid_facture.generer_facturx(
-            profil=ProfilFacturX.EN16931
-        ) as constructeur:
+        with invalid_facture.generer_facturx(profil=ProfilFacturX.EN16931) as constructeur:
             xml_invalide = constructeur.xml_str
             valider_xml_facturx_schematron(xml_invalide, ProfilFacturX.EN16931)
 
     # Optionnel: vérifier que le message d'erreur contient des informations pertinentes
-    assert "[BR-02]-An Invoice shall have an Invoice number (BT-1)" in str(
-        excinfo.value
-    )
+    assert "[BR-02]-An Invoice shall have an Invoice number (BT-1)" in str(excinfo.value)
     assert "ram:ID" in str(excinfo.value)

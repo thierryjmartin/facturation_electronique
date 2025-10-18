@@ -163,11 +163,7 @@ class TestConstructeurAdresse:
 
     def test_construction_avec_siret(self):
         """Vérifie la construction chaînée avec un SIRET."""
-        adresse = (
-            ConstructeurAdresse(siren="123456789")
-            .avec_siret("12345678901234")
-            .construire()
-        )
+        adresse = ConstructeurAdresse(siren="123456789").avec_siret("12345678901234").construire()
         assert adresse.identifiant == "123456789_12345678901234"
 
     def test_construction_avec_code_routage(self):
@@ -182,27 +178,19 @@ class TestConstructeurAdresse:
 
     def test_construction_avec_suffixe(self):
         """Vérifie la construction avec un suffixe."""
-        adresse = (
-            ConstructeurAdresse(siren="123456789").avec_suffixe("PDP01").construire()
-        )
+        adresse = ConstructeurAdresse(siren="123456789").avec_suffixe("PDP01").construire()
         assert adresse.identifiant == "123456789_PDP01"
 
     def test_echec_siren_invalide(self):
         """Vérifie qu'une erreur est levée si le SIREN est invalide."""
-        with pytest.raises(
-            ValueError, match="Le SIREN doit être une chaîne de 9 chiffres."
-        ):
+        with pytest.raises(ValueError, match="Le SIREN doit être une chaîne de 9 chiffres."):
             ConstructeurAdresse(siren="12345")
-        with pytest.raises(
-            ValueError, match="Le SIREN doit être une chaîne de 9 chiffres."
-        ):
+        with pytest.raises(ValueError, match="Le SIREN doit être une chaîne de 9 chiffres."):
             ConstructeurAdresse(siren="abcdefghi")
 
     def test_echec_siret_invalide(self):
         """Vérifie qu'une erreur est levée si le SIRET est invalide."""
-        with pytest.raises(
-            ValueError, match="Le SIRET doit être une chaîne de 14 chiffres."
-        ):
+        with pytest.raises(ValueError, match="Le SIRET doit être une chaîne de 14 chiffres."):
             ConstructeurAdresse(siren="123456789").avec_siret("12345")
 
     def test_echec_siret_ne_correspond_pas_au_siren(self):

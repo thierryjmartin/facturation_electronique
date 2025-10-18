@@ -35,9 +35,7 @@ from facture_electronique.generated.factur_x_1_07_03.factur_x_extended.factur_x_
     TextType,
 )
 
-__NAMESPACE__ = (
-    "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
-)
+__NAMESPACE__ = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100"
 
 
 @dataclass
@@ -1054,9 +1052,7 @@ class ExchangedDocumentContextType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    guideline_specified_document_context_parameter: Optional[
-        DocumentContextParameterType
-    ] = field(
+    guideline_specified_document_context_parameter: Optional[DocumentContextParameterType] = field(
         default=None,
         metadata={
             "name": "GuidelineSpecifiedDocumentContextParameter",
@@ -1199,15 +1195,13 @@ class LogisticsServiceChargeType:
 
 @dataclass
 class SupplyChainConsignmentType:
-    specified_logistics_transport_movement: list[LogisticsTransportMovementType] = (
-        field(
-            default_factory=list,
-            metadata={
-                "name": "SpecifiedLogisticsTransportMovement",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            },
-        )
+    specified_logistics_transport_movement: list[LogisticsTransportMovementType] = field(
+        default_factory=list,
+        metadata={
+            "name": "SpecifiedLogisticsTransportMovement",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
     )
 
 
@@ -1493,9 +1487,7 @@ class TradeSettlementPaymentMeansType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    applicable_trade_settlement_financial_card: Optional[
-        TradeSettlementFinancialCardType
-    ] = field(
+    applicable_trade_settlement_financial_card: Optional[TradeSettlementFinancialCardType] = field(
         default=None,
         metadata={
             "name": "ApplicableTradeSettlementFinancialCard",
@@ -1511,25 +1503,23 @@ class TradeSettlementPaymentMeansType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    payee_party_creditor_financial_account: Optional[CreditorFinancialAccountType] = (
+    payee_party_creditor_financial_account: Optional[CreditorFinancialAccountType] = field(
+        default=None,
+        metadata={
+            "name": "PayeePartyCreditorFinancialAccount",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
+    )
+    payee_specified_creditor_financial_institution: Optional[CreditorFinancialInstitutionType] = (
         field(
             default=None,
             metadata={
-                "name": "PayeePartyCreditorFinancialAccount",
+                "name": "PayeeSpecifiedCreditorFinancialInstitution",
                 "type": "Element",
                 "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
             },
         )
-    )
-    payee_specified_creditor_financial_institution: Optional[
-        CreditorFinancialInstitutionType
-    ] = field(
-        default=None,
-        metadata={
-            "name": "PayeeSpecifiedCreditorFinancialInstitution",
-            "type": "Element",
-            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-        },
     )
 
 
@@ -1587,9 +1577,7 @@ class LineTradeSettlementType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    receivable_specified_trade_accounting_account: Optional[
-        TradeAccountingAccountType
-    ] = field(
+    receivable_specified_trade_accounting_account: Optional[TradeAccountingAccountType] = field(
         default=None,
         metadata={
             "name": "ReceivableSpecifiedTradeAccountingAccount",
@@ -2103,25 +2091,21 @@ class TradePaymentTermsType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    applicable_trade_payment_penalty_terms: Optional[TradePaymentPenaltyTermsType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "ApplicableTradePaymentPenaltyTerms",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            },
-        )
+    applicable_trade_payment_penalty_terms: Optional[TradePaymentPenaltyTermsType] = field(
+        default=None,
+        metadata={
+            "name": "ApplicableTradePaymentPenaltyTerms",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
     )
-    applicable_trade_payment_discount_terms: Optional[TradePaymentDiscountTermsType] = (
-        field(
-            default=None,
-            metadata={
-                "name": "ApplicableTradePaymentDiscountTerms",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            },
-        )
+    applicable_trade_payment_discount_terms: Optional[TradePaymentDiscountTermsType] = field(
+        default=None,
+        metadata={
+            "name": "ApplicableTradePaymentDiscountTerms",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
     )
     payee_trade_party: Optional[TradePartyType] = field(
         default=None,
@@ -2216,15 +2200,13 @@ class HeaderTradeSettlementType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    specified_trade_settlement_payment_means: list[TradeSettlementPaymentMeansType] = (
-        field(
-            default_factory=list,
-            metadata={
-                "name": "SpecifiedTradeSettlementPaymentMeans",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            },
-        )
+    specified_trade_settlement_payment_means: list[TradeSettlementPaymentMeansType] = field(
+        default_factory=list,
+        metadata={
+            "name": "SpecifiedTradeSettlementPaymentMeans",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
     )
     applicable_trade_tax: list[TradeTaxType] = field(
         default_factory=list,
@@ -2286,15 +2268,13 @@ class HeaderTradeSettlementType:
             "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
         },
     )
-    receivable_specified_trade_accounting_account: list[TradeAccountingAccountType] = (
-        field(
-            default_factory=list,
-            metadata={
-                "name": "ReceivableSpecifiedTradeAccountingAccount",
-                "type": "Element",
-                "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
-            },
-        )
+    receivable_specified_trade_accounting_account: list[TradeAccountingAccountType] = field(
+        default_factory=list,
+        metadata={
+            "name": "ReceivableSpecifiedTradeAccountingAccount",
+            "type": "Element",
+            "namespace": "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+        },
     )
     specified_advance_payment: list[AdvancePaymentType] = field(
         default_factory=list,

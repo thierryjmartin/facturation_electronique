@@ -118,9 +118,7 @@ def _get_facturx_quantity_units(unite: str) -> str:
 def _gen_applicable_header_trade_agreement(facturx_module, facture: FactureFacturX):
     """Génère la section `ApplicableHeaderTradeAgreement` du XML Factur-X."""
     return facturx_module.HeaderTradeAgreementType(
-        buyer_reference=facturx_module.TextType(
-            value=facture.destinataire.code_service_executant
-        ),
+        buyer_reference=facturx_module.TextType(value=facture.destinataire.code_service_executant),
         seller_trade_party=facturx_module.TradePartyType(
             name=facturx_module.TextType(value=facture.fournisseur.nom),
             specified_legal_organization=facturx_module.LegalOrganizationType(
@@ -157,9 +155,7 @@ def _gen_applicable_header_trade_agreement(facturx_module, facture: FactureFactu
             ),
         ),
         buyer_order_referenced_document=facturx_module.ReferencedDocumentType(
-            issuer_assigned_id=facturx_module.Idtype(
-                value=facture.references.numero_bon_commande
-            )
+            issuer_assigned_id=facturx_module.Idtype(value=facture.references.numero_bon_commande)
         ),
     )
 
@@ -183,37 +179,25 @@ def _gen_facturx_minimum(facture: FactureFacturX):
         ),
     )
     supply_chain_trade_transaction = module.SupplyChainTradeTransactionType(
-        applicable_header_trade_agreement=_gen_applicable_header_trade_agreement(
-            module, facture
-        ),
+        applicable_header_trade_agreement=_gen_applicable_header_trade_agreement(module, facture),
         applicable_header_trade_delivery=module.HeaderTradeDeliveryType(),
         applicable_header_trade_settlement=module.HeaderTradeSettlementType(
-            invoice_currency_code=module.CurrencyCodeType(
-                value=facture.references.devise_facture
-            ),
+            invoice_currency_code=module.CurrencyCodeType(value=facture.references.devise_facture),
             specified_trade_settlement_header_monetary_summation=module.TradeSettlementHeaderMonetarySummationType(
                 tax_basis_total_amount=module.AmountType(
-                    value=_float_vers_decimal_facturx(
-                        facture.montant_total.montant_ht_total
-                    )
+                    value=_float_vers_decimal_facturx(facture.montant_total.montant_ht_total)
                 ),
                 tax_total_amount=[
                     module.AmountType(
-                        value=_float_vers_decimal_facturx(
-                            facture.montant_total.montant_tva
-                        ),
+                        value=_float_vers_decimal_facturx(facture.montant_total.montant_tva),
                         currency_id=facture.references.devise_facture,
                     )
                 ],
                 grand_total_amount=module.AmountType(
-                    value=_float_vers_decimal_facturx(
-                        facture.montant_total.montant_ttc_total
-                    )
+                    value=_float_vers_decimal_facturx(facture.montant_total.montant_ttc_total)
                 ),
                 due_payable_amount=module.AmountType(
-                    value=_float_vers_decimal_facturx(
-                        facture.montant_total.montant_a_payer
-                    )
+                    value=_float_vers_decimal_facturx(facture.montant_total.montant_a_payer)
                 ),
             ),
         ),
@@ -225,14 +209,10 @@ def _gen_facturx_minimum(facture: FactureFacturX):
     )
 
 
-def _ligne_poste_facturx(
-    ligne: LigneDePoste, facture: FactureFacturX, module: ModuleType
-):
+def _ligne_poste_facturx(ligne: LigneDePoste, facture: FactureFacturX, module: ModuleType):
     """Génère une ligne de facture (`SupplyChainTradeLineItem`)."""
     date_debut_retenue = ligne.date_debut_periode or facture.date_facture
-    date_fin_retenue = (
-        ligne.date_fin_periode or ligne.date_debut_periode or facture.date_facture
-    )
+    date_fin_retenue = ligne.date_fin_periode or ligne.date_debut_periode or facture.date_facture
 
     trade_allowance_charge = None
     trade_allowance_charge_trade_agreement = None
@@ -247,8 +227,8 @@ def _ligne_poste_facturx(
         )
 
         trade_allowance_charge_trade_agreement = copy.deepcopy(trade_allowance_charge)
-        trade_allowance_charge_trade_agreement.actual_amount.value = (
-            _float_vers_decimal_facturx(ligne.montant_remise_ht)
+        trade_allowance_charge_trade_agreement.actual_amount.value = _float_vers_decimal_facturx(
+            ligne.montant_remise_ht
         )
 
         if ligne.code_raison_reduction:
@@ -256,9 +236,7 @@ def _ligne_poste_facturx(
                 value=ligne.code_raison_reduction
             )
         if ligne.raison_reduction:
-            trade_allowance_charge.reason = module.TextType(
-                value=ligne.raison_reduction
-            )
+            trade_allowance_charge.reason = module.TextType(value=ligne.raison_reduction)
 
     ligne_unit_code = _get_facturx_quantity_units(ligne.unite)
 
@@ -267,9 +245,7 @@ def _ligne_poste_facturx(
             line_id=module.Idtype(value=str(ligne.numero))
         ),
         specified_trade_product=module.TradeProductType(
-            name=module.TextType(
-                value=(ligne.reference or "") + " " + ligne.denomination
-            )
+            name=module.TextType(value=(ligne.reference or "") + " " + ligne.denomination)
         ),
         specified_line_trade_agreement=module.LineTradeAgreementType(
             gross_price_product_trade_price=module.TradePriceType(
@@ -376,12 +352,9 @@ def _gen_facturx_profil_complexe(facture: FactureFacturX, profil: ProfilFacturX)
     )
     supply_chain_trade_transaction = module.SupplyChainTradeTransactionType(
         included_supply_chain_trade_line_item=[
-            _ligne_poste_facturx(ligne, facture, module)
-            for ligne in facture.lignes_de_poste
+            _ligne_poste_facturx(ligne, facture, module) for ligne in facture.lignes_de_poste
         ],
-        applicable_header_trade_agreement=_gen_applicable_header_trade_agreement(
-            module, facture
-        ),
+        applicable_header_trade_agreement=_gen_applicable_header_trade_agreement(module, facture),
         applicable_header_trade_delivery=module.HeaderTradeDeliveryType(),
         applicable_header_trade_settlement=module.HeaderTradeSettlementType(
             creditor_reference_id=module.Idtype(),
@@ -401,8 +374,7 @@ def _gen_facturx_profil_complexe(facture: FactureFacturX, profil: ProfilFacturX)
                 ),
             ],
             applicable_trade_tax=[
-                _ligne_tva_facturx(ligne_tva, module)
-                for ligne_tva in facture.lignes_de_tva
+                _ligne_tva_facturx(ligne_tva, module) for ligne_tva in facture.lignes_de_tva
             ],
             # billing_specified_period=module.SpecifiedPeriodType(),
             # specified_trade_allowance_charge=[module.TradeAllowanceChargeType(
@@ -419,22 +391,16 @@ def _gen_facturx_profil_complexe(facture: FactureFacturX, profil: ProfilFacturX)
                 due_date_date_time=module.DateTimeType(
                     date_time_string=module.DateTimeType.DateTimeString(
                         format="102",
-                        value=_parse_date_chorus_vers_facturx(
-                            facture.date_echeance_paiement
-                        ),
+                        value=_parse_date_chorus_vers_facturx(facture.date_echeance_paiement),
                     )
                 ),
             ),
-            invoice_currency_code=module.CurrencyCodeType(
-                value=facture.references.devise_facture
-            ),
+            invoice_currency_code=module.CurrencyCodeType(value=facture.references.devise_facture),
             # invoice_referenced_document=[factur_x_module.ReferencedDocumentType(),], # Numéro de facture antérieure ?
             # receivable_specified_trade_accounting_account=factur_x_module.TradeAccountingAccountType(),
             specified_trade_settlement_header_monetary_summation=module.TradeSettlementHeaderMonetarySummationType(
                 line_total_amount=module.AmountType(
-                    value=_float_vers_decimal_facturx(
-                        facture.montant_total.montant_ht_total
-                    )
+                    value=_float_vers_decimal_facturx(facture.montant_total.montant_ht_total)
                 ),
                 allowance_total_amount=module.AmountType(
                     value=_float_vers_decimal_facturx(
@@ -442,32 +408,22 @@ def _gen_facturx_profil_complexe(facture: FactureFacturX, profil: ProfilFacturX)
                     )
                 ),
                 tax_basis_total_amount=module.AmountType(
-                    value=_float_vers_decimal_facturx(
-                        facture.montant_total.montant_ht_total
-                    )
+                    value=_float_vers_decimal_facturx(facture.montant_total.montant_ht_total)
                 ),
                 tax_total_amount=[
                     module.AmountType(
-                        value=_float_vers_decimal_facturx(
-                            facture.montant_total.montant_tva
-                        ),
+                        value=_float_vers_decimal_facturx(facture.montant_total.montant_tva),
                         currency_id=facture.references.devise_facture,
                     ),
                 ],
                 grand_total_amount=module.AmountType(
-                    value=_float_vers_decimal_facturx(
-                        facture.montant_total.montant_ttc_total
-                    )
+                    value=_float_vers_decimal_facturx(facture.montant_total.montant_ttc_total)
                 ),
                 total_prepaid_amount=module.AmountType(
-                    value=_float_vers_decimal_facturx(
-                        (facture.montant_total.acompte or 0)
-                    )
+                    value=_float_vers_decimal_facturx((facture.montant_total.acompte or 0))
                 ),
                 due_payable_amount=module.AmountType(
-                    value=_float_vers_decimal_facturx(
-                        facture.montant_total.montant_a_payer
-                    )
+                    value=_float_vers_decimal_facturx(facture.montant_total.montant_a_payer)
                 ),
             ),
         ),
@@ -527,9 +483,7 @@ REGEX_ASSERTION_ECHOUEE_SVRL = re.compile(
 def valider_xml_facturx_schematron(xml_data: str, profil: ProfilFacturX) -> bool:
     """Valide un XML Factur-X en utilisant le Schematron approprié."""
     try:
-        ref_xslt = resources.files(profil.chemin_ressource_xslt).joinpath(
-            profil.nom_fichier_xslt
-        )
+        ref_xslt = resources.files(profil.chemin_ressource_xslt).joinpath(profil.nom_fichier_xslt)
     except (ModuleNotFoundError, FileNotFoundError) as e:
         raise FileNotFoundError(
             f"Ressource XSLT introuvable pour le profil '{profil.name}'. Erreur: {e}"
